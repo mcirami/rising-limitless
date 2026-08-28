@@ -118,7 +118,7 @@ class Company
     //Output: Array
     function getColorArray($colorStr)
     {
-        return explode(";", $colorStr);
+        return \App\Support\NetworkTheme::colors($colorStr);
     }
 
     //different functions will change loaded boolean to determine whether or not we have shit instanciated
@@ -139,7 +139,6 @@ class Company
 
 
             $this->loadCompany();
-            $this->loaded();
 
             $_SESSION["company"] = serialize($this);
         }
@@ -199,11 +198,7 @@ class Company
 
     public function getColors()
     {
-        if ($this->isLoaded()) {
-            return $this->colors;
-        }
-
-        return false;
+        return \App\Support\NetworkTheme::colors($this->colors);
     }
 
     public function getSkype()
@@ -250,6 +245,10 @@ class Company
 
 
             $company = $prep->fetch(PDO::FETCH_ASSOC);
+            if (!$company) {
+                $this->loaded = false;
+                return false;
+            }
 
             $this->uid = $company["uid"] ?? '';
 

@@ -30,5 +30,6 @@ $dotEnv->load();
 //	unset($_SESSION["company"]);
 
 // find company information
-    $company = LeadMax\TrackYourStats\System\Company::loadFromSession();
-    $company->setSession();
+    // Refresh once per request so saved settings reach existing signed-in sessions.
+    $company = new LeadMax\TrackYourStats\System\Company();
+    $company->reloadSettings();

@@ -1,40 +1,28 @@
+@php
+    $canViewRevenue = true; // Agents already see their own earnings on this report.
+    $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
+    $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
+    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'FreeSignUps' => 'Free Sign Ups', 'PendingConversions' => 'Pending Conversions', 'Conversions' => 'Conversions', 'Revenue' => 'Revenue', 'Deductions' => 'Deductions', 'EPC' => 'EPC', 'TOTAL' => 'Total'];
+@endphp
 @extends('report.template')
 
 @section('report-title')
     Click Reports
 @endsection
 
+@section('report-description', 'Track clicks, conversions, and earnings across your offers')
+@section('report-summary')
+    @include('report.partials.summary')
+@endsection
+@section('report-actions')
+    <span class="rl-report-count">{{ number_format($reportSummary['count']) }} {{ $reportSummary['count'] === 1 ? 'offer' : 'offers' }}</span>
+@endsection
 @section('table-options')
     @include('report.options.dates')
 @endsection
 
 @section('table')
-    <table class="table table-bordered table-striped table_01 tablesorter" id="mainTable">
-        <thead>
-        <tr>
-            <th class="value_span9">Offer ID</th>
-            <th class="value_span9">Offer Name</th>
-            <th class="value_span9">Raw</th>
-            <th class="value_span9">Unique</th>
-            <th class="value_span9">Free Sign Ups</th>
-            <th class="value_span9">Pending Conversions</th>
-            <th class="value_span9">Conversions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @php
-            $reporter->between($dates['startDate'], $dates['endDate'], new LeadMax\TrackYourStats\Report\Formats\HTML(true, [
-                'idoffer',
-                'offer_name',
-                'Clicks',
-                'UniqueClicks',
-                'FreeSignUps',
-                'PendingConversions',
-                'Conversions',
-            ]));
-        @endphp
-        </tbody>
-    </table>
+    @include('report.partials.performance-table', ['reportCaption' => 'Your offer performance'])
     @if($report->bonuses)
         <table class="table table-bordered table_01">
             <thead>

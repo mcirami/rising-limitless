@@ -49,15 +49,11 @@ $mid = (isset($_GET["mid"]) && $_GET["mid"] != "") ? $_GET["mid"] : "";
 	
 	
 	<title><?php echo \LeadMax\TrackYourStats\System\Company::loadFromSession()->getShortHand(); ?></title>
+<link rel="stylesheet" href="/css/network.css?v=<?= filemtime(public_path('css/network.css')) ?>">
+<script src="/js/network.js?v=<?= filemtime(public_path('js/network.js')) ?>" defer></script>
 </head>
-<body style = "background-color:#EAEEF1;">
-<div class = "top_sec value_span1">
-	<div class = "logo">
-		<a href = "<?php echo $webroot ?>"><img src = "<?=\LeadMax\TrackYourStats\System\Company::loadFromSession()->getImgDir() ?>/logo.png" alt = "TRACK YOUR STATS"
-												title = "TRACK YOUR STATS"/></a>
-	</div>
-
-</div> <!-- top_sec -->
+<body class="rl-app rl-standalone">
+<header class="rl-standalone-header"><a class="rl-brand" href="/login"><span class="rl-brand-mark">RL</span><span><?= htmlspecialchars(config('app.network_name', 'Rising Limitless'), ENT_QUOTES, 'UTF-8') ?></span></a><a class="rl-button" href="/login">Back to sign in</a></header>
 
 <style>
 	

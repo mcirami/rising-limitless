@@ -9,7 +9,6 @@ use LeadMax\TrackYourStats\Clicks\PostBackURLEventHandler;
 use LeadMax\TrackYourStats\Clicks\URLEvents\ClickRegistrationEvent;
 use LeadMax\TrackYourStats\System\Company;
 use LeadMax\TrackYourStats\System\IPBlackList;
-use LeadMax\TrackYourStats\System\Lander;
 
 class IndexController extends Controller
 {
@@ -31,20 +30,8 @@ class IndexController extends Controller
             return redirect('404');
         }
 
-        if (Company::getSub() != "chattrackpro") {
-
-            $company = Company::loadFromSession();
-
-            if ($request->getHttpHost() !== $company->landing_page && $request->getHttpHost() !== $company->login_url) {
-                if (Company::getCustomSub() == "debug") {
-                    return redirect('login');
-                }
-            }
-
-            $lander = new Lander($company);
-            $lander->loadCompanyLander();
-        }
-
+        // Tracking and postback requests above retain their existing handlers.
+        // Regular root visits use the network homepage, not the copied tenant lander.
         return view('landing-page');
     }
 

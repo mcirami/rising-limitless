@@ -1,170 +1,91 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+@php $networkName = config('app.network_name', 'Rising Limitless'); @endphp
+<!DOCTYPE html>
+<html lang="en" data-landing-theme="dark">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="no-referrer-when-downgrade">
-    <link href="css/style.css" rel="stylesheet" type="text/css"/>
-
-    <link rel="shortcut icon" type="image/ico" href="http://chattrackpto.com/resources/views/favicon.ico"/>
-
-    <title>Chat Track Pro</title>
+    <title>{{ $networkName }} — Performance Marketing Network</title>
+    <meta name="description" content="Connect your offers, affiliates, and performance reporting with {{ $networkName }}. Sign in to manage your network in one place.">
+    <meta property="og:title" content="{{ $networkName }} — Performance Marketing Network">
+    <meta property="og:description" content="Your offers, your partners, your performance. One connected network.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{{ $networkName }} — Performance Marketing Network">
+    <meta name="twitter:description" content="Your offers, your partners, your performance. One connected network.">
+    <link rel="stylesheet" href="/css/font-awesome/css/all.css">
+    <link rel="stylesheet" href="/css/network-landing.css?v={{ filemtime(public_path('css/network-landing.css')) }}">
+    <script src="/js/network-landing.js?v={{ filemtime(public_path('js/network-landing.js')) }}" defer></script>
 </head>
-<body>
-<!--header-->
-<div class="main_bg">
-    <div class="top_sec">
-        <div class="holder">
-            <div class="logo">
-                <a href="#">
-                    <img src="images/logo.png" alt="Chat Track Pro" title="Chat Track Pro"/>
-                </a>
-            </div>
-            <div class="header_right">
-                <ul>
-                    <li><a href="#about">About us</a></li>
-                    <li><a href="#content">Features</a></li>
-                    <li><a href="#contact">Contact Us</a></li>
-                </ul>
-                <a class="btn" href="/login">Login</a>
-            </div>
-            
-        </div>
+<body class="rl-landing">
+<a class="landing-skip" href="#main-content">Skip to content</a>
+<header class="landing-header">
+    <a class="landing-brand" href="/" aria-label="{{ $networkName }} home"><span class="landing-mark">RL</span>{{ $networkName }}</a>
+    <nav class="landing-nav" aria-label="Main navigation">
+        <a href="#platform">Platform</a><a href="#advertisers">Advertisers</a><a href="#affiliates">Affiliates</a><a href="#support">Support</a>
+    </nav>
+    <div class="landing-header-actions">
+        <button type="button" class="landing-icon-button" data-landing-theme-toggle aria-label="Switch to light theme" aria-pressed="true"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
+        <a class="landing-button landing-login-link" href="#sign-in">Log in</a>
+        {{--<a class="landing-button landing-primary" href="/signup.php">Apply to Join <span aria-hidden="true">↗</span></a>--}}
     </div>
-    <div class="header_sec">
-        <div class="holder">
-                <h2>Custom Tracking for Serious Marketers!</h2>
-            <br/>
-            <div class="text_wrap column">
-                <h3>Monitor productivity of all your employees and traffic in one easy place.</h3>
-                <p>Our platform offers tiered management, agent tracking, privatized domain names, and unique design services that will make us a one stop shop for your affiliate tracking and help you stand out! Get in touch today for more information!</p>
-                <a class="btn" href="skype:live:.cid.1a53fdcac7cdeced?chat">Contact Us</a>
+</header>
+<main id="main-content">
+    <section class="landing-hero" aria-labelledby="hero-heading">
+        <div class="landing-hero-copy">
+            <span class="landing-eyebrow"><span class="landing-dot"></span>Performance Marketing Network</span>
+            <h1 id="hero-heading">Every conversion<br>tracked. Every<br><em>partner connected.</em></h1>
+            <p class="landing-intro">{{ $networkName }} brings your offers, affiliates, and campaign performance together — with clear reporting, conversion tracking, and the tools to grow your network.</p>
+            <div class="landing-stats" aria-label="Platform capabilities">
+                <div><strong>CPA / CPC</strong><span>Offer types</span></div><div><strong>5</strong><span>Sub-ID variables</span></div><div><strong>S2S</strong><span>Postbacks</span></div><div><strong>GEO</strong><span>Traffic insights</span></div>
             </div>
-            <div class="column">
-                <img src="images/header_img.jpg" alt="">
-            </div>
+            <div class="landing-highlights"><span><i class="fas fa-chart-line" aria-hidden="true"></i> Campaign reporting</span><span><i class="fas fa-users" aria-hidden="true"></i> Partner management</span><span><i class="fas fa-globe" aria-hidden="true"></i> Geo rules</span></div>
         </div>
-        <div class="whiteDiagonal"></div>
-    </div>
-    
-</div>
-<!--header-->
-<!--section2-->
-<div class="section2" id="content">
-    <div class="holder">
-        <h2>Our Features</h2>
-        <h3>Here are a few features that make us stand out!</h3>
-        <p>Join one of the most comprehensive tracking platforms on earth. Designed with you in mind, we offer real time postbacks, tracking for unlimited agents/affiliates/employees, tiered and unlimited Manager and Admin accounts, Add your own custom offers or allow us to provide offers for you. Track accurately in real time, every time with Chat Track Pro! </p>
-        <div class="three_col_section">
-            <div class="sub">
-                <h2>Unlimited Agents</h2>
-            </div>
-
-            <div class="sub">
-                <h2>Unlimited Managers</h2>
-            </div>
-
-            <div class="sub">
-                <h2>Unlimited Admins</h2>
-            </div>
+        <section class="landing-signin" id="sign-in" aria-labelledby="signin-heading">
+            <h2 id="signin-heading">Welcome back</h2><p>Sign in to your {{ $networkName }} account</p>
+           {{-- <div class="landing-account-note"><i class="fas fa-shield-alt" aria-hidden="true"></i> One sign-in for your network account</div>--}}
+            <form method="post" action="/login">
+                @csrf
+                <label for="landing-username">Username or email</label>
+                <input id="landing-username" name="txt_uname_email" type="text" autocomplete="username" placeholder="your_username" required>
+                <label for="landing-password">Password</label>
+                <div class="landing-password"><input id="landing-password" name="txt_password" type="password" autocomplete="current-password" placeholder="Your password" required><button type="button" data-password-toggle aria-label="Show password" aria-controls="landing-password" aria-pressed="false"><i class="far fa-eye" aria-hidden="true"></i></button></div>
+                <div class="landing-form-meta"><span><i class="fas fa-lock" aria-hidden="true"></i> Access based on your account</span><a href="/aff_help.php">Forgot password?</a></div>
+                <button type="submit" name="button" value="login" class="landing-button landing-primary landing-submit">Sign in <span aria-hidden="true">→</span></button>
+            </form>
+        </section>
+    </section>
+    <div class="landing-network-strip" aria-label="Network tools"><span class="landing-strip-label"><span class="landing-dot"></span>Your Network</span><span>Offers <strong>CPA &amp; CPC</strong></span><span>Tracking <strong>Sub-IDs</strong></span><span>Reporting <strong>By country</strong></span><span>Access <strong>By role</strong></span><span>Integrations <strong>Postbacks</strong></span></div>
+    <div class="landing-trust"><span><i class="fas fa-user-shield" aria-hidden="true"></i> Role-based access</span><span><i class="fas fa-globe" aria-hidden="true"></i> Geo targeting rules</span><span><i class="fas fa-chart-bar" aria-hidden="true"></i> Detailed reporting</span><span><i class="fas fa-link" aria-hidden="true"></i> Conversion postbacks</span><span><i class="fas fa-filter" aria-hidden="true"></i> IP blacklist controls</span></div>
+    <section class="landing-platform landing-section" id="platform" aria-labelledby="platform-heading">
+        <div class="landing-section-heading"><span class="landing-kicker">Why {{ $networkName }}</span><h2 id="platform-heading">Built for performance<br>at every step.</h2><p>From your first tracking link to your next campaign, keep your partners and performance in one connected workspace.</p></div>
+        <div class="landing-feature-grid">
+            @foreach([
+                ['fa-chart-line', 'Campaign Reporting', 'Explore clicks, conversions, and revenue. Filter by date, offer, affiliate, or country to understand what is working.', 'A clearer view of performance'],
+                ['fa-globe', 'Geo Targeting', 'Manage country and device rules for your offers and review the locations your traffic comes from.', 'Traffic that fits your offers'],
+                ['fa-wallet', 'Payout Visibility', 'Review offer payouts and conversion totals with reporting that reflects your account permissions.', 'Know your numbers'],
+                ['fa-shield-alt', 'Traffic Controls', 'Use IP blacklists, sub-ID controls, and offer access rules to help manage the traffic entering your network.', 'More control over your traffic'],
+                ['fa-users', 'Partner Management', 'Organize agents and managers, assign offers, and give every account access to the tools it needs.', 'Your team, connected'],
+                ['fa-code', 'Tracking & Postbacks', 'Connect conversion events to your offers with tracking links, five sub-ID variables, and server-to-server postbacks.', 'Built for your workflow']
+            ] as [$icon, $title, $description, $note])
+                <article class="landing-feature"><span class="landing-feature-icon"><i class="fas {{ $icon }}" aria-hidden="true"></i></span><h3>{{ $title }}</h3><p>{{ $description }}</p><span class="landing-feature-note">{{ $note }} <span aria-hidden="true">↗</span></span></article>
+            @endforeach
         </div>
-        <div class="three_col_section">
-            <div class="sub">
-                <h2>Private Offers</h2>
-            </div>
-
-            <div class="sub">
-                <h2>Public Offers</h2>
-            </div>
-
-            <div class="sub">
-                <h2>Requestable Offers</h2>
-            </div>
-        </div>
-        <div class="three_col_section">
-            <div class="sub">
-                <h2>Real Time Stats</h2>
-            </div>
-
-            <div class="sub">
-                <h2>Unique Domains</h2>
-            </div>
-
-            <div class="sub">
-                <h2>Postback URL</h2>
-            </div>
-        </div>
-
-    </div>
-</div>
-<!--section2-->
-<!--section3-->
-
-<!--section3-->
-<!--section4-->
-<div class="section4">
-    <div class="dark_slant"></div>
-    <div class="top_section">
-        <div class="holder">
-            <div class="column">
-                <img src="images/dark-section-image.png" alt="">
-            </div>
-            <div class="column" id="about">
-                <h2>Straight from the Pros!</h2>
-                <h3>Get the best when you</br>work with the best!</h3>
-                <p>After decades of experience, we feel like we were able to truly design a software that will fit all of your tracking needs. Whether you are managing a small group or several offices in a large firm, we've got you covered. The ability to provide custom designs, offers, and permissions to control a tiered Userbase and track everything in real time gives us a competitive edge over many other softwares. Contact Us today to find out why Chat Track Pro manages to remain one of the best affiliate stats tracking software on the internet!</p>
-            </div>
-        </div>
-    </div>
-    <div class="bottom_section">
-        <div class="holder">
-            <h2>Chat Track Pro</h2>
-            <h3>Tiered User Setup Explained</h3>
-            <div class="three_col_section">
-                <div class="column">
-                    <img src="images/img_networkowner.png" alt="">
-                    <h4>Admins</h4>
-                    <p>A Admin is a User who has full access to all other Users in their network, whether those Users are Managers or Agents. Admins can track all traffic generated inside their network as well by any Agent of any Manager. Track it all in one place!</p>
-                </div>
-
-                <div class="column">
-                    <img src="images/img_merchant.png" alt="">
-                    <h4>Managers</h4>
-                    <p>Managers can create an unlimited amount of Agent accounts for anyone they want to send traffic. Every Manager can see all traffic and monies earned from their agents but not any information of any other Manager or their Agents under an Admin.</p>
-                </div>
-
-                <div class="column">
-                    <img src="images/img_affiliate.png" alt="">
-                    <h4>Agents</h4>
-                    <p>An Agent is the only type of User that will have an offer link to promote and generate sales using their unique marketing methods. Each agent will be able to track all clicks and sales to any offers they promote real time inside their account.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!--section4-->
-<div class="section5">
-    <div class="holder" id="contact">
-        <p>Interested in Your Own Network?</p>
-        <h2>Get in Touch!</h2>
-        <p>We'll walk you through each stage of the process to make sure you have the tools you need to be successful.</p>
-        <a class="btn" href="skype:live:.cid.1a53fdcac7cdeced?chat">Contact Us</a>
-    </div>
-</div>
-<footer>
-    <div class="holder">
-        <h2>ChatTrackPro</h2>
-        <ul>
-            <li><a href="#about">About Us</a></li>
-            <li><a href="#content">Features</a></li>
-            <li><a href="#contact">Contact Us</a></li>
-        </ul>
-        <span class="footer_txt">&copy; ChatTrackPro</span>
-    </div>
+    </section>
+    {{--<section class="landing-audiences landing-section" aria-label="Who the network is for">
+        <article id="advertisers"><span class="landing-kicker">For Advertisers</span><h2>Your offers.<br>A connected network.</h2><p>Bring your campaigns to a network built around offer management, controlled access, and clear performance reporting.</p><a class="landing-button" href="/signup.php">Join the network <span aria-hidden="true">↗</span></a></article>
+        <article id="affiliates"><span class="landing-kicker">For Affiliates</span><h2>Your traffic.<br>A clearer picture.</h2><p>Find the offers available to you, create tracking links, and follow your conversions from one place.</p><a class="landing-button landing-primary" href="/signup.php">Apply as a partner <span aria-hidden="true">↗</span></a></article>
+    </section>--}}
+    <section class="landing-support landing-section" id="support"><div><span class="landing-kicker">Already a partner?</span><h2>Let's keep you moving.</h2><p>Sign in to access your network. Need help getting back in? Reset your password or contact your network manager.</p></div><div><a class="landing-button landing-primary" href="#sign-in">Sign in <span aria-hidden="true">→</span></a><a class="landing-support-link" href="/aff_help.php">Reset your password</a></div></section>
+</main>
+<footer class="landing-footer">
+    <a class="landing-brand" href="/">
+        <span class="landing-mark">RL</span>{{ $networkName }}
+    </a>
+    <span>© {{ date('Y') }} {{ $networkName }}. All rights reserved.</span>
+    {{--<nav aria-label="Footer navigation">
+        <a href="#platform">Platform</a><a href="/signup.php">Apply to join</a>
+        <a href="#support">Support</a></nav>--}}
 </footer>
-
-<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-
 </body>
 </html>

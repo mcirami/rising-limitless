@@ -1,47 +1,47 @@
 @extends('layouts.master')
-
-
 @section('content')
-
-    <div class = "right_panel member_home">
-
-        <div class = "white_box_outer">
-            <div class = "heading_holder">
-                <span class = "lft value_span9">My Account</span>
+@php
+    $profile = \LeadMax\TrackYourStats\System\Session::userData();
+    $fullName = trim(($profile->first_name ?? '') . ' ' . ($profile->last_name ?? '')) ?: $profile->user_name;
+    $roleLabel = [0 => 'Network Admin', 1 => 'Administrator', 2 => 'Manager', 3 => 'Agent'][(int) $userType] ?? 'Member';
+    $editUrl = $webroot . 'aff_update.php?idrep=' . $userId;
+@endphp
+<div class="right_panel">
+    <div class="rl-page-heading"><div><h1>My Account</h1><p>Manage your profile, credentials, and network links</p></div></div>
+    <div class="rl-account">
+        <section class="rl-card rl-profile-hero" aria-label="Account overview">
+            <span class="rl-avatar rl-avatar-large">{{ mb_strtoupper(mb_substr($fullName, 0, 1)) }}</span>
+            <div><h2>{{ $fullName }}</h2><div class="rl-profile-meta"><span>{{ $email }}</span><span class="rl-badge">{{ $roleLabel }}</span></div></div>
+            <div class="rl-profile-id"><strong>#{{ $userId }}</strong><small>Account ID</small></div>
+        </section>
+        <div class="rl-account-layout">
+            <section class="rl-card rl-account-details">
+                <header class="rl-card-header"><h2><i class="far fa-user" aria-hidden="true"></i>Profile Details</h2><a href="{{ $editUrl }}"><i class="far fa-edit" aria-hidden="true"></i> Edit</a></header>
+                <dl class="rl-profile-details">
+                    @foreach(['Full Name' => $fullName, 'Username' => $profile->user_name, 'Email' => $email, 'Phone' => $profile->cell_phone ?? '', 'Skype ID' => $profile->skype ?? ''] as $label => $value)
+                        <div><dt>{{ $label }}</dt><dd>@if(trim((string) $value) !== ''){{ $value }}@else<span class="rl-empty-value">Not set</span>@endif</dd></div>
+                    @endforeach
+                </dl>
+            </section>
+            <div class="rl-account-support">
+                <div class="rl-account-grid">
+                    <section class="rl-card">
+                        <header class="rl-card-header"><h2><i class="fas fa-lock" aria-hidden="true"></i>Security</h2></header>
+                        <div class="rl-card-body"><div class="rl-security-row"><div><p>Password</p><strong aria-label="Password is hidden">••••••••••</strong></div><a class="rl-button" href="{{ $editUrl }}">Change</a></div><p class="rl-note">Keep your account secure with a strong, unique password.</p></div>
+                    </section>
+                    <section class="rl-card">
+                        <header class="rl-card-header"><h2><i class="fas fa-id-card" aria-hidden="true"></i>Network Access</h2></header>
+                        <div class="rl-card-body"><span class="rl-badge">{{ $roleLabel }}</span><p class="rl-note">Your navigation and available actions reflect your assigned account permissions.</p><a class="rl-button" style="margin-top:14px" href="/logout">Sign out</a></div>
+                    </section>
+                </div>
+                @if($canViewPostback)
+                    <section class="rl-card"><header class="rl-card-header"><h2><i class="fas fa-link" aria-hidden="true"></i>Postback URL</h2></header><div class="rl-card-body"><div class="rl-link-box"><code>{{ $postBackURL }}</code><button class="rl-button" type="button" data-copy-text="{{ $postBackURL }}">Copy link</button></div><p class="rl-note">Use your network postback URL to report conversions.</p></div></section>
+                @endif
+                @if((int) $userType === 2)
+                    <section class="rl-card"><header class="rl-card-header"><h2><i class="fas fa-user-plus" aria-hidden="true"></i>Your Signup Link</h2></header><div class="rl-card-body"><div class="rl-link-box"><code>{{ $domain . $userId }}</code><button class="rl-button" type="button" data-copy-text="{{ $domain . $userId }}">Copy link</button></div></div></section>
+                @endif
             </div>
-            <div class = "clear"></div>
-            <div class = "white_box value_span8">
-
-                <div class = "com_acc">
-                    <p><span class = "lft value_span9">Name</span><span class = "rt value_span10">{{$firstName}}</span></p>
-                    <p><span class = "lft value_span9">E-mail:</span><span class = "rt "><a href = "mailto:{{$email}}">{{$email}}</a></span></p>
-                    <p><span class = "lft value_span9">Password</span><span class = "rt value_span10"><a href = "{{$webroot . "aff_update.php?idrep=" . $userId}}">Change Password</a></span></p>
-
-                    @if ($canViewPostback)
-                        <p><span class = "lft value_span9">PostBack URL:</span>
-                        <p>
-                            <span id = "pb1" class = "rt blue_txt\">{{$postBackURL}}</span>
-                            <button onclick = "copyToClipboard(getElementById('pb1'));" class = 'copy_text value_span6 value_span5'>Click To Copy Link</button>
-                        </p>
-                    @endif
-
-                    @if ($userType == 2)
-                        <p><span class = "lft value_span9">Your Signup Link:</span>
-                        <p>
-                            <span id = "pb1" class = "rt blue_txt\">{{ $domain . $userId}}</span>
-                            <button onclick = "copyToClipboard(getElementById('pb1'));" class = 'copy_text value_span6 value_span5'>Click To Copy Link</button>
-                        </p>
-                    @endif
-
-
-                    <div class = "com_acc">
-                        <a class = "btn btn-default value_span11 value_span2 value_span4" href = "aff_update.php?idrep={{$userId}}">Edit my account</a>
-                    </div>
-                </div><!-- com_acc -->
-            </div><!-- white_box -->
-        </div><!-- white_box_outer -->
+        </div>
     </div>
-    <!--right_panel-->
-
-
+</div>
 @endsection

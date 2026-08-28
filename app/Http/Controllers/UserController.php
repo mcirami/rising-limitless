@@ -61,7 +61,12 @@ class UserController extends Controller
         $users = $users->get();
 		$users = $this->getDiffForHumans($users);
 
-		//dd($users);
+        if ((int) $userType === Privilege::ROLE_MANAGER) {
+            $directorySummary = \App\Support\UserDirectorySummary::forUsers(
+                User::myUsers(), Carbon::now()->startOfMonth()->toDateTimeString()
+            );
+            return view('user.manager-directory', compact('users', 'directorySummary'));
+        }
         return view('user.manage', compact('users'));
     }
 
@@ -291,6 +296,7 @@ class UserController extends Controller
 	private function getDiffForHumans($users) {
 
 		foreach($users as $key => $user) {
+			$user->directory_joined_at = $user->rep_timestamp;
 			if($user->rep_timestamp) {
 				$user->rep_timestamp = Carbon::parse($user->rep_timestamp)->diffForHumans();
 			}

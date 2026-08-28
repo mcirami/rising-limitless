@@ -205,6 +205,30 @@ class NavBar
     }
 
 
+    /** Share the same permission checks with the Blade and legacy sidebar. */
+    public function getVisibleMenu()
+    {
+        $sections = [];
+        foreach ($this->menu as $name => $section) {
+            if (!$this->checkUserType($section) || !$this->checkPermissions($section) || !$this->checkPossiblePermissions($section)) {
+                continue;
+            }
+            $items = [];
+            foreach ($section as $label => $item) {
+                if (!is_array($item) || !isset($item['url'])) {
+                    continue;
+                }
+                if ($this->checkUserType($item) && $this->checkPermissions($item) && $this->checkPossiblePermissions($item)) {
+                    $items[] = ['label' => $label, 'url' => $item['url'], 'active' => $item['url'] === $this->currentPage];
+                }
+            }
+            if ($items) {
+                $sections[] = ['label' => $name, 'icon' => $section['css'], 'items' => $items];
+            }
+        }
+        return $sections;
+    }
+
     public function printNav($mobile = false)
     {
 
