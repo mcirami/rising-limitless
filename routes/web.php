@@ -190,7 +190,15 @@ Route::group(['middleware' => 'legacy.auth'], function () {
 });
 
 Route::get('/css/company.css', function () {
-    header('Content-Type: text/css');
+    ob_start();
     include resource_path('styles/company.php');
-    exit;
+    return response(ob_get_clean(), 200, ['Content-Type' => 'text/css', 'Cache-Control' => 'no-store']);
+});
+
+// Legacy URLs now use Laravel authentication, authorization, CSRF and validation.
+Route::middleware(['legacy.auth', 'role:0'])->group(function () {
+    Route::get('/settings.php', [\App\Http\Controllers\NetworkSettingsController::class, 'show']);
+    Route::post('/settings.php', [\App\Http\Controllers\NetworkSettingsController::class, 'save']);
+    Route::post('/upload_logo.php', [\App\Http\Controllers\NetworkSettingsController::class, 'upload'])->defaults('kind', 'logo');
+    Route::post('/upload_favicon.php', [\App\Http\Controllers\NetworkSettingsController::class, 'upload'])->defaults('kind', 'favicon');
 });

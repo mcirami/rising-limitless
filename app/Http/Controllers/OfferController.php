@@ -86,6 +86,7 @@ class OfferController extends Controller
 		}
 
 		$data = array_merge(compact('offers'), $data);
+		$data['offerCountries'] = \App\Support\OfferCountryBadges::forOffers($offers->concat($data['requestableOffers'] ?? []));
 		return view('offer.manage', $data)->with(['data' => $data]);
 	}
 

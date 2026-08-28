@@ -1,62 +1,25 @@
-{{--@php--}}
-    {{--$aTimeZones = array(--}}
-        {{--'America/New_York' => "Eastern",--}}
-        {{--'America/Chicago' => 'Central',--}}
-        {{--'America/Denver' => 'Mountain',--}}
-        {{--'America/Phoenix' => 'Mountain no DST',--}}
-        {{--'America/Los_Angeles' => 'Pacific',--}}
-        {{--'America/Anchorage' => 'Alaska',--}}
-        {{--'America/Adak' => 'Hawaii',--}}
-        {{--'Pacific/Honolulu' => 'Hawaii no DST',--}}
-    {{--);--}}
-{{--@endphp--}}
-
-
-{{--<b style='margin-left:2px; '>Timezone: </b>--}}
-{{--<select class="selectBox" id="timezone" name="timezone"--}}
-        {{--onchange='refreshDates();'>--}}
-    {{--@foreach($aTimeZones as $zone => $shortHand)--}}
-        {{--@if(request()->query('timezone', 'America/Los_Angeles') == $zone)--}}
-            {{--<option selected value="{{$zone}}">{{$shortHand}}</option>--}}
-        {{--@else--}}
-            {{--<option value="{{$zone}}">{{$shortHand}}</option>--}}
-        {{--@endif--}}
-    {{--@endforeach--}}
-{{--</select>--}}
-
-
-<script type='text/javascript'>var dateSelect = {{request()->query('dateSelect', 0)}};</script>
-
-<script src='/js/tables.js'></script>
-
-
-<select style='width:170px;' onchange="handleDateSelect(this);" class="selectBox" id="preDefined" name="preDefined">";
-
-    <option {{request()->query('dateSelect') == 0 ? 'selected' : ''}} value='0'>Today</option>
-    <option {{request()->query('dateSelect') == 1 ? 'selected' : ''}}  value='1'>Yesterday</option>
-    <option {{request()->query('dateSelect') == 2 ? 'selected' : ''}} value='2'>Week to Date</option>
-    <option {{request()->query('dateSelect') == 3 ? 'selected' : ''}} value='3'>Month to Date</option>
-    <option {{request()->query('dateSelect') == 4 ? 'selected' : ''}} value='4'>Year to Date</option>
-    <option {{request()->query('dateSelect') == 5 ? 'selected' : ''}} value='5'>Last Week</option>
-    <option {{request()->query('dateSelect') == 6 ? 'selected' : ''}} value='6'>Last Month</option>
-    <option {{request()->query('dateSelect') == 7 ? 'selected' : ''}} value='7'>Custom</option>
+@php
+    $selectedReportRange = (int) request()->query('dateSelect', 0);
+    $reportFrom = $dates['originalStart'] ?? request()->query('d_from', \Carbon\Carbon::today('America/New_York')->format('Y-m-d'));
+    $reportTo = $dates['originalEnd'] ?? request()->query('d_to', \Carbon\Carbon::today('America/New_York')->format('Y-m-d'));
+@endphp
+<script>var dateSelect = {{ $selectedReportRange }};</script>
+<select onchange="handleDateSelect(this);" class="selectBox" id="preDefined" name="preDefined" aria-label="Report date range">
+    @foreach([0 => 'Today', 1 => 'Yesterday', 2 => 'Week to Date', 3 => 'Month to Date', 4 => 'Year to Date', 5 => 'Last Week', 6 => 'Last Month', 7 => 'Custom Range'] as $value => $label)
+        <option value="{{ $value }}" @selected($selectedReportRange === $value)>{{ $label }}</option>
+    @endforeach
 </select>
-
-
-<label for='d_from'>From:</label>
-<input style='width:100px;' onchange='setCustom();' type="text" id="d_from"
-       name="d_from"
-       value='{{request()->query("d_from", \Carbon\Carbon::today('America/New_York')->format('Y-m-d'))}}'>
-
-<label for='d_to'>To:</label>
-<input style='width:100px;' onchange='setCustom();' type="text" id="d_to" name="d_to"
-       value='{{request()->query('d_to', \Carbon\Carbon::today('America/New_York')->format('Y-m-d'))}}'>
-
+<span class="rl-report-date">
+    <label for="d_from">From:</label>
+    <input onchange="setCustom();" type="text" id="d_from" name="d_from" value="{{ $reportFrom }}" autocomplete="off" placeholder="YYYY-MM-DD" aria-label="Report start date" required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}">
+</span>
+<span class="rl-report-date">
+    <label for="d_to">To:</label>
+    <input onchange="setCustom();" type="text" id="d_to" name="d_to" value="{{ $reportTo }}" autocomplete="off" placeholder="YYYY-MM-DD" aria-label="Report end date" required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}">
+</span>
 <div class="button_wrap">
-    <button id='searchBtn' class=" btn btn-default btn-sm"
-            onclick="window.location = '/{{request()->path() . "?" . http_build_query(request()->except(['d_from','d_to','dateSelect']))}}' +  processDates()  ">
-        Search
-    </button>
+    <button type="button" id="searchBtn" class="rl-button rl-primary" onclick="searchReportDates()"><i class="fas fa-search" aria-hidden="true"></i> Search</button>
 </div>
-
-
+@once
+<script src="{{ $webroot }}js/network-report-dates.js?v={{ filemtime(public_path('js/network-report-dates.js')) }}" defer></script>
+@endonce

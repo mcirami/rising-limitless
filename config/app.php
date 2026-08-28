@@ -2,6 +2,8 @@
 
 return [
 
+    'network_name' => env('NETWORK_NAME', 'Rising Limitless'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

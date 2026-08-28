@@ -71,7 +71,7 @@ class Company extends Model
 
     public function colors(): array
     {
-        return explode(';', $this->colors);
+        return \App\Support\NetworkTheme::colors($this->colors);
     }
 
 }

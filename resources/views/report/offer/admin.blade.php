@@ -1,79 +1,33 @@
 @php
     use App\Privilege;
-	use LeadMax\TrackYourStats\System\Session;
-	$userType = Session::userType();
+    use LeadMax\TrackYourStats\System\Session;
+    $userType = (int) Session::userType();
+    $canViewRevenue = $userType === Privilege::ROLE_GOD || ($userType === Privilege::ROLE_ADMIN && Session::permissions()->can('view_payouts'));
+    $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
+    $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
+    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'FreeSignUps' => 'Free Sign Ups', 'PendingConversions' => 'Pending Conversions', 'Conversions' => 'Conversions'];
+    if ($canViewRevenue) $reportColumns += ['Revenue' => 'Revenue', 'Deductions' => 'Deductions', 'EPC' => 'EPC'];
 @endphp
-
 @extends('report.template')
-
-@section('report-title')
-    Offer Reports
+@section('report-title', 'Offer Reports')
+@section('report-description', $canViewRevenue ? 'Track clicks, conversions, and revenue across your offers' : 'Track clicks and conversions across your offers')
+@section('report-summary')
+    @include('report.partials.summary')
 @endsection
-
 @section('table-options')
     @include('report.options.dates')
-    @if ($userType == 0 || $userType == 1)
-        <div class="button_wrap" style="width: 100%; display:inline-block; margin-top: 10px;">
-            <a style="
-			width: 170px;
-			border:none;
-			padding: 10px;
-			font-size: 18px;
-			border-radius: 6px;
-			color: #676767;"
-               class="btn btn-default btn-sm" href="/report/offer-data/export?d_from={{$startDate}}&d_to={{$endDate}}&dateSelect={{$dateSelect}}">
-                Export Data
-            </a>
-        </div>
-    @endif
 @endsection
-
+@section('report-actions')
+    @if($userType === Privilege::ROLE_GOD || $userType === Privilege::ROLE_ADMIN)
+        <a class="rl-button rl-report-export" href="/report/offer-data/export?{{ http_build_query(array_merge(request()->only(['adminLogin']), ['d_from' => $startDate, 'd_to' => $endDate, 'dateSelect' => $dateSelect])) }}"><i class="fas fa-download" aria-hidden="true"></i> Export Data</a>
+    @endif
+    <span class="rl-report-count">{{ number_format($reportSummary['count']) }} {{ $reportSummary['count'] === 1 ? 'offer' : 'offers' }}</span>
+@endsection
 @section('table')
-    <table class="table table-bordered table_01 tablesorter" id="mainTable">
-        <thead>
-
-        <tr>
-            <th class="value_span9">Offer ID</th>
-            <th class="value_span9">Offer Name</th>
-            <th class="value_span9">Raw</th>
-            <th class="value_span9">Unique</th>
-            <th class="value_span9">Free Sign Ups</th>
-            <th class="value_span9">Pending Conversion</th>
-            <th class="value_span9">Conversion</th>
-            @if (Session::userType() == Privilege::ROLE_GOD ||
-                (Session::userType() == Privilege::ROLE_ADMIN && Session::permissions()->can("view_payouts") ))
-                <th class="value_span9">Revenue</th>
-                <th class="value_span9">Deductions</th>
-                <th class="value_span9">EPC</th>
-            @endif
-        </tr>
-        </thead>
-        <tbody>
-        @php
-            if (Session::userType() == Privilege::ROLE_GOD ||
-            (Session::userType() == Privilege::ROLE_ADMIN && Session::permissions()->can("view_payouts") )
-            ) {
-				$array = ['idoffer', 'offer_name', 'Clicks', 'UniqueClicks', 'FreeSignUps', 'PendingConversions', 'Conversions', 'Revenue', 'Deductions', 'EPC'];
-			} else {
-				$array = ['idoffer', 'offer_name', 'Clicks', 'UniqueClicks', 'FreeSignUps', 'PendingConversions', 'Conversions'];
-			}
-
-			$reporter->between($dates['startDate'], $dates['endDate'],
-			new LeadMax\TrackYourStats\Report\Formats\HTML(true,
-			$array,$dates));
-        @endphp
-
-        </tbody>
-    </table>
+    @include('report.partials.performance-table', ['reportCaption' => 'Offer performance'])
 @endsection
 @section('footer')
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("#mainTable").tablesorter(
-                {
-                    sortList: [[6, 1]],
-                    widgets: ['staticRow']
-                });
-        });
+    <script>
+        $(function () { $('#mainTable').tablesorter({sortList: [[6, 1]], widgets: ['staticRow']}); });
     </script>
 @endsection

@@ -1,88 +1,32 @@
-<?php
-$webroot = getWebRoot();
-?>
-
-        <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" type="image/ico" href="<?= \LeadMax\TrackYourStats\System\Company::loadFromSession()->getImgDir() ?>/favicon.ico"/>
-    <link rel="stylesheet" type="text/css" href="<?php echo $webroot; ?>css/default.css"/>
-    <link rel="stylesheet" href="<?php echo $webroot; ?>css/company.css">
-    <link href="<?php echo $webroot; ?>css/responsive_table.css" rel="stylesheet" type="text/css"/>
-    <link href="<?php echo $webroot; ?>css/drawer.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?php echo $webroot; ?>css/magic.min.css">
-    <script type="text/javascript" src="<?php echo $webroot; ?>js/jquery_2.1.3_jquery.min.js"></script>
-    <script type="text/javascript" src="<?php echo $webroot; ?>js/jscolor.min.js"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="<?php echo $webroot; ?>js/main.js"></script>
-    <title><?php echo \LeadMax\TrackYourStats\System\Company::loadFromSession()->getShortHand(); ?></title>
-    <style>
-        .white_box { box-sizing: border-box; margin-top: 40px; }
-        .white_box_outer { float:none; margin:0 auto; max-width:400px; box-sizing:border-box; }
-        @media screen and (max-width: 768px) { .white_box_outer { max-width:none; float:left; width:100%; } }
-        .left_con01 { width:auto; padding:10px 10px 5px 17px; float:none; }
-        .heading_holder { margin:0 0 10px 0; }
-    </style>
+    <title>Sign in · {{ config('app.network_name', 'Rising Limitless') }}</title>
+    <link rel="stylesheet" href="{{ $webroot }}css/font-awesome/css/all.css">
+    <link rel="stylesheet" href="{{ $webroot }}css/network.css?v={{ filemtime(public_path('css/network.css')) }}">
+    <script src="{{ $webroot }}js/network.js?v={{ filemtime(public_path('js/network.js')) }}" defer></script>
 </head>
-<body style="background-color:#EAEEF1;">
-<div class="top_sec value_span1">
-    <div class="logo">
-        <a href="<?php echo $webroot ?>"><img src="<?= \LeadMax\TrackYourStats\System\Company::loadFromSession()->getImgDir() ?>/logo.png" alt="<?php echo \LeadMax\TrackYourStats\System\Company::loadFromSession()->getShortHand(); ?>" title="<?php echo \LeadMax\TrackYourStats\System\Company::loadFromSession()->getShortHand(); ?>"/></a>
-    </div>
-</div>
-<div class="white_box_outer">
-    <div class="clear"></div>
-    <div class="white_box value_span8">
-        <div class="com_acc">
-            <form method="post" class="login_form">
-				<?php echo csrf_field(); ?>
-                @if(request()->has('redirectUri'))
-                    <input type="hidden" name="redirectUri" value="{{ request('redirectUri') }}" />
-                @endif
-                <div class="left_con01">
-                    <div class="heading_holder">
-                        <span class="lft value_span9">{{ env('LOGIN_PAGE_TEXT') }}</span>
-                    </div>
-                    <br/>
-                    @if(isset($error))
-                        <div class="alert alert-danger" style=" padding-bottom:5px;">
-                            <i class="glyphicon glyphicon-warning-sign"></i> &nbsp;<span style="color:red;">{{ $error }}</span>
-                        </div>
-                    @endif
-                    <p>
-                        <input type="text" name="txt_uname_email" placeholder="Enter Username" value="{{ $user->autoFillEmail }}" required/>
-                    </p>
-                    <p>
-                        <input type="password" name="txt_password" placeholder="Enter Password" required/>
-                    </p>
-                    <p>
-                        <a class="small_txt value_span10" style="font-size:14px;float:left;" href="aff_help.php">{{ env('FORGOT_PASS_LINK_TEXT') }}</a>
-                    </p>
-                    <span class="btn_yellow btn_wrap">
-                        <input type="submit" name="button" class="value_span5-1 value_span2 value_span4" value="{{ env('LOGIN_PAGE_BUTTON_TEXT') }}"/>
-                    </span>
-                    <br/>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{{--<script type="text/javascript" src="js/dropdown.min.js"></script>
-<script type="text/javascript" src="js/jquery-ui.min.js"></script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
-<script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="js/widget-staticRow.min.js"></script>
-<script type="text/javascript" src="js/moment-timezone-with-data.js"></script>
-<script type="text/javascript" src="js/jquery-ui-timepicker-addon.js"></script>
-<script type="text/javascript" src="js/drawer.min.js" charset="utf-8"></script>
-<script type="text/javascript">
-	$(document).ready(function () {
-		$('.drawer').drawer();
-		$('[data-toggle="popover"]').popover();
-	});
-</script>--}}
+<body class="rl-auth">
+<main class="rl-login">
+    <a class="rl-brand" href="/"><span class="rl-brand-mark">RL</span>{{ config('app.network_name', 'Rising Limitless') }}</a>
+    <section class="rl-login-card">
+        <h1>Welcome back</h1>
+        <p>Sign in to your network account.</p>
+        <form method="post">
+            @csrf
+            @if(request()->has('redirectUri'))<input type="hidden" name="redirectUri" value="{{ request('redirectUri') }}">@endif
+            @if(isset($error))<div role="alert" class="rl-note" style="color:#c84242;margin:0 0 18px">{{ strip_tags($error) }}</div>@endif
+            <label for="login-username">Username or email</label>
+            <input id="login-username" type="text" name="txt_uname_email" autocomplete="username" placeholder="Enter your username" value="{{ $user->autoFillEmail }}" required autofocus>
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" name="txt_password" autocomplete="current-password" placeholder="Enter your password" required>
+            <a href="/aff_help.php">Forgot your password?</a>
+            <button class="rl-button rl-primary" type="submit" name="button" value="login">Sign in <span aria-hidden="true">→</span></button>
+        </form>
+    </section>
+    <footer class="rl-login-footer"><span>{{ config('app.network_name', 'Rising Limitless') }} · Partner network</span><button type="button" class="rl-icon-button" data-theme-toggle aria-label="Switch to dark theme" aria-pressed="false"><i class="far fa-moon" aria-hidden="true"></i></button></footer>
+</main>
 </body>
 </html>

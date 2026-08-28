@@ -1,5 +1,5 @@
 <?php
-header('Content-Type: text/css');
+
 
 //include("../../bootstrap/legacy_loader.php");
 
@@ -125,10 +125,12 @@ color: #$valueSpan9 ;
 }
 
 .value_span10 {
-color: #999999;
+color: #$valueSpan10;
 }
 
 .value_span11 {
   background: #$valueSpan11;
 }
   ";
+
+echo \App\Support\NetworkTheme::css($colors);

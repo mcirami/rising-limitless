@@ -59,6 +59,7 @@ if ($assignType == 0) {
 
                   <div class="column_wrap">
                     <div class="left_con01 value_span7">
+                        <h3>Offer Details</h3>
                         <p>
                             <label class="value_span9">Name</label>
                             <input id="offer_name" name="offer_name" type="text" value="<?= $assign->name; ?>"
@@ -174,6 +175,7 @@ if ($assignType == 0) {
                     </div><!-- left_con01 -->
 
                     <div class="right_con01 value_span7">
+                        <h3>Payout &amp; Access</h3>
                         <p>
                             <label class="value_span9">Agent Payout</label>
 
@@ -339,8 +341,10 @@ if ($assignType == 0) {
                         </p>
                     </div>
                   </div><!-- column_wrap -->
+                  <div class="button_wrap">
                   <span class="btn_yellow"> <input type="submit" name="button" class="value_span6-2 value_span2 value_span1-2"
                                                    value="Create" onclick="return selectAll();"/></span>
+                  </div>
                 </form>
             </div>
 

@@ -32,7 +32,7 @@ class AdminLogin
 $('a').each(function() {
     var href = $(this).attr('href');
 
-    if (href) {
+    if (href && href.charAt(0) !== '#') {
         href += (href.match(/\?/) ? '&' : '?') + 'adminLogin';
         $(this).attr('href', href);
     }
