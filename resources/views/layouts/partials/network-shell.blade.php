@@ -16,7 +16,7 @@
 <aside class="rl-sidebar" id="network-navigation" aria-label="Network sidebar">
     <a class="rl-brand" href="/dashboard">@if($hasBrandLogo)<img class="rl-brand-logo" src="/{{ $brandLogo }}?v={{ filemtime(public_path($brandLogo)) }}" alt="">@else<span class="rl-brand-mark">{{ mb_strtoupper(mb_substr($brandName, 0, 2)) }}</span>@endif<span>{{ $brandName }}</span></a>
     <nav class="rl-navigation" aria-label="Main navigation">
-        @foreach(['Management' => ['Users', 'Offers', 'Reports'], 'Settings' => ['Advertisers', 'Account']] as $group => $labels)
+        @foreach(['Main' => ['Dashboard'], 'Management' => ['Users', 'Offers', 'Reports', 'Announcements'], 'Settings' => ['Advertisers', 'Account']] as $group => $labels)
             @php $groupSections = array_filter($sections, fn($section) => in_array($section['label'], $labels)); @endphp
             @if(count($groupSections))
                 <p class="rl-nav-label">{{ $group }}</p>
@@ -28,20 +28,26 @@
                                 'Users' => !$isProfileEdit && (str_starts_with($currentPath, '/user/') || str_starts_with($currentPath, '/aff_')),
                                 'Offers' => str_starts_with($currentPath, '/offer/') || str_starts_with($currentPath, '/offer_'),
                                 'Reports' => str_starts_with($currentPath, '/report/'),
+                                'Announcements' => str_starts_with($currentPath, '/announcements'),
                                 'Advertisers' => str_starts_with($currentPath, '/campaign_'),
                                 'Account' => $isProfileEdit,
                                 default => false,
                             };
                         }
                     @endphp
-                    <details class="rl-nav-section {{ $selected ? 'is-active' : '' }}" @if($selected && $role !== 2) open @endif>
-                        <summary><i class="{{ $section['icon'] }}" aria-hidden="true"></i><span>{{ $section['label'] }}</span><span class="rl-chevron" aria-hidden="true">⌄</span></summary>
-                        <div class="rl-subnav">
-                            @foreach($section['items'] as $item)
-                                <a href="{{ $item['url'] }}" @if($item['active']) aria-current="page" @endif>{{ $item['label'] }}</a>
-                            @endforeach
-                        </div>
-                    </details>
+                    @if($section['label'] === 'Dashboard')
+                        @php $dashboardItem = $section['items'][0]; @endphp
+                        <a class="rl-nav-direct {{ $selected ? 'is-active' : '' }}" href="{{ $dashboardItem['url'] }}" @if($selected) aria-current="page" @endif><i class="{{ $section['icon'] }}" aria-hidden="true"></i><span>{{ $section['label'] }}</span></a>
+                    @else
+                        <details class="rl-nav-section {{ $selected ? 'is-active' : '' }}" @if($selected && $role !== 2) open @endif>
+                            <summary><i class="{{ $section['icon'] }}" aria-hidden="true"></i><span>{{ $section['label'] }}</span><span class="rl-chevron" aria-hidden="true">⌄</span></summary>
+                            <div class="rl-subnav">
+                                @foreach($section['items'] as $item)
+                                    <a href="{{ $item['url'] }}" @if($item['active']) aria-current="page" @endif>{{ $item['label'] }}</a>
+                                @endforeach
+                            </div>
+                        </details>
+                    @endif
                 @endforeach
             @endif
         @endforeach
@@ -63,6 +69,8 @@
     <div class="rl-breadcrumb">
         @if(str_starts_with($currentPath, '/report/'))
             <span>Reports</span><span aria-hidden="true">/</span><strong data-page-title>{{ $pageTitle ?? 'Report' }}</strong>
+        @elseif(in_array($role, [2, 3], true) && $currentPath === '/dashboard')
+            <span>{{ $brandName }}</span><span aria-hidden="true">›</span><strong data-page-title data-page-title-fixed>Dashboard</strong>
         @elseif($role === 2 && $currentPath === '/user/manage')
             <span>Management</span><span aria-hidden="true">/</span><strong data-page-title data-page-title-fixed>Users</strong>
         @else

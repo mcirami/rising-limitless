@@ -222,3 +222,29 @@ Verified My Account, Create User, Create Offer, Create Advertiser and Edit User 
 light/dark appearance and exercised Offer Cap and Bonus Offer reveals without
 submitting. The account view tests now verify support-column structure and link
 placement: 75 UI assertions, 42 settings assertions and 36 country assertions pass.
+
+## Announcements and traffic dashboard
+
+Manager and Agent logins now land on `/dashboard`, which lists announcements and
+today's traffic by offer. Agents see only their own traffic; managers see traffic
+for users inside their nested-set team. Unique clicks exclude raw and blacklisted
+clicks, and sales use today's conversion records. God and Admin accounts retain
+the existing My Account landing page, which is also available at `/account`.
+
+Admins and God users with the new `create_announcements` permission can open
+`/announcements` and `/announcements/create`. The management table provides
+search plus CSRF-protected edit and delete actions. Announcements support a title,
+type, body, optional attachment and pinned status. Edits retain the current file
+unless it is replaced or explicitly removed; deleting an announcement also deletes
+its stored attachment. Pinned posts sort before the remaining newest-first feed.
+Attachments are stored on Laravel's private local disk under
+`storage/app/announcements`; downloads pass through an authenticated controller
+instead of exposing storage paths. Production deployments must keep `storage/app`
+writable and persistent and run the new migration.
+
+Verification: `php scripts/verify-announcements.php` passes 23 assertions covering
+the migration, role and permission gates, scoped traffic totals, validation,
+private attachment storage and authenticated downloads. The complete UI suite now
+passes 86 assertions; settings and country-badge suites continue to pass 42 and
+36 assertions respectively. Desktop and mobile fixture checks covered both themes,
+responsive layouts, escaped announcement content and client-side traffic search.

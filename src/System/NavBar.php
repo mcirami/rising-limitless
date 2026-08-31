@@ -23,6 +23,20 @@ class NavBar
 
     public $menu = array(
 
+        "Dashboard" => [
+            "css" => "fas fa-chart-line",
+            "required_user_types" => [\App\Privilege::ROLE_MANAGER, \App\Privilege::ROLE_AFFILIATE],
+            "Overview" => ["url" => "/dashboard"],
+        ],
+
+        "Announcements" => [
+            "css" => "fas fa-bullhorn",
+            "required_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN],
+            "required_permissions" => [Permissions::CREATE_ANNOUNCEMENTS],
+            "Manage Announcements" => ["url" => "/announcements"],
+            "Create Announcement" => ["url" => "/announcements/create"],
+        ],
+
         "Users" => [
 
             "css" => "fas fa-users",
@@ -161,7 +175,7 @@ class NavBar
         "Account" => [
             "css" => "fas fa-building",
 
-            "My Account" => ['url' => '/dashboard'],
+            "My Account" => ['url' => '/account'],
 
             "Verification" => ['url' => '/verification', 'required_user_types' => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_AFFILIATE], 'required_permissions' => [Permissions::SMS_CHAT]],
 
