@@ -20,9 +20,9 @@ class AdvertiserReportController extends ReportController
         $dates = self::getDates();
         $repository = new AdvertiserRepository(\DB::getPdo());
         $reporter = new Reporter($repository);
-        $reporter->addFilter(new Total(['Clicks', 'UniqueClicks', 'PendingConversions', 'FreeSignUps', 'Conversions', 'Revenue', 'TOTAL'], ['Revenue']))
+        $reporter->addFilter(new Total(['Clicks', 'UniqueClicks', 'Conversions', 'Revenue', 'TOTAL'], ['Revenue']))
             ->addFilter(new EarningPerClick())
-            ->addFilter(new DollarSign(['Revenue', 'Deductions','TOTAL']));
+            ->addFilter(new DollarSign(['Revenue', 'EPC', 'TOTAL']));
 
         return view('report.advertiser', compact('reporter', 'dates'));
     }

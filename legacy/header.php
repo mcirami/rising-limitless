@@ -29,6 +29,7 @@ $navBar = new \LeadMax\TrackYourStats\System\NavBar(\LeadMax\TrackYourStats\Syst
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="referrer" content="no-referrer-when-downgrade">
+    <?php echo view('layouts.partials.network-theme-init')->render(); ?>
     <?php echo view('layouts.partials.network-favicon')->render(); ?>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <!--    <link href="css/bootstrap-theme.min.css" rel="stylesheet">-->

@@ -2,7 +2,7 @@
     'use strict';
     var root = document.documentElement;
     // Preference only; authentication/session storage is untouched.
-    try { if (localStorage.getItem('rl-theme') === 'dark') root.dataset.theme = 'dark'; } catch (_) {}
+    try { root.dataset.theme = localStorage.getItem('rl-theme') === 'light' ? 'light' : 'dark'; } catch (_) { root.dataset.theme = 'dark'; }
     function ready() {
         var toggle = document.querySelector('[data-theme-toggle]');
         function syncTheme() {

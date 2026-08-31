@@ -35,11 +35,8 @@ class AggregateReportRepository extends Repository
                aggregate_date,
                sum(clicks) clicks,
                sum(unique_clicks) unique_clicks,
-               sum(free_sign_ups) free_sign_ups,
-               sum(pending_conversions) pending_conversions,
                sum(conversions) conversions,
-               sum(revenue) revenue,
-               sum(deductions) deductions
+               sum(revenue) revenue
             FROM aggregate_reports  
              " . $constraint . "
             AND aggregate_date BETWEEN :startDate AND :endDate

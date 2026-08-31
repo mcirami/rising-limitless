@@ -4,7 +4,9 @@
     <!--right_panel-->
     <div class="right_panel">
         <div class="white_box_outer">
-            <div class="heading_holder value_span9"><span class="lft">Mass Assign Offers </span></div>
+            <div class="heading_holder value_span9">
+                <span class="lft">Mass Assign Offers </span>
+            </div>
             <div class="white_box value_span8">
 
                 @include('report.options.user-type')
@@ -52,11 +54,13 @@
 
                         </div><!-- right_con01 -->
                     </div><!-- column_wrap -->
-                    <span class="btn_yellow"> <input type="submit" name="button"
-                                                     class="value_span6-2 value_span2 value_span1-2"
-                                                     value="Assign Users" onclick=""/></span>
+                    <div class="button_wrap">
+                        <span class="btn_yellow">
+                            <input type="submit" name="button" class="value_span6-2 value_span2 value_span1-2" value="Assign Users" onclick=""/>
+                        </span>
+                    </div>
+                </form>
             </div>
-
 
         </div>
     </div>

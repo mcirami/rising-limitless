@@ -54,7 +54,7 @@ body.rl-app,body.rl-auth{margin:0;padding:0;background:var(--rl-bg);color:var(--
 body.rl-app .panels_wrap{float:none;width:auto;margin:0 0 0 var(--rl-width);padding:28px;position:relative;min-height:calc(100vh - 54px);overflow:visible}
 body.rl-app .right_panel,body.rl-app .right_panel.member_home{float:none;width:100%;min-width:0;margin:0;overflow:visible}
 body.rl-app .white_box_outer,body.rl-app .white_box_outer.large,body.rl-app .white_box_outer.large_table{float:none;width:100%;margin:0;max-width:none}
-body.rl-app .white_box,body.rl-app .white_box_outer .manage_aff.white_box{float:none;width:100%;max-width:100%;padding:24px;margin:0 0 24px;border:1px solid var(--rl-border);border-radius:10px;background:var(--rl-surface);box-shadow:var(--rl-shadow)}
+body.rl-app .white_box,body.rl-app .white_box_outer .manage_aff.white_box{float:none;width:100%;max-width:100%;padding:0;margin:0 0 24px;border:1px solid var(--rl-border);border-radius:10px;background:var(--rl-surface);box-shadow:var(--rl-shadow)}
 body.rl-app .white_box:after{content:'';display:table;clear:both}
 body.rl-app .white_box_outer .manage_aff.white_box,body.rl-app .white_box_x_scroll{padding:0;overflow-x:auto}
 body.rl-app .heading_holder{margin:0 0 22px;display:flex;align-items:center;flex-wrap:wrap;gap:12px}
@@ -339,7 +339,7 @@ body.rl-app button.rl-button.rl-primary:hover{background:var(--rl-button-hover,v
 /* Legacy forms: a single surface, consistent spacing and responsive columns.
    Scope to forms so report filters and read-only detail layouts keep their layout. */
 body.rl-app .white_box form :is(.left_con01,.right_con01){background:transparent;border:0;box-shadow:none;min-width:0;padding:0 16px}
-body.rl-app .white_box form .column_wrap:has(>.left_con01){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;float:none;width:100%;align-items:start}
+body.rl-app .white_box form .column_wrap:has(>.left_con01){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;float:none;width:100%;align-items:start; padding: 24px;}
 body.rl-app .white_box form .column_wrap>:is(.left_con01,.right_con01){float:none;width:auto;margin:0;padding:0}
 body.rl-app .white_box form:has(>.left_con01):has(>.right_con01){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 32px;align-items:start}
 body.rl-app .white_box form:has(>.left_con01):has(>.right_con01)>*{grid-column:1/-1;min-width:0}
@@ -403,6 +403,19 @@ body.rl-app .rl-user-tabs-bar .rl-login-as-user:hover{background:var(--rl-accent
 body.rl-app .rl-user-account-tab{padding:24px 0 0!important}
 @media(max-width:1000px){body.rl-app .rl-user-form .rl-user-form-grid{padding:22px;gap:24px}}
 @media(max-width:620px){body.rl-app .rl-user-form .rl-name-grid{grid-template-columns:1fr;gap:0}body.rl-app .rl-role-options{grid-template-columns:1fr}body.rl-app .rl-user-form .rl-user-form-actions{padding:16px 20px}body.rl-app .rl-user-tabs-bar{align-items:stretch;flex-direction:column;gap:0}body.rl-app .rl-user-tabs-bar #tabs{width:100%;overflow-x:auto}body.rl-app .rl-user-tabs-bar .rl-login-as-user{align-self:flex-end;margin:8px}}
+/* Compact create forms use the same inset body and separated action footer. */
+body.rl-app .rl-compact-form-card{max-width:760px;padding:0;overflow:hidden}
+body.rl-app .rl-compact-form{display:block!important}
+body.rl-app .rl-compact-form .rl-compact-form-body{padding:28px}
+body.rl-app .rl-compact-form .rl-user-field{max-width:560px;margin:0 0 20px}
+body.rl-app .rl-compact-form .rl-user-field:last-child{margin-bottom:0}
+body.rl-app .rl-compact-form .rl-field-label{display:block;margin:0 0 8px;color:var(--rl-text);font-size:12px;font-weight:700}
+body.rl-app .rl-compact-form .rl-user-field :is(input,select){width:100%}
+body.rl-app .rl-compact-form .rl-form-note{display:flex;align-items:flex-start;gap:10px;max-width:560px;margin:0 0 24px;padding:13px 14px;border:1px solid var(--rl-border);border-radius:7px;background:var(--rl-soft);color:var(--rl-muted);font-size:12px}
+body.rl-app .rl-compact-form .rl-form-note i{margin-top:3px;color:var(--rl-brand-accent,var(--rl-accent))}
+body.rl-app .rl-compact-form .rl-form-note strong{color:var(--rl-text)}
+body.rl-app .rl-compact-form .rl-compact-form-actions{margin:0;padding:18px 28px}
+@media(max-width:620px){body.rl-app .rl-compact-form .rl-compact-form-body{padding:20px}body.rl-app .rl-compact-form .rl-compact-form-actions{padding:16px 20px}}
 /* Announcements and manager/agent dashboard. */
 .rl-inline-breadcrumb{display:flex;align-items:center;gap:9px;margin:0 0 22px;color:var(--rl-muted);font-size:12px}
 .rl-inline-breadcrumb a{color:var(--rl-muted)}
