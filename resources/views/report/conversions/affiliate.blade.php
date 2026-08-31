@@ -1,5 +1,9 @@
 @extends('report.template')
 
+@php
+    $canViewPayouts = \App\Support\PayoutVisibility::forCurrentUser();
+@endphp
+
 @section('report-title')
     {{$user->user_name}}'s Clicks
 @endsection
@@ -45,7 +49,7 @@
 				@endif
 				<th class="value_span9">Offer Name</th>
 				<th class="value_span9">Conversion Timestamp</th>
-				<th class="value_span9">Paid</th>
+				@if($canViewPayouts)<th class="value_span9">Paid</th>@endif
 				<th class="value_span9">Sub 1</th>
 				<th class="value_span9">Sub 2</th>
 				<th class="value_span9">Sub 3</th>
@@ -69,7 +73,7 @@
 					@endif
 					<td>{{$row->offer_name}}</td>
 					<td>{{$convertionTimeStamp}}</td>
-					<td>{{$row->paid}}</td>
+					@if($canViewPayouts)<td>{{$row->paid}}</td>@endif
 					<td>{{$row->sub1}}</td>
 					<td>{{$row->sub2}}</td>
 					<td>{{$row->sub3}}</td>

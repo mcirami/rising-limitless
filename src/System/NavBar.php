@@ -83,11 +83,6 @@ class NavBar
             ],
 
 
-            "Global PostBack" => [
-                'url' => '/global_postback.php',
-                'required_user_types' => [\App\Privilege::ROLE_AFFILIATE],
-            ],
-
             'Multi-Assign Offers' => [
                 'url' => '/offer/mass-assign',
                 'required_permissions' => ['create_offers'],

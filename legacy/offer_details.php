@@ -62,12 +62,14 @@ if (isset($_GET['idoffer']))
 			
 			</div>
 			<div class = "right_con01">
+				<?php if (\App\Support\PayoutVisibility::forCurrentUser()) { ?>
 				<p>
 					<label class = "value_span9">Payout</label>
 					
 					<input type = "text" disabled class = "form-control" name = "payout" maxlength = "12"
 						   value = "<?php echo $rows->payout; ?>" id = "payout"/>
 					<span class = "small_txt value_span10">The Amount paid to affiliates per conversion</span></p>
+				<?php } ?>
 				
 				<?php
 				

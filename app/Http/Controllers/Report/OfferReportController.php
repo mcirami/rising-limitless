@@ -81,7 +81,9 @@ class OfferReportController extends ReportController
 		$this->applyAffiliateOfferFilters($reporter);
 
         if (\request()->expectsJson()) {
-            return response($reporter->fetchReport($dates['startDate'], $dates['endDate']));
+            $rows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
+
+            return response(\App\Support\PayoutVisibility::withoutPayoutFields($rows));
         }
 
         return view('report.offer.affiliate', compact('reporter', 'dates'));

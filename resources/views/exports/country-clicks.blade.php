@@ -1,10 +1,13 @@
 <table>
+    @php
+        $canViewPayouts = \App\Support\PayoutVisibility::forCurrentUser();
+    @endphp
     <thead>
     <tr>
         <th>Click ID</th>
         <th>Click Timestamp</th>
         <th>Conversion Timestamp</th>
-        <th>Paid</th>
+        @if($canViewPayouts)<th>Paid</th>@endif
         <th>Sub 1</th>
         <th>Sub 2</th>
         <th>Sub 3</th>
@@ -28,7 +31,7 @@
             <td>{{ $data['idclicks'] }}</td>
             <td>{{ $timestamp }}</td>
             <td>{{ $conversionTimeStamp }}</td>
-            <td>{{ $data['paid'] }}</td>
+            @if($canViewPayouts)<td>{{ $data['paid'] }}</td>@endif
             <td>{{ $data['sub1'] }}</td>
             <td>{{ $data['sub2'] }}</td>
             <td>{{ $data['sub3'] }}</td>

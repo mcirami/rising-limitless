@@ -1,8 +1,8 @@
 @php
-    $canViewRevenue = true; // Agents already see their own earnings on this report.
+    $canViewRevenue = false;
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
-    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions', 'Revenue' => 'Revenue', 'EPC' => 'EPC', 'TOTAL' => 'Total'];
+    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];
 @endphp
 @extends('report.template')
 
@@ -10,7 +10,7 @@
     Click Reports
 @endsection
 
-@section('report-description', 'Track clicks, conversions, and earnings across your offers')
+@section('report-description', 'Track clicks and conversions across your offers')
 @section('report-summary')
     @include('report.partials.summary')
 @endsection

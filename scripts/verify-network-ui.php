@@ -78,12 +78,13 @@ context(3, '/offer/manage');
 $html = $view->make('offer.manage', $offerData)->render();
 check(!str_contains($html, 'data-delete-offer'), 'Agent has delete control');
 check(!str_contains($html, 'Create New Offer'), 'Agent has create control');
-check(str_contains($html, '$0.65'), 'Agent payout is not used');
+check(!str_contains($html, 'Payout') && !str_contains($html, '$0.65') && !str_contains($html, '$2.50'), 'Agent offer inventory exposes payout information');
 check(str_contains($html, 'data-copy-text="https://tracking.example.test/'), 'Agent tracking link missing');
 check(str_contains($html, 'data-request-offer'), 'Requestable offers missing');
 $menu = $view->shared('navBar')->getVisibleMenu();
 check(!in_array('Users', array_column($menu, 'label')), 'Agent can see Users navigation');
 check(!in_array('Advertisers', array_column($menu, 'label')), 'Agent can see Advertisers navigation');
+check(!collect($menu)->flatMap(fn($section) => $section['items'])->contains(fn($item) => $item['url'] === '/global_postback.php'), 'Agent can see Global Postback navigation');
 file_put_contents($output . '/agent-offers.html', $html);
 context(2, '/offer/manage');
 $html = $view->make('offer.manage', $offerData)->render();
@@ -95,6 +96,12 @@ context(0, '/offer/manage');
 $html = $view->make('offer.manage', ['offers' => collect(), 'urls' => []])->render();
 check(str_contains($html, '$0.00'), 'Empty inventory handling failed');
 file_put_contents($output . '/empty-offers.html', $html);
+context(1, '/offer/manage');
+$html = $view->make('offer.manage', $offerData)->render();
+check(!str_contains($html, 'Avg Payout') && !str_contains($html, 'data-payout=') && !str_contains($html, '$0.10'), 'Admin without payout permission can see offer payouts');
+context(1, '/offer/manage', [Permissions::VIEW_PAYOUTS]);
+$html = $view->make('offer.manage', $offerData)->render();
+check(str_contains($html, 'Avg Payout') && str_contains($html, 'data-payout='), 'Admin with payout permission cannot see offer payouts');
 context(3, '/dashboard');
 $agentMenu = $view->shared('navBar')->getVisibleMenu();
 check(in_array('Dashboard', array_column($agentMenu, 'label')), 'Agent dashboard navigation missing');
@@ -233,8 +240,44 @@ check(str_contains($html, '/report/offer/17/user-conversions'), 'Offer conversio
 file_put_contents($output . '/manager-offer-report.html', $html);
 context(3, '/report/offer');
 $html = $view->make('report.offer.affiliate', $offerData + ['report' => (object) ['bonuses' => []]])->render();
-check(str_contains($html, '$240.00') && str_contains($html, '/user/42/17/conversions-by-country'), 'Agent report lost own earnings or country drill-down');
+check(!str_contains($html, '$240.00') && !str_contains($html, '>Revenue<') && !str_contains($html, '>EPC<') && !str_contains($html, '>Total<'), 'Agent report exposes payout columns or values');
+check(str_contains($html, '/user/42/17/conversions-by-country'), 'Agent report lost country drill-down');
 file_put_contents($output . '/agent-report.html', $html);
+
+$restrictedRows = \App\Support\PayoutVisibility::withoutPayoutFields($offerRows);
+foreach (['Revenue', 'Deductions', 'EPC', 'TOTAL', 'BonusRevenue', 'ReferralRevenue', 'paid', 'payout'] as $field) {
+    check(!array_key_exists($field, $restrictedRows[0]), "Restricted JSON still includes {$field}");
+}
+
+context(1, '/report/daily');
+$html = $view->make('report.daily', ['report' => $report])->render();
+check(!str_contains($html, '>Revenue<') && !str_contains($html, '$30.00'), 'Admin without payout permission can see daily revenue');
+context(1, '/report/daily', [Permissions::VIEW_PAYOUTS]);
+$html = $view->make('report.daily', ['report' => $report])->render();
+check(str_contains($html, '>Revenue<'), 'Admin with payout permission cannot see daily revenue');
+
+$advertiserReporter = new class {
+    public function between($from, $to, $format): void {}
+};
+context(1, '/report/advertiser', [Permissions::VIEW_ADV_REPORTS]);
+$html = $view->make('report.advertiser', ['reporter' => $advertiserReporter, 'dates' => $reportDates])->render();
+check(!str_contains($html, '>Revenue<') && !str_contains($html, '>EPC<') && !str_contains($html, '>TOTAL<'), 'Admin without payout permission can see advertiser payout columns');
+context(1, '/report/advertiser', [Permissions::VIEW_ADV_REPORTS, Permissions::VIEW_PAYOUTS]);
+$html = $view->make('report.advertiser', ['reporter' => $advertiserReporter, 'dates' => $reportDates])->render();
+check(str_contains($html, '>Revenue<') && str_contains($html, '>EPC<') && str_contains($html, '>TOTAL<'), 'Admin with payout permission cannot see advertiser payout columns');
+
+$clickRow = (object) ['idclicks' => 123, 'offer_name' => 'Sample Offer', 'conversion_timestamp' => '2026-08-28 12:00:00', 'paid' => '98765.43', 'sub1' => '', 'sub2' => '', 'sub3' => '', 'sub4' => '', 'sub5' => ''];
+$clickPaginator = new class { public function links(): string { return ''; } };
+$clickViewData = ['report' => [$clickRow], 'user' => (object) ['idrep' => 17, 'user_name' => 'Sample Rep'], 'reportCollection' => $clickPaginator, 'startDate' => '2026-08-28', 'endDate' => '2026-08-28', 'dateSelect' => 0, 'offerId' => 17];
+context(2, '/user/17/conversions');
+$html = $view->make('report.conversions.affiliate', $clickViewData)->render();
+check(!str_contains($html, '>Paid<') && !str_contains($html, '98765.43'), 'Manager conversion details expose payout data');
+context(1, '/user/17/conversions');
+$html = $view->make('report.conversions.affiliate', $clickViewData)->render();
+check(!str_contains($html, '>Paid<') && !str_contains($html, '98765.43'), 'Admin without payout permission can see conversion payout data');
+context(1, '/user/17/conversions', [Permissions::VIEW_PAYOUTS]);
+$html = $view->make('report.conversions.affiliate', $clickViewData)->render();
+check(str_contains($html, '>Paid<') && str_contains($html, '98765.43'), 'Admin with payout permission cannot see conversion payout data');
 context(2, '/report/affiliate');
 $emptyReporter = new class { public function fetchReport($from, $to): array { return [[]]; } };
 $html = $view->make('report.employee', array_replace($reportData, ['reporter' => $emptyReporter]))->render();

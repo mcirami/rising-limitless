@@ -5,11 +5,11 @@
     $role = (int) $session::userType();
     $permissions = $session::permissions();
     $isAgent = $role === 3;
-    $showPayout = $role !== 2;
+    $showPayout = \App\Support\PayoutVisibility::forCurrentUser();
     $showAccess = !$isAgent && in_array($role, [0, 1]) && $permissions->can('edit_affiliates');
     $typeNames = [0 => 'CPA', 1 => 'CPC', 2 => 'Blacklisted', 3 => 'Pending'];
     $offerList = collect($offers);
-    $payouts = $offerList->map(fn($offer) => (float) ($isAgent ? data_get($offer, 'pivot.payout', 0) : $offer->payout));
+    $payouts = $showPayout ? $offerList->map(fn($offer) => (float) $offer->payout) : collect();
     $availableTypes = $offerList->pluck('offer_type')->unique()->values();
     $inactive = request('showInactive', 0) == 1;
     $urlIndex = max(0, (int) request('url', 0));
@@ -20,7 +20,7 @@
     $columns = 6 + ($showPayout ? 1 : 0) + ($showAccess ? 1 : 0);
 @endphp
 <div class="right_panel">
-    <div class="rl-page-heading"><div><h1>Offers</h1><p>Manage your network's offer inventory and payout rules</p></div>
+    <div class="rl-page-heading"><div><h1>Offers</h1><p>{{ $showPayout ? "Manage your network's offer inventory and payout rules" : "Browse your network's offer inventory" }}</p></div>
         @if($permissions->can('create_offers'))<a class="rl-button rl-primary" href="{{ $contextUrl('/offer_add.php') }}"><span aria-hidden="true">＋</span> Create New Offer</a>@endif
     </div>
     <div class="rl-metrics">
@@ -95,10 +95,10 @@
         <div class="rl-table-footer"><span data-offer-count role="status">{{ $offerList->count() }} offers</span><nav class="rl-pagination" data-offer-pagination aria-label="Offer pagination"></nav></div>
     </section>
     @if($isAgent && isset($requestableOffers) && count($requestableOffers))
-        <section class="rl-card"><header class="rl-card-header"><h2>Requestable Offers</h2></header><div class="rl-table-scroll"><table class="table"><thead><tr><th>Offer</th><th>Payout</th><th>Access</th></tr></thead><tbody>
+        <section class="rl-card"><header class="rl-card-header"><h2>Requestable Offers</h2></header><div class="rl-table-scroll"><table class="table"><thead><tr><th>Offer</th><th>Access</th></tr></thead><tbody>
         @foreach($requestableOffers as $offer)
             @php $countryInfo = $offerCountries[$offer->idoffer] ?? \App\Support\OfferCountryBadges::present(html_entity_decode($offer->offer_name, ENT_QUOTES, 'UTF-8')); @endphp
-            <tr><td><span class="rl-offer-name">{{ $countryInfo['name'] }}</span>@include('offer.partials.country-meta')</td><td class="rl-money">${{ number_format($offer->payout, 2) }}</td><td><button class="rl-button" data-request-offer="{{ $contextUrl('/offer/' . $offer->idoffer . '/request') }}">Request Offer</button></td></tr>
+            <tr><td><span class="rl-offer-name">{{ $countryInfo['name'] }}</span>@include('offer.partials.country-meta')</td><td><button class="rl-button" data-request-offer="{{ $contextUrl('/offer/' . $offer->idoffer . '/request') }}">Request Offer</button></td></tr>
         @endforeach
         </tbody></table></div></section>
     @endif

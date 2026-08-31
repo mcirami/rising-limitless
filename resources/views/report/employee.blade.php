@@ -2,7 +2,7 @@
     use App\Privilege;
     use LeadMax\TrackYourStats\System\Session;
     $userType = (int) Session::userType();
-    $canViewRevenue = $userType === Privilege::ROLE_GOD || ($userType === Privilege::ROLE_ADMIN && Session::permissions()->can('view_payouts'));
+    $canViewRevenue = \App\Support\PayoutVisibility::forCurrentUser();
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
     $reportColumns = ['idrep' => 'Rep ID', 'user_name' => 'Rep', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];

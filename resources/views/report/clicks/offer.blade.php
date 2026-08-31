@@ -1,4 +1,8 @@
-@php use App\Privilege;use LeadMax\TrackYourStats\System\Session; @endphp
+@php
+	use App\Privilege;
+	use LeadMax\TrackYourStats\System\Session;
+	$canViewPayouts = \App\Support\PayoutVisibility::forCurrentUser();
+@endphp
 
 @extends('report.template')
 
@@ -94,9 +98,7 @@
 					@endif
 					<th class="value_span9">Click Timestamp</th>
 					<th class="value_span9">Conversion Timestamp</th>
-					@if(Session::userType() == Privilege::ROLE_GOD ||
-							(Session::userType() == Privilege::ROLE_ADMIN && Session::permissions()->can("view_payouts") )
-						)
+					@if($canViewPayouts)
 						<th class="value_span9">Paid</th>
 					@endif
 					<th class="value_span9">Sub 1</th>
@@ -136,8 +138,7 @@
 						@endif
 						<td>{{$timestamp}}</td>
 						<td>{{$conversionTimeStamp}}</td>
-						@if ( Session::permissions()->can("view_fraud_data") ||
-							(Session::userType() == Privilege::ROLE_ADMIN && Session::permissions()->can("view_payouts") ))
+						@if($canViewPayouts)
 							<td>{{$row['paid']}}</td>
 						@endif
 						@for($i = 1; $i <= 3; $i++)

@@ -2,6 +2,7 @@
 	use LeadMax\TrackYourStats\System\Session;
 	use App\Privilege;
 	$canViewFraudData = Session::permissions()->can("view_fraud_data");
+	$canViewPayouts = \App\Support\PayoutVisibility::forCurrentUser();
 
 @endphp
 
@@ -40,7 +41,7 @@
 				@endif
 				<th class="value_span9">Click Timestamp</th>
 				<th class="value_span9">Conversion Timestamp</th>
-				@if ($canViewFraudData || (Session::userType() == Privilege::ROLE_ADMIN && Session::permissions()->can("view_payouts") ))
+				@if ($canViewPayouts)
 					<th class="value_span9">Paid</th>	
 				@endif
 				<th class="value_span9">Referer Url</th>
@@ -74,7 +75,7 @@
 					@endif
 					<td>{{$timestamp}}</td>
 					<td>{{$convertionTimeStamp}}</td>
-					@if ($canViewFraudData || (Session::userType() == Privilege::ROLE_ADMIN && Session::permissions()->can("view_payouts") ))
+					@if ($canViewPayouts)
 						<td>{{$row->paid}}</td>
 					@endif
 					<td>{{$row->referer}}</td>

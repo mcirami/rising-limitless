@@ -1,5 +1,9 @@
 @extends('report.template')
 
+@php
+    $canViewPayouts = \App\Support\PayoutVisibility::forCurrentUser();
+@endphp
+
 @section('report-title')
     Daily Reports
 @endsection
@@ -17,7 +21,7 @@
             <th class="value_span9">Raw</th>
             <th class="value_span9">Unique</th>
             <th class="value_span9">Conversions</th>
-            @if(\LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_ADMIN || \LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_GOD)
+            @if($canViewPayouts)
                 <th class="value_span9">Revenue</th>
             @endif
         </tr>
@@ -29,7 +33,7 @@
                 <td>{{$row['clicks']}}</td>
                 <td>{{$row['unique_clicks']}}</td>
                 <td>{{$row['conversions']}}</td>
-                @if(\LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_ADMIN || \LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_GOD)
+                @if($canViewPayouts)
                     <td>{{$row['revenue']}}</td>
                 @endif
             </tr>
