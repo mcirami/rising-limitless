@@ -199,11 +199,13 @@ $update->dumpPermissionsToJavascript();
 				                    <tr>
 				
 				                        <th class=\"value_span9\">Offer ID</th>
-				                        <th class=\"value_span9\">Offer Name</th>
-				                        <th class=\"value_span9\">Offer Payout</th>";
+				                        <th class=\"value_span9\">Offer Name</th>";
 
+					if(Session::userType() == \App\Privilege::ROLE_GOD) {
+						echo "<th class=\"value_span9\">Offer Payout</th>";
+					}
 
-					if ( Session::permissions()->can("edit_aff_payout"))
+					if ( Session::userType() == \App\Privilege::ROLE_GOD)
 					{
 						echo "<th class=\"value_span9\">Change Aff Payout</th>";
 					}

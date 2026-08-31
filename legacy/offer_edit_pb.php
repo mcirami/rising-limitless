@@ -1,11 +1,5 @@
 <?php
 
-$isActiveAdminLogin = isset($_SESSION['adminLogin']);
-if ($isActiveAdminLogin && !isset($_GET['adminLogin']))
-{
-	$_GET['adminLogin'] = 1;
-}
-
 $section = "offers-edit-pb";
 require('header.php');
 

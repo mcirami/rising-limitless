@@ -179,22 +179,13 @@ class Create
     public function dumpAdmins()
     {
 
-        if(Session::userType() == \App\Privilege::ROLE_ADMIN) {
+        if(\App\Privilege::ROLE_ADMIN) {
             $id = Session::userID();
 			$username = \App\User::where('idrep', $id)->first()->user_name;
 			$this->listAdmin = [$id.';'.$username];
         }
 
-		if (Session::userType() == \App\Privilege::ROLE_GOD) {
-			$usernames = \App\Privilege::where('is_admin', 1)->join('rep', 'rep.idrep', '=', 'privileges.rep_idrep')->get();
-			$usernameArray = array();
-			foreach ($usernames as $username) {
-				$usernameArray[] = $username->idrep.';'.$username->user_name.';';
-			}
-			$this->listAdmin = $usernameArray;
-
-		}
-
+        //print_r($this->listAdmin);
         echo "<script type=\"text/javascript\">";
         echo "var listAdmin = ".json_encode($this->listAdmin).";";
         echo "</script>";
@@ -241,9 +232,11 @@ class Create
         $new_replist->user_id = Session::userID();
 
         if (Session::userType() == \App\Privilege::ROLE_ADMIN) {
-            $this->assignTos = $new_replist->selectOwnedManagers()->fetchALL(PDO::FETCH_ASSOC);
-        } else if (Session::userType() == \App\Privilege::ROLE_GOD) {
-	        $this->assignTos = $new_replist->select_all_managers();
+			if(Session::permissions()->can("view_all_users")) {
+				$this->assignTos = $new_replist->selectAssignablesManager();
+			} else {
+				$this->assignTos = $new_replist->selectOwnedManagers()->fetchALL(PDO::FETCH_ASSOC);
+			}
         } else {
             $this->assignTos = $new_replist->selectAssignablesManager();
         }
@@ -251,18 +244,6 @@ class Create
         if (Session::userType() == \App\Privilege::ROLE_MANAGER) {
             $this->filterManagerAssignables();
         }
-
-		if(Session::permissions()->can("create_admins")) {
-			$db = \LeadMax\TrackYourStats\Database\DatabaseConnection::getInstance();
-			$sql = "SELECT * FROM rep INNER JOIN privileges ON privileges.rep_idrep = rep.idrep AND privileges.is_god = 1";
-			$stmt = $db->prepare($sql);
-			$stmt->execute();
-
-			$gods = $stmt->fetchALL(PDO::FETCH_ASSOC);
-			foreach ($gods as $key => $value) {
-				$this->assignTos[] = $value;
-			}
-		}
 
         //dd($this->assignTos);
 
@@ -273,7 +254,6 @@ class Create
         foreach ($this->assignTos as $key => $value) {
             $user_name = $value["user_name"];
             $idrep = $value["idrep"];
-
             if ($value["is_god"] == 1) {
                 $this->listGod[] = $idrep.";".$user_name;
             }

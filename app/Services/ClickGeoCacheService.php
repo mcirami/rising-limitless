@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Services;
-
 use App\ClickGeoCache;
 use Illuminate\Support\Collection;
 use LeadMax\TrackYourStats\Clicks\ClickGeo;

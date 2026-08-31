@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClickGeoCache extends Model
 {
-	use HasFactory;
+    use HasFactory;
 
 	protected $table = 'click_geo_cache';
 

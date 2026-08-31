@@ -67,7 +67,7 @@ class ClickGeo
         return Cache::remember($cacheKey, $ttl, function () use ($ip, $geo) {
             try {
 
-                $reader = self::reader();
+	            $reader = self::reader();
                 $record = $reader->city($ip);
     
                  if($record->country->isoCode == "") {

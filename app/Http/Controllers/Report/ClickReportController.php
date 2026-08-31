@@ -6,6 +6,7 @@ use App\Click;
 use App\Offer;
 use App\Privilege;
 use App\Services\Repositories\Offer\OfferClicksRepository;
+use App\Services\CountryReportBuilderService;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
@@ -22,6 +23,18 @@ class ClickReportController extends ReportController
 {
 
 	use ClickTraits;
+
+	private function findReportUser(int $userId): User
+	{
+		if (
+			Session::userType() === Privilege::ROLE_GOD ||
+			Session::permissions()->can(Permissions::VIEW_ALL_USERS)
+		) {
+			return User::findOrFail($userId);
+		}
+
+		return User::myUsers()->findOrFail($userId);
+	}
 
     /**
      * Shows an offers clicks, and affiliates with those clicks.
@@ -93,7 +106,7 @@ class ClickReportController extends ReportController
 		['startDate' => $startDate, 'endDate' => $endDate, 'dateSelect' => $dateSelect] = $this->reportDateContext($dates);
 		$selectedRole = (int) request()->query('role', Privilege::ROLE_AFFILIATE);
 
-        $user = User::myUsers()->findOrFail($userId);
+        $user = $this->findReportUser($userId);
 
 		$reportCollection = Click::query()
 			->userClicksReportByRole($userId, $dates['startDate'], $dates['endDate'], $selectedRole)
@@ -112,6 +125,46 @@ class ClickReportController extends ReportController
 			'selectedRole'
 		));
     }
+
+	public function showUserClicksByCountry(
+		$userId,
+		CountryReportBuilderService $countryReportBuilderService,
+		ClickGeoCacheService $geoCache
+	) {
+		$dates = self::getDates();
+		['startDate' => $startDate, 'endDate' => $endDate, 'dateSelect' => $dateSelect] = $this->reportDateContext($dates);
+		$selectedRole = (int) request()->query('role', Privilege::ROLE_AFFILIATE);
+
+		$user = $this->findReportUser($userId);
+
+		$ipsMissingGeo = Click::missingCountryCodeIps(
+			$dates['startDate'],
+			$dates['endDate'],
+			$user->idrep,
+			$selectedRole
+		);
+		$geoCache->warm($ipsMissingGeo);
+
+		$clicksSubquery = Click::query()
+			->countryClicksByIpInGeo($dates['startDate'], $dates['endDate'], $user->idrep, null, $selectedRole);
+
+		$conversionsSubquery = \App\Conversion::query()
+			->countryConversionsByIpInGeo($dates['startDate'], $dates['endDate'], $user->idrep, null, $selectedRole);
+
+		$countryReports = $countryReportBuilderService
+			->buildFromIpSubqueries($clicksSubquery, $conversionsSubquery);
+		$reports = $countryReports['reports']->sortByDesc('total_clicks');
+
+		return view('report.clicks.affiliate-by-country',
+			compact(
+				'reports',
+				'user',
+				'startDate',
+				'endDate',
+				'dateSelect',
+				'selectedRole'
+			));
+	}
 
 	public function showManagersClicks($id) {
 

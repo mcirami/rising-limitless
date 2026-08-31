@@ -58,6 +58,26 @@ class OfferController extends Controller
 
 		$urls = \App\Company::instance()->first()->offerUrls()->where('status',1)->get();
 		/* @var $urls Collection */
+		$company = \App\Company::instance()->first();
+		$urlQuery = $company->offerUrls()->where('status', 1);
+
+		$user = \LeadMax\TrackYourStats\System\Session::user();
+		$urls = new Collection();
+
+		if ($user->getRole() === Privilege::ROLE_AFFILIATE || $user->getRole() === Privilege::ROLE_MANAGER) {
+			$managerId = $user->getRole() === Privilege::ROLE_AFFILIATE ? $user->referrer_repid : $user->idrep;
+			$managerUrls = (clone $urlQuery)->where('assigned_manager_id', $managerId)->get();
+
+			if ($managerUrls->isNotEmpty()) {
+				$urls = $managerUrls;
+			} else {
+				$urls = (clone $urlQuery)->whereNull('assigned_manager_id')->get();
+			}
+		} else {
+			$urls = $urlQuery->get();
+		}
+
+		/* @var $urls Collection */
 		if ($urls->isEmpty()) {
 			$url = new OfferURL();
 			$url->url = request()->getHttpHost();
@@ -81,8 +101,25 @@ class OfferController extends Controller
 			$offers = $offers->get();
 		}
 
+		$offerIds = $offers->pluck('idoffer')->filter()->unique()->values()->all();
+		$geoRuleNames = collect();
+
+		if (!empty($offerIds)) {
+			$geoRuleNames = DB::table('rule')
+			                  ->select('offer_idoffer', 'name')
+			                  ->whereIn('offer_idoffer', $offerIds)
+			                  ->where('type', '=', 'geo')
+			                  ->orderBy('name')
+			                  ->get()
+			                  ->groupBy('offer_idoffer')
+			                  ->map(function ($rules) {
+				                  return $rules->pluck('name')->filter()->implode(', ');
+			                  });
+		}
+
 		foreach ($offers as $offer) {
-			$offer["offer_name"] = htmlspecialchars($offer["offer_name"]);
+			$offer["offer_name"] = htmlspecialchars($offer["offer_name"], ENT_QUOTES, 'UTF-8');
+			$offer["geo_rule_names"] = htmlspecialchars($geoRuleNames->get($offer["idoffer"], 'N/A'), ENT_QUOTES, 'UTF-8');
 		}
 
 		$data = array_merge(compact('offers'), $data);

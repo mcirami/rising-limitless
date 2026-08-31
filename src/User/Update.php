@@ -31,6 +31,13 @@ class Update
 
     public $cannotUpgrade = false;
 
+	public $assignTos = [];
+
+	public $listGod = [];
+
+	public $listAdmin = [];
+
+	public $listManager = [];
 
     private $type = array("is_admin" => "", "is_manager" => "", "is_rep" => "");
 
@@ -275,12 +282,12 @@ class Update
 		    echo "<tr>";
 		    echo "<td>{$row['idoffer']}</td>";
 		    echo "<td>{$row['offer_name']}</td>";
-		    if ($this->userType != Privilege::ROLE_AFFILIATE) {
+		    if ($this->userType == Privilege::ROLE_GOD) {
 			    echo "<td>{$row['payout']}</td>";
 		    }
 		    if ($this->userType == Privilege::ROLE_AFFILIATE) {
 			    echo "<td>{$row['repPayout']}</td>";
-		    } else {
+		    } elseif($this->userType == Privilege::ROLE_GOD) {
 			    echo '<td>
 						<input
 						class="update_aff_payout"
@@ -294,7 +301,7 @@ class Update
                      </td>';
 		    }
 
-		    if($this->userType != Privilege::ROLE_AFFILIATE) {
+		    if($this->userType == Privilege::ROLE_GOD) {
 			    $this->getUserOfferAccess($row);
 		    }
 

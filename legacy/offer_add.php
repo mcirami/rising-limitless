@@ -151,7 +151,7 @@ if ($assignType == 0) {
                                    required/>
                             <span class="small_txt value_span10">The offer URL where traffic will be directed to. The variables below can be used in offer URLs.</span>
                         </p>
-                        <p>
+                        <p class="value_span9">
 
                             When building offer url, these values will populate automatically:
 
@@ -160,7 +160,7 @@ if ($assignType == 0) {
                             <span class="small_txt value_span10">Click ID: #clickid#</span>
                             <span class="small_txt value_span10">Offer ID: #offid#</span>
                         </p>
-                        <p>
+                        <p class="value_span9">
                             When storing values Sub ID 1-5 on incoming clicks, these tags will populate the
                             corresponding values.
 
@@ -252,10 +252,10 @@ if ($assignType == 0) {
 
                         </script>
 
-                        <p>
+                        <p class="value_span9">
                             <label class="value_span9">Offer Cap</label>
 
-                            <input class="fixCheckBox" type="checkbox" id="enable_cap" name="enable_cap"> Offer Cap
+                            <input class="fixCheckBox value_span9" type="checkbox" id="enable_cap" name="enable_cap"> Offer Cap
                         <p id="offer_cap_form" style="display:none;">
 
                             <span class="small_txt value_span10">Cap Type</span>
@@ -299,19 +299,19 @@ if ($assignType == 0) {
                         </p>
 
                         </p>
-                        <p>
+                        <p class="value_span9">
                             <label class="value_span9">Bonus Offer</label>
 
-                            <input class="fixCheckBox" type="checkbox" id="enable_bonus_offer"
+                            <input class="fixCheckBox value_span9" type="checkbox" id="enable_bonus_offer"
                                    name="enable_bonus_offer"> Enable
                         <p id="bonus_offer_div" style="display:none;">
-                            <label for="required_sales">Required Sales:</label>
+                            <label class="value_span9" for="required_sales">Required Sales:</label>
                             <input type="number" name="required_sales" id="required_sales" value="0"
                                    style="width:100px" disabled>
                         </p>
                         </p>
 
-                        <p>
+                        <p class="value_span9">
 
                             <?php $create->printRadios(); ?>
 

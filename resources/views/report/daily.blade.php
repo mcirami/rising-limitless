@@ -17,7 +17,9 @@
             <th class="value_span9">Raw</th>
             <th class="value_span9">Unique</th>
             <th class="value_span9">Conversions</th>
-            <th class="value_span9">Revenue</th>
+            @if(\LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_ADMIN || \LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_GOD)
+                <th class="value_span9">Revenue</th>
+            @endif
         </tr>
         </thead>
         <tbody>
@@ -27,7 +29,9 @@
                 <td>{{$row['clicks']}}</td>
                 <td>{{$row['unique_clicks']}}</td>
                 <td>{{$row['conversions']}}</td>
-                <td>{{$row['revenue']}}</td>
+                @if(\LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_ADMIN || \LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_GOD)
+                    <td>{{$row['revenue']}}</td>
+                @endif
             </tr>
         @endforeach
         </tbody>

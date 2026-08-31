@@ -33,32 +33,31 @@ class UserController extends Controller
 
     public function viewManageUsers()
     {
-
-	    $userType = Session::userType();
-	    $canViewUsers = Session::permissions()->can('view_all_users');
+		$userType = Session::userType();
+		$canViewUsers = Session::permissions()->can('view_all_users');
 
         $this->validate(request(), [
             'showInactive' => 'numeric|min:0|max:1'
         ]);
 
-	    $users =
-		    ($userType == Privilege::ROLE_ADMIN && $canViewUsers) || $userType == Privilege::ROLE_GOD ?
-			    User::withRole(request('role', Privilege::ROLE_AFFILIATE))->with('referrer')
-			    :
-			    User::myUsers()->withRole(request('role', Privilege::ROLE_AFFILIATE))->with('referrer');
+        $users =
+	        ($userType == Privilege::ROLE_ADMIN && $canViewUsers) || $userType == Privilege::ROLE_GOD ?
+		        User::withRole(request('role', Privilege::ROLE_AFFILIATE))->with('referrer')
+		        :
+		        User::myUsers()->withRole(request('role', Privilege::ROLE_AFFILIATE))->with('referrer');
 
         if (request('showInactive', 0) == 1) {
             $users->where('status', 0);
         } else {
             $users->where('status', 1);
         }
-/*
-		if (Session::userType() == Privilege::ROLE_ADMIN && (request('role') == null ||  request('role') == '3')) {
+
+		/*if (Session::userType() == Privilege::ROLE_ADMIN && (request('role') == null ||  request('role') == '3')) {
 			$userId = Session::userID();
 			$managers = DB::table('rep')->where('referrer_repid', '=', $userId)->get()->pluck('idrep')->toArray();
 			$users->whereIn('referrer_repid', $managers);
-		}
-		*/
+		}*/
+		
         $users = $users->get();
 		$users = $this->getDiffForHumans($users);
 
@@ -68,7 +67,6 @@ class UserController extends Controller
             );
             return view('user.manager-directory', compact('users', 'directorySummary'));
         }
-
         return view('user.manage', compact('users'));
     }
 
@@ -101,15 +99,49 @@ class UserController extends Controller
 
 	public function getUserSubIds() {
         $affId = $_GET["idrep"] ?? null;
-		$data = DB::select(
-			"SELECT
-	        sub_ids.sub_id as subId,
-	        CASE WHEN blocked_sub_ids.sub_id IS NULL THEN FALSE ELSE TRUE END AS blocked
-		     FROM sub_ids
-		     LEFT JOIN blocked_sub_ids ON blocked_sub_ids.sub_id = sub_ids.sub_id
-		     WHERE sub_ids.idrep = ?
-		     GROUP BY subId", [ $affId ]
-		);
+		$date = new Date;
+		$now = Carbon::now();
+		$todaysDate = $date->convertDateTimezone($now);
+		$monthsAgo = $date->convertDateTimezone(Carbon::now()->subMonths(1)->startOfDay());
+		$daysAgo = $date->convertDateTimezone(Carbon::now()->subDay(3)->startOfDay());
+
+		$cacheKey = "user_{$affId}_subids";
+        $cacheTime = 7200; // 60 minutes
+
+		if($affId == 1020) {
+			$data = DB::select(
+				"SELECT
+							        click_vars.sub1 as subId,
+							        CASE WHEN blocked_sub_ids.sub_id IS NULL THEN FALSE ELSE TRUE END AS blocked
+								     FROM clicks
+								     JOIN click_vars ON click_vars.click_id = clicks.idclicks
+								     LEFT JOIN blocked_sub_ids ON blocked_sub_ids.sub_id = click_vars.sub1
+								     WHERE clicks.rep_idrep = ?
+								       AND clicks.first_timestamp BETWEEN ? AND ?
+								       AND click_vars.sub1 != ''
+								     GROUP BY click_vars.sub1
+								     ORDER BY click_vars.sub1",
+				[$affId, $daysAgo, $todaysDate]
+			);
+		} else {
+			$data = Cache::remember($cacheKey, $cacheTime, function () use ($affId, $monthsAgo, $todaysDate) {
+				return DB::select(
+					"SELECT
+							        click_vars.sub1 as subId,
+							        CASE WHEN blocked_sub_ids.sub_id IS NULL THEN FALSE ELSE TRUE END AS blocked
+								     FROM clicks
+								     JOIN click_vars ON click_vars.click_id = clicks.idclicks
+								     LEFT JOIN blocked_sub_ids ON blocked_sub_ids.sub_id = click_vars.sub1
+								     WHERE clicks.rep_idrep = ?
+								       AND clicks.first_timestamp BETWEEN ? AND ?
+								       AND click_vars.sub1 != ''
+								     GROUP BY click_vars.sub1
+								     ORDER BY click_vars.sub1",
+					[$affId, $monthsAgo, $todaysDate]
+				);
+			});
+		}
+
 		return json_encode($data);
     }
 

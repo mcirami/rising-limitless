@@ -35,7 +35,7 @@ class HTML implements Format
         return $temp;
     }
 
-    public function output($report)
+	public function output($report)
     {
 		$params = "";
 		if(isset($_GET['d_from']) && isset($_GET['d_to']) && isset($_GET['dateSelect']) ) {
@@ -49,6 +49,7 @@ class HTML implements Format
 
         $report = $this->resetArrayKeys($report);
 
+
         foreach ($report as $key => $row) {
             if ($this->lastRowStatic && $key == count($report) - 1) {
                 echo "<tr class='static'>";
@@ -61,7 +62,10 @@ class HTML implements Format
 					if($item == "conversions" && $val > 0 && (key_exists('sub', $row) && $row["sub"] != "TOTAL") ) {
 						echo "<td><a href='/report/sub/conversions?subid={$row["sub"]}". "&" . "{$params}'>{$val}</a></td>";
 					} else {
-						echo "<td>{$val}</td>";
+						if($item !== "revenue") {
+							echo "<td>{$val}</td>";
+						}
+
 					}
                 }
             } else {
@@ -70,29 +74,34 @@ class HTML implements Format
 
                     if (isset($row[$toPrint])) {
 						if($toPrint == "offer_name") {
-							echo "<td><a href='/offer_update.php?idoffer=" . $row['idoffer'] . "'>$row[$toPrint]</a></td>";
+							if (Session::userType() == Privilege::ROLE_ADMIN || Session::userType() == Privilege::ROLE_AFFILIATE) {
+								echo "<td>{$row[$toPrint]}</td>";
+							} else {
+								echo "<td><a href='/offer_update.php?idoffer=" . $row['idoffer'] . "'>$row[$toPrint]</a></td>";
+							}
 						} elseif ($toPrint == "Conversions" && $row[$toPrint] > 0 && (key_exists('idoffer', $row) && $row["idoffer"] != "TOTAL") ) {
                             if(Session::userType() == Privilege::ROLE_AFFILIATE) {
                                 $userId = Session::userID();
-                                echo "<td><a href='/user/{$userId}/{$row['idoffer']}/conversions-by-country?{$params}'>$row[$toPrint]</a></td>";
+                                echo "<td><a class='load_click' href='/user/{$userId}/{$row['idoffer']}/conversions-by-country?{$params}'>$row[$toPrint]</a></td>";
                             } else {
-                                echo "<td><a href='/report/offer/{$row['idoffer']}/user-conversions?{$params}'>$row[$toPrint]</a></td>";
+                                echo "<td><a class='load_click' href='/report/offer/{$row['idoffer']}/user-conversions?{$params}'>$row[$toPrint]</a></td>";
                             }
-						} elseif($toPrint == "Conversions" && $row[$toPrint] > 0 && (key_exists('idrep', $row) && $row[$toPrint] != "TOTAL")) {
+						} elseif($toPrint == "Conversions" && $row[$toPrint] > 0 && (key_exists('idrep', $row) && $row['idrep'] != "TOTAL")) {
 							if ( isset( $_GET['role'] ) && $_GET['role'] == 2 ) {
-								echo "<td><a href='/report/manager/{$row['idrep']}/conversions-by-offer?{$params}'>$row[$toPrint]</a></td>";
+								echo "<td><a class='load_click' href='/report/manager/{$row['idrep']}/conversions-by-offer?{$params}'>$row[$toPrint]</a></td>";
 							} else {
-								echo "<td><a href='/user/{$row['idrep']}/conversions-by-offer?{$params}'>$row[$toPrint]</a></td>";
+								echo "<td><a class='load_click' href='/user/{$row['idrep']}/conversions-by-offer?{$params}'>$row[$toPrint]</a></td>";
 							}
 						} elseif ($toPrint == "Conversions" &&
 						          $row[$toPrint] > 0 &&
 						          (key_exists('type', $row) &&
 						           $row['type'] == "advertiser" &&
 						           $row[$toPrint] != "TOTAL")) {
-							echo "<td><a href='/report/advertiser/{$row['id']}/conversions-by-offer?{$params}'>$row[$toPrint]</a></td>";
+							echo "<td><a class='load_click' href='/report/advertiser/{$row['id']}/conversions-by-offer?{$params}'>$row[$toPrint]</a></td>";
 						} else {
 							echo "<td>$row[$toPrint]</td>";
 						}
+
 
                     }
                 }

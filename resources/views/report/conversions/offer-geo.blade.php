@@ -36,9 +36,6 @@
             </tr>
             </thead>
             <tbody>
-            @php
-                $params = "d_from=$startDate&d_to=$endDate&dateSelect=$dateSelect";
-            @endphp
             @foreach($report as $key => $row)
                 <tr role="row">
                     <td>{{$row->offer_name}}</td>
@@ -50,7 +47,7 @@
                 </tr>
             @endforeach
             <tr role="row">
-                <td></td>
+                <td>Totals</td>
                 @foreach($totals as $total)
                     <td>
                         {{ $total }}

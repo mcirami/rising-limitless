@@ -113,7 +113,7 @@ switch ($result)
 						</p>
 						</div><!-- left_con01 -->
 					<div class = "right_con01 value_span7">
-						<h3 class="value_span10">Account Details</h3>
+						<h3 class="value_span9">Account Details</h3>
 						<p>
 							<label class = "value_span9">Status</label>
 							<select class = "form-control input-sm " id = "status" name = "status">

@@ -14,9 +14,6 @@ use LeadMax\TrackYourStats\System\Session;
 class AggregateReportController extends ReportController
 {
 
-    /**
-     * @return array
-     */
     public function show()
     {
         $dates = static::getDates(false);

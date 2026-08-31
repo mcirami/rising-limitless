@@ -20,6 +20,7 @@ class AdminEmployeeRepository extends Repository
     {
         $report = $this->mergeReport($this->getClicks($dateFrom, $dateTo), $this->getConversions($dateFrom, $dateTo));
 	    $report = $this->mergeReport($report, $this->getCodes($dateFrom, $dateTo));
+
         $report = $this->mergeReport($report, $this->getBonusesRevenue($dateFrom, $dateTo));
 
 
@@ -351,6 +352,7 @@ class AdminEmployeeRepository extends Repository
 
 		return $result;
 	}
+
     public function query($dateFrom, $dateTo): \PDOStatement
     {
         // TODO: Implement query() method.

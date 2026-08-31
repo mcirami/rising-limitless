@@ -11,7 +11,6 @@
 |
 */
 
-use App\Http\Controllers\ExportDataController;
 use App\Privilege;
 use Illuminate\Support\Facades\Route;
 use LeadMax\TrackYourStats\User\Permissions;
@@ -40,6 +39,7 @@ use App\Http\Controllers\Sms\SmsController;
 use App\Http\Controllers\Sms\SmsClientController;
 use App\Http\Controllers\ChatLogController;
 use App\Http\Controllers\Report\ConversionReportController;
+use App\Http\Controllers\ExportDataController;
 use App\Http\Controllers\SmsOrderController;
 
 Route::get('/', [IndexController::class, 'index']);
@@ -66,6 +66,7 @@ Route::group(['middleware' => 'legacy.auth'], function () {
 		'role:0,3',
 		'permissions:' . Permissions::SMS_CHAT
 	);
+
     Route::group(['prefix' => 'user'], function () {
         Route::get('manage', [UserController::class, 'viewManageUsers'])->middleware(['role:0,1,2']);
         Route::get('{id}/affiliates', [UserController::class, 'viewManagersAffiliates'])->middleware([
@@ -87,8 +88,9 @@ Route::group(['middleware' => 'legacy.auth'], function () {
                 Route::get('showUpdate', [SalaryController::class, 'showUpdate'])->name('salary.show.update');
                 Route::post('update', [SalaryController::class, 'update'])->name('salary.update');
             });
+        Route::get('{id}/clicks-by-country', [ClickReportController::class, 'showUserClicksByCountry'])->middleware('role:0,1,2')->name('userClicksByCountry');
         Route::get('{id}/clicks', [ClickReportController::class, 'showUsersClicks'])->middleware('role:0,1,2')->name('userClicks');
-        Route::get('{id}/clicks/export', [ExportDataController::class, 'exportUsersClicks'])->middleware('role:0,1,2')->name('exportUserClicks');
+        Route::get('{id}/clicks/export', [ExportDataController::class, 'exportUsersClicks'])->middleware('role:0,1')->name('exportUserClicks');
         Route::get('{id}/search-clicks', [ClickReportController::class, 'searchClicks'])->middleware('role:0')->name('clicks.search');
 
         Route::get('{id}/conversions-by-offer', [ConversionReportController::class, 'showUserConversionsByOffer'])->middleware('role:0,1,2')->name('userConversionsByOffer');
@@ -106,19 +108,17 @@ Route::group(['middleware' => 'legacy.auth'], function () {
 	    Route::get('geo-by-offer', [ConversionReportController::class, 'showGeoByOffer'])->middleware('role:0,1');
 	    Route::get('geo/clicks-in-country', [ClickReportController::class, 'clicksInCountry'])->middleware('role:0,1');
 	    Route::get('geo/clicks-in-country/export', [ExportDataController::class, 'exportCountryClicks'])->middleware('role:0,1');
-		Route::get('offer', [OfferReportController::class, 'show']);
+        Route::get('offer', [OfferReportController::class, 'show']);
 	    Route::get('offer-data/export', [ExportDataController::class, 'exportOfferData'])->middleware('role:0,1')->name('exportOfferData');
 	    Route::get('offer/{offer}/user-conversions', [OfferReportController::class, 'showConversionsByUser']);
-        Route::get('offer/{offer}/conversions-by-country', [OfferReportController::class, 'showConversionsByCountry']);
+        Route::get('offer/{offer}/conversions-by-country', [OfferReportController::class, 'showConversionsByCountry'])->name('offer.conversions.by.country');
+	    Route::get('offer/conversions-by-country', [OfferReportController::class, 'showConversionsByCountry'])->name('conversions.by.country');
 
 	    Route::get('manager/{user}/conversions-by-offer', [ConversionReportController::class, 'showManagerConversionsByOffer']);
 		Route::group(['middleware' => 'role:' . Privilege::ROLE_GOD], function () {
             Route::get('blacklist', [BlackListReportController::class, 'show']);
         });
 	    Route::get('advertiser', [AdvertiserReportController::class, 'show'])
-	         ->middleware(['permissions:' . Permissions::VIEW_ADV_REPORTS,'role:0,1']);
-
-	    Route::get('advertiser/{id}/conversions-by-offer', [AdvertiserReportController::class, 'showConversionsByOffer'])
 	         ->middleware(['permissions:' . Permissions::VIEW_ADV_REPORTS,'role:0,1']);
 
 		Route::get('adjustments', [AdjustmentsReportController::class, 'show'])->middleware([

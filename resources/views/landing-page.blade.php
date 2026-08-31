@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <title>{{ $networkName }} — Performance Marketing Network</title>
     <meta name="description" content="Connect your offers, affiliates, and performance reporting with {{ $networkName }}. Sign in to manage your network in one place.">
     <meta property="og:title" content="{{ $networkName }} — Performance Marketing Network">

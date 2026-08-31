@@ -5,6 +5,8 @@
 /public/sale_log
 /public/GeoIP2-City.mmdb
 /storage/GeoIP2-City.mmdb
+/storage/clockwork/
+/storage/logs/
 /storage/*.key
 /vendor
 /storage/clockwork

@@ -53,6 +53,7 @@ class Permissions
     const ADJUST_SALES = "adjust_sales";
     const BAN_USERS = "ban_users";
     const EMAIL_POOLS = 'email_pools';
+    //const SMS_CHAT = 'sms_chat';
     const ACCOUNT_TYPE = ACCOUNT_TYPE;
 
     public static $permissionsArray = [
@@ -76,19 +77,19 @@ class Permissions
         ],
 
         self::SMS_CHAT => [
-	        'description' => 'Can use SMS Verification',
-	        'allowed_user_types' => [Privilege::ROLE_GOD, Privilege::ROLE_AFFILIATE]
+			'description' => 'Can use SMS Verification',
+			'allowed_user_types' => [Privilege::ROLE_GOD, Privilege::ROLE_AFFILIATE]
         ],
 
         self::VIEW_SMS_STATS => [
 	        'description' => 'Can View SMS Stats',
-	        'allowed_user_types' => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN, Privilege::ROLE_MANAGER]
+	        'allowed_user_types' => [Privilege::ROLE_GOD, Privilege::ROLE_ADMIN, Privilege::ROLE_MANAGER]
         ],
 
         self::VIEW_ALL_USERS => [
-	        "description" => "Can View All Users",
-	        "allowed_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN]
-        ],
+			"description" => "Can View All Users",
+		    "allowed_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN]
+	    ],
 
         self::CREATE_OFFERS => ["description" => "Can Create Offers", "allowed_user_types" => [\App\Privilege::ROLE_GOD]],
 
@@ -167,10 +168,10 @@ class Permissions
             "allowed_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN, Privilege::ROLE_MANAGER],
         ],
 
-        self::VIEW_PAYOUTS => [
-	        "description" => "Can View Payouts",
-	        "allowed_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN],
-        ],
+	    self::VIEW_PAYOUTS => [
+			"description" => "Can View Payouts",
+			"allowed_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN],
+	    ],
 
         self::VIEW_ADV_REPORTS => [
 	        "description" => "Can View Adv Reports",
@@ -178,7 +179,6 @@ class Permissions
         ],
 
         self::ADJUST_SALES => ["description" => "Can Adjust Sales", "allowed_user_types" => [\App\Privilege::ROLE_GOD]],
-
 
         self::BAN_USERS => ["description" => "Can Ban Users", "allowed_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN, Privilege::ROLE_MANAGER]],
 
@@ -221,7 +221,6 @@ class Permissions
         }
 
         $permissionDetails = self::$permissionsArray[$permission];
-
 
         if (isset($permissionDetails["allowed_user_types"])) {
             //check editing user
@@ -271,7 +270,7 @@ class Permissions
 				p.empty();         	 ";
 
         foreach (self::$permissionsArray as $permission => $val) {
-            if ($permission != "aff_id" && $permission != "sms_chat") {
+            if ($permission != "aff_id" && $permission !== "sms_chat") {
                 if ($this->canPrintPermission($permission, Privilege::ROLE_ADMIN)) {
                     $this->printPermission($permission, $checkCheckBoxes);
                 }
@@ -291,7 +290,7 @@ class Permissions
 				p.empty();         	 ";
 
         foreach (self::$permissionsArray as $permission => $val) {
-            if ($permission != "aff_id" && $permission != "sms_chat") {
+            if ($permission != "aff_id" && $permission !== "sms_chat") {
                 if ($this->canPrintPermission($permission, Privilege::ROLE_MANAGER)) {
                     $this->printPermission($permission, $checkCheckBoxes);
                 }

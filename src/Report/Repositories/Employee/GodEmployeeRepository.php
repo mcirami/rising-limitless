@@ -22,6 +22,7 @@ class GodEmployeeRepository extends Repository
         $report = $this->mergeReport($this->getClicks($dateFrom, $dateTo), $this->getConversions($dateFrom, $dateTo));
         $report = $this->mergeReport($report, $this->getCodes($dateFrom, $dateTo));
 
+
         $report = $this->mergeReport($report, $this->getBonusesRevenue($dateFrom, $dateTo));
 
 
@@ -47,7 +48,6 @@ class GodEmployeeRepository extends Repository
 
 
         $report = $this->sortByRequestedUserType($report);
-
 
         return $report;
     }
@@ -111,7 +111,9 @@ class GodEmployeeRepository extends Repository
     }
 
 
-    private function queryGetRequestedUserType($userType): false|\PDOStatement {
+    private function queryGetRequestedUserType($userType)
+    {
+
         $db = $this->getDB();
         $sql = "SELECT
 					rep.idrep, rep.user_name, rep.lft, rep.rgt
@@ -119,10 +121,9 @@ class GodEmployeeRepository extends Repository
 				
 				INNER JOIN privileges p on rep.idrep = p.rep_idrep AND  " . $this->returnQueryBasedOnUserType($userType);
 
-	    if(!Session::permissions()->can('view_all_users')) {
-		    $sql .= " WHERE rep.lft > :left AND rep.rgt < :right";
-	    }
-
+		if(!Session::permissions()->can('view_all_users')) {
+			$sql .= " WHERE rep.lft > :left AND rep.rgt < :right";
+		}
 
         $prep = $db->prepare($sql);
 
@@ -136,7 +137,8 @@ class GodEmployeeRepository extends Repository
         return $prep;
     }
 
-    private function returnQueryBasedOnUserType($userType): string {
+    private function returnQueryBasedOnUserType($userType)
+    {
         switch ($userType) {
             case \App\Privilege::ROLE_GOD:
                 return "p.is_god = 1";
@@ -156,7 +158,8 @@ class GodEmployeeRepository extends Repository
     }
 
 
-    private function getReferralRevenue($dateFrom, $dateTo): array {
+    private function getReferralRevenue($dateFrom, $dateTo)
+    {
         $db = $this->getDB();
         $sql = "
 				SELECT
@@ -195,7 +198,8 @@ class GodEmployeeRepository extends Repository
         return $result;
     }
 
-    private function getBonusesRevenue($dateFrom, $dateTo): array {
+    private function getBonusesRevenue($dateFrom, $dateTo)
+    {
         $db = $this->getDB();
         $sql = "
 				SELECT
@@ -242,7 +246,8 @@ class GodEmployeeRepository extends Repository
     }
 
 
-    private function getConversions($dateFrom, $dateTo): array {
+    private function getConversions($dateFrom, $dateTo)
+    {
         $db = $this->getDB();
         $sql = "
 				SELECT
@@ -293,7 +298,8 @@ class GodEmployeeRepository extends Repository
         return $result;
     }
 
-    private function getCodes($dateFrom, $dateTo): array {
+    private function getCodes($dateFrom, $dateTo)
+    {
         $db = $this->getDB();
         $sql = "
 				SELECT
@@ -333,7 +339,8 @@ class GodEmployeeRepository extends Repository
     }
 
 
-    private function getClicks($dateFrom, $dateTo): array {
+    private function getClicks($dateFrom, $dateTo)
+    {
         
 
         $db = $this->getDB();

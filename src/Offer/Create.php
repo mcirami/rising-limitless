@@ -109,6 +109,7 @@ class Create
         if ($per->can("create_managers")) {
             echo "
                 <input {$man} 
+                    class='value_span9'
                     onchange=\"changeAssignType('managers');\"
                     type=\"radio\"
                     name=\"assignToType\" value=\"man\" style=\"width:2%;\"> Managers";
@@ -117,6 +118,7 @@ class Create
         if ($per->can("create_managers")) {
             echo "
                 <input {$aff}
+                    class='value_span9'
                     onchange=\"changeAssignType('affiliates');\"
                     type=\"radio\"
                     name=\"assignToType\" value=\"aff\" style=\"width:2%;\">Affiliates

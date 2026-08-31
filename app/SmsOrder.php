@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class SmsOrder extends Model
 {
-
 	protected $fillable = [
 		'rep_id',
 		'client_reference',

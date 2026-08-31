@@ -50,6 +50,129 @@ foreach ($rules->rules as $rule) {
 
 ?>
 	
+	<style>
+		#geoModal .geo-section {
+			margin-bottom: 20px;
+		}
+
+		#geoModal .geo-section .control-label {
+			display: block;
+			margin-bottom: 12px;
+		}
+
+		#geoModal .geo-table-scroll {
+			max-height: 320px;
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+
+		#geoModal #searchCountryList {
+			width: 100%;
+			margin-bottom: 12px;
+		}
+
+		#geoModal #countryList,
+		#geoModal #toAdd {
+			margin-bottom: 0;
+			width: 100%;
+		}
+
+		#geoUpdateConfirmModal .modal-body p:last-child {
+			margin-bottom: 0;
+		}
+
+		#geoUpdateConfirmModal {
+			z-index: 1080;
+		}
+
+		.rule-actions {
+			display: inline-flex;
+			align-items: center;
+			gap: 18px;
+			white-space: nowrap;
+		}
+
+		.rule-actions > a {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 4px;
+			width: 24px;
+		}
+
+		.delete-rule-action {
+			width: auto;
+			min-width: 0;
+			height: auto;
+			margin: 0;
+			border: 0;
+			background: transparent;
+			box-shadow: none;
+			color: #d9534f;
+			font-size: 16px;
+			line-height: 1;
+			text-decoration: none;
+			vertical-align: middle;
+		}
+
+		.delete-rule-action:hover,
+		.delete-rule-action:focus {
+			background: transparent;
+			color: #c9302c;
+			text-decoration: none;
+		}
+	</style>
+	
+	<div class = "modal fade" id = "geoUpdateConfirmModal" tabindex = "-1" role = "dialog" aria-labelledby = "geoUpdateConfirmModalLabel">
+		<div class = "modal-dialog modal-sm" role = "document">
+			<div class = "modal-content">
+				<div class = "modal-header">
+					<button type = "button" class = "close" onclick = "resolveGeoRuleUpdateDecision(null);" aria-label = "Close">
+						<span aria-hidden = "true">&times;</span>
+					</button>
+					<h4 class = "modal-title" id = "geoUpdateConfirmModalLabel">Update Shared Rule</h4>
+				</div>
+				<div class = "modal-body">
+					<p id = "geoUpdateConfirmMessage">Choose how you want to save this rule.</p>
+					<p class = "text-muted" id = "geoUpdateConfirmHelp" style = "margin-top:10px;">
+						Choose Save Only This Offer to keep the other offers unchanged.
+					</p>
+				</div>
+				<div class = "modal-footer" style = "position:unset;">
+					<button type = "button" class = "btn btn-default" onclick = "resolveGeoRuleUpdateDecision(null);">
+						Cancel
+					</button>
+					<button type = "button" class = "btn btn-default" onclick = "resolveGeoRuleUpdateDecision('single');">
+						Save Only This Offer
+					</button>
+					<button type = "button" class = "btn btn-primary" onclick = "resolveGeoRuleUpdateDecision('shared');">
+						Overwrite Shared Rule
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class = "modal fade" id = "deleteRuleConfirmModal" tabindex = "-1" role = "dialog" aria-labelledby = "deleteRuleConfirmModalLabel">
+		<div class = "modal-dialog modal-sm" role = "document">
+			<div class = "modal-content">
+				<div class = "modal-header">
+					<button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
+						<span aria-hidden = "true">&times;</span>
+					</button>
+					<h4 class = "modal-title" id = "deleteRuleConfirmModalLabel">Delete Rule</h4>
+				</div>
+				<div class = "modal-body">
+					<p>Are you sure you want to delete?</p>
+				</div>
+				<div class = "modal-footer" style = "position:unset;">
+					<button type = "button" class = "btn btn-default" data-dismiss = "modal">No</button>
+					<button type = "button" class = "btn btn-danger" id = "confirmDeleteRuleButton">Yes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 	
 	<!-- Geo Modal -->
 	<div class = "modal " id = "geoModal" tabindex = "-1" role = "dialog" aria-labelledby = "geoModalLabel">
@@ -63,49 +186,63 @@ foreach ($rules->rules as $rule) {
 				</div>
 				<div class = "modal-body ">
 					<div class = "row">
+						<div class = "col-md-12">
+							<div class = "form-group">
+								<label for = "geoPredefinedRule">Load Predefined Rule:</label>
+								<div>
+									<select id = "geoPredefinedRule" class = "form-control" style = "width:75%;display:inline-block;">
+										<option value = "">Select a predefined rule...</option>
+										<?php \LeadMax\TrackYourStats\Offer\Rules\Handlers\PredefinedGeo::printOptionsForUser(\LeadMax\TrackYourStats\System\Session::userID()); ?>
+									</select>
+									<button id = "geoLoadPredefinedRule" type = "button" class = "btn btn-default btn-sm" style = "margin-left:10px;">
+										Load
+									</button>
+								</div>
+							</div>
+						</div>
 						
-						<div class = "col-md-6 ">
-							<label class = "control-label">Country List:</label>
-							
-							<table id = countryList"
-								   class = "table table-sm table-bordered table-responsive table-striped form-control  "
-								   style = "height:250px;  min-width:0 !important;">
-								<thead>
-								<tr>
-									<th>Country</th>
-									<th>Action</th>
-								</tr>
-								</thead>
-								<tbody id = "countryListBody">
-								<?php \LeadMax\TrackYourStats\Offer\Rules\Geo::printCountriesAsTable(); ?>
-								
-								</tbody>
-							
-							</table>
-							<input type = "text" id = "searchCountryList" placeholder = "Search countries..." style = "width:100%;">
+						<div class = "col-md-12">
+							<div class = "geo-section">
+								<label class = "control-label">Country List:</label>
+								<input type = "text" id = "searchCountryList" placeholder = "Search countries...">
+								<div class = "geo-table-scroll">
+									<table id = "countryList"
+										   class = "table table-sm table-bordered table-responsive table-striped form-control">
+										<thead>
+										<tr>
+											<th>Country</th>
+											<th>Action</th>
+										</tr>
+										</thead>
+										<tbody id = "countryListBody">
+										<?php \LeadMax\TrackYourStats\Offer\Rules\Geo::printCountriesAsTable(); ?>
+										
+										</tbody>
+									
+									</table>
+								</div>
+							</div>
 						</div>
 						
 						
-						<div class = "col-md-6 ">
-							<label class = "control-label">Items:</label>
-							
-							<table id = "toAdd"
-								   class = "table table-sm table-bordered table-responsive table-striped form-control  "
-								   style = "height:250px;  min-width:0 !important; ">
-								<thead>
-								<tr>
-									<th>Country</th>
-									<th>Action</th>
-									<th>Caps</th>
-								</tr>
-								</thead>
-								<tbody>
+						<div class = "col-md-12">
+							<div class = "geo-section">
+								<label class = "control-label">Items:</label>
+								<table id = "toAdd"
+									   class = "table table-sm table-bordered table-responsive table-striped form-control">
+									<thead>
+									<tr>
+										<th>Country</th>
+										<th>Action</th>
+										<th>Caps</th>
+									</tr>
+									</thead>
+									<tbody>
+									
+									</tbody>
 								
-								</tbody>
-							
-							</table>
-						
-						
+								</table>
+							</div>
 						</div>
 					
 					</div>
@@ -125,6 +262,7 @@ foreach ($rules->rules as $rule) {
 						</div>
 						<input type = "hidden" id = "offerID" value = "<?= $offid ?>">
 						<input type = "hidden" id = "geoRuleID" value = "">
+						<input type = "hidden" id = "geoOriginalRuleName" value = "">
 						
 						
 						<div class = "form-group">
@@ -135,6 +273,17 @@ foreach ($rules->rules as $rule) {
 						<div class = "form-group">
 							<label style = "margin-top:10px;" for = "geoRedirectOffer">Redirect Offer:</label>
 							<?php $offerView->printToSelectBox("geoRedirectOffer"); ?>
+						</div>
+						<div id = "geoPredefinedRuleCreateWrap">
+							<div class = "form-group">
+								<input id = "geoCreatePredefinedRule" type = "checkbox"
+									   style = "width:15px;height:15px;">
+								<span id = "geoPredefinedRuleActionText">Create Predefined Rule</span>
+							</div>
+							<div class = "form-group" id = "geoPredefinedRuleNameWrap" style = "display:none;">
+								<label for = "geoPredefinedRuleName">Predefined Rule Name:</label>
+								<input type = "text" id = "geoPredefinedRuleName">
+							</div>
 						</div>
 					</div>
 				</div>
@@ -363,10 +512,62 @@ foreach ($rules->rules as $rule) {
 	
 	<script type = "text/javascript">
 		
+		var geoRequestInFlight = false;
+		var rulePendingDeletion = null;
+
+		function promptDeleteRule(ruleID, trigger) {
+			rulePendingDeletion = {
+				id: ruleID,
+				row: $(trigger).closest("tr")
+			};
+
+			$("#deleteRuleConfirmModal").modal("show");
+		}
+
+		$("#deleteRuleConfirmModal").on("hidden.bs.modal", function () {
+			if (!$("#confirmDeleteRuleButton").prop("disabled")) {
+				rulePendingDeletion = null;
+			}
+		});
+
+		$("#confirmDeleteRuleButton").click(function () {
+			if (!rulePendingDeletion) {
+				return;
+			}
+
+			var pendingDeletion = rulePendingDeletion;
+			var deleteButton = $(this);
+			deleteButton.prop("disabled", true);
+
+			$.ajax({
+				type: "POST",
+				url: "/scripts/offer/rules/delete.php",
+				dataType: "json",
+				data: {
+					ruleID: pendingDeletion.id,
+					offerID: $("#offerID").val()
+				},
+				success: function () {
+					pendingDeletion.row.remove();
+					rulePendingDeletion = null;
+					$("#deleteRuleConfirmModal").modal("hide");
+				},
+				error: function (result) {
+					alert((result.responseJSON && result.responseJSON.message) || "Unable to delete the rule.");
+				},
+				complete: function () {
+					deleteButton.prop("disabled", false);
+				}
+			});
+		});
 		
 		$("#searchCountryList").on('propertychange change keyup paste input', function () {
 			searchCountryList($("#searchCountryList").val());
 			
+		});
+
+		$("#geoCreatePredefinedRule").change(function () {
+			toggleGeoPredefinedRuleName();
 		});
 		
 		
@@ -390,6 +591,216 @@ foreach ($rules->rules as $rule) {
 				}
 			}
 		}
+
+		function toggleGeoPredefinedRuleName() {
+			if ($("#geoCreatePredefinedRule").is(":checked"))
+				$("#geoPredefinedRuleNameWrap").show();
+			else {
+				$("#geoPredefinedRuleNameWrap").hide();
+				$("#geoPredefinedRuleName").val("");
+			}
+		}
+
+		function setGeoPredefinedRuleMode(mode) {
+			var actionText = mode === "edit" ? "Save as Predefined Rule" : "Create Predefined Rule";
+			$("#geoPredefinedRuleActionText").text(actionText);
+		}
+		
+		function resetGeoPredefinedRuleForm(mode) {
+			$("#geoCreatePredefinedRule").prop("checked", false);
+			$("#geoPredefinedRuleName").val("");
+			$("#geoPredefinedRuleCreateWrap").show();
+			setGeoPredefinedRuleMode(mode || "create");
+			toggleGeoPredefinedRuleName();
+		}
+
+		function setGeoSubmissionState(isSubmitting) {
+			geoRequestInFlight = isSubmitting;
+			$("#geoCreateButton").prop("disabled", isSubmitting);
+			$("#geoUpdateButton").prop("disabled", isSubmitting);
+			$("#geoLoadPredefinedRule").prop("disabled", isSubmitting);
+		}
+
+		function validateGeoRuleSubmission() {
+			var rows = $('#toAdd > tbody > tr');
+			
+			if (rows.length === 0) {
+				alert("Add at least one country before saving a geo rule.");
+				return false;
+			}
+			
+			if ($("#geoCreatePredefinedRule").is(":checked") && $("#geoPredefinedRuleName").val().trim() === "") {
+				alert("Enter a predefined rule name or uncheck the predefined rule option.");
+				return false;
+			}
+			
+			return true;
+		}
+
+		function getGeoPredefinedRuleRequestData() {
+			return {
+				saveAsPredefinedRule: $("#geoCreatePredefinedRule").is(":checked") ? 1 : 0,
+				predefinedRuleName: $("#geoPredefinedRuleName").val().trim()
+			};
+		}
+
+		function normalizeRuleName(ruleName) {
+			return $.trim((ruleName || "").toString()).toLowerCase();
+		}
+
+		function hasExistingRuleWithName(ruleName, ruleType) {
+			var normalizedName = normalizeRuleName(ruleName);
+			
+			if (normalizedName === "") {
+				return false;
+			}
+			
+			var hasMatch = false;
+			
+			$("#rules tbody tr").each(function () {
+				var existingType = ($(this).data("rule-type") || "").toString().toLowerCase();
+				var existingName = normalizeRuleName($(this).data("rule-name"));
+				
+				if (existingType === ruleType && existingName === normalizedName) {
+					hasMatch = true;
+					return false;
+				}
+			});
+			
+			return hasMatch;
+		}
+
+		function confirmRuleOverwrite(ruleName, ruleType) {
+			if (!hasExistingRuleWithName(ruleName, ruleType)) {
+				return true;
+			}
+			
+			return confirm("Do you want to overwrite the existing rule you dipshit?");
+		}
+
+		function clearSelectedGeoCountries() {
+			var rows = $('#toAdd > tbody > tr');
+			
+			for (var i = 0; i < rows.length; i++) {
+				if (rows[i].lastChild) {
+					rows[i].lastChild.remove();
+				}
+				
+				$("#countryListBody").append(rows[i]);
+				
+				$("#_" + rows[i].id).attr("onclick", "addCountry(\"" + rows[i].id + "\")");
+				
+				$("#" + rows[i].id + "_img").attr("src", "images/icons/add.png");
+			}
+			
+			sortCountries("a", "asc");
+		}
+
+		function applyPredefinedGeoRule(predefinedRule) {
+			clearSelectedGeoCountries();
+			
+			$("#geoRuleName").val(predefinedRule["name"] || "");
+			$("#geoPredefinedRuleName").val(predefinedRule["name"] || "");
+			$("#geoRedirectOffer").val(predefinedRule["redirectOffer"] || "");
+			$("#geoIsAllowed").prop("checked", parseInt(predefinedRule["deny"], 10) === 1 || predefinedRule["deny"] === true);
+			$("#geoIsActive").prop("checked", parseInt(predefinedRule["is_active"], 10) === 1 || predefinedRule["is_active"] === true);
+			
+			for (var i = 0; i < predefinedRule["countries"].length; i++) {
+				addCountry(
+					predefinedRule["countries"][i]["country_code"],
+					parseInt(predefinedRule["countries"][i]["cap_status"], 10) || 0,
+					parseInt(predefinedRule["countries"][i]["cap"], 10) || 0,
+					false
+				);
+			}
+			
+			sortTable($('#toAdd'), 'asc');
+		}
+
+		$("#geoLoadPredefinedRule").click(function () {
+			if (geoRequestInFlight) {
+				return;
+			}
+
+			var predefinedRuleID = $("#geoPredefinedRule").val();
+			
+			if (predefinedRuleID === "") {
+				alert("Select a predefined rule first.");
+				return;
+			}
+
+			setGeoSubmissionState(true);
+			
+			$.ajax({
+				type: "GET",
+				url: "/scripts/offer/rules/geo/predefined.php",
+				data: {presetID: predefinedRuleID},
+				dataType: "json",
+				cache: false,
+				success: function (result) {
+					applyPredefinedGeoRule(result);
+				},
+				error: function (result) {
+					alert((result.responseJSON && result.responseJSON.message) || result.responseText || "Unable to load predefined rule.");
+				},
+				complete: function () {
+					setGeoSubmissionState(false);
+				}
+			});
+		});
+
+		var geoRuleUpdateDecisionCallback = null;
+
+		function promptGeoRuleUpdateDecision(onChoice) {
+			var ruleName = $("#geoRuleName").val().trim();
+			var helpMessage = "Choose Save Only This Offer to keep the other offers unchanged.";
+
+			if ($("#geoCreatePredefinedRule").is(":checked")) {
+				helpMessage += " If you keep Save as Predefined Rule checked, this version will also be saved to that predefined rule name.";
+			}
+
+			helpMessage += " If you want this offer to stay separate, use a unique Rule Name.";
+
+			$("#geoUpdateConfirmMessage").text(
+				ruleName === ""
+					? "How would you like to save this rule?"
+					: "How would you like to save \"" + ruleName + "\"?"
+			);
+			$("#geoUpdateConfirmHelp").text(helpMessage);
+
+			geoRuleUpdateDecisionCallback = onChoice;
+			$("#geoUpdateConfirmModal").modal({
+				backdrop: "static",
+				keyboard: false
+			});
+		}
+
+		function resolveGeoRuleUpdateDecision(choice) {
+			var callback = geoRuleUpdateDecisionCallback;
+
+			geoRuleUpdateDecisionCallback = null;
+			$("#geoUpdateConfirmModal").modal("hide");
+
+			if (typeof callback === "function") {
+				callback(choice);
+			}
+		}
+
+		$('#geoUpdateConfirmModal').on('show.bs.modal', function () {
+			var zIndex = 1080;
+
+			$(this).css('z-index', zIndex);
+
+			window.setTimeout(function () {
+				$('.modal-backdrop').not('.geo-update-confirm-backdrop').last().css('z-index', zIndex - 10).addClass('geo-update-confirm-backdrop');
+				$('body').addClass('modal-open');
+			}, 0);
+		});
+
+		$('#geoUpdateConfirmModal').on('hidden.bs.modal', function () {
+			$('body').addClass('modal-open');
+			$('.geo-update-confirm-backdrop').removeClass('geo-update-confirm-backdrop');
+		});
 		
 		function editRule(ruleID, ruleType) {
 			switch (ruleType) {
@@ -415,18 +826,52 @@ foreach ($rules->rules as $rule) {
 		
 		
 		$("#geoCreateButton").click(function () {
+			if (geoRequestInFlight) {
+				return;
+			}
+
+			if (!validateGeoRuleSubmission()) {
+				return;
+			}
+
+			if (!confirmRuleOverwrite($("#geoRuleName").val(), "geo")) {
+				return;
+			}
+
+			setGeoSubmissionState(true);
+
+			var predefinedRuleData = getGeoPredefinedRuleRequestData();
 
 			$.ajax({
 				type: "POST",
 				url: "/scripts/offer/rules/geo/addGeo.php",
-				data: {data: parseCountries("toAdd")},
+				dataType: "json",
+				data: {
+					data: parseCountries("toAdd"),
+					saveAsPredefinedRule: predefinedRuleData.saveAsPredefinedRule,
+					predefinedRuleName: predefinedRuleData.predefinedRuleName
+				},
 				cache: false,
 				success: function (result) {
+					if (result && result["status"] === "error") {
+						alert(result["message"] || "Unable to create geo rule.");
+						return;
+					}
+					
+					if (result && result["status"] === "partial" && result["message"]) {
+						alert(result["message"]);
+					}
 					
 					$("#geoModal").modal("hide");
 					location.reload();
 					
 					
+				},
+				error: function (result) {
+					alert((result.responseJSON && result.responseJSON.message) || result.responseText || "Unable to create geo rule.");
+				},
+				complete: function () {
+					setGeoSubmissionState(false);
 				}
 				
 			});
@@ -434,6 +879,10 @@ foreach ($rules->rules as $rule) {
 		});
 		
 		$("#deviceCreateButton").click(function () {
+			if (!confirmRuleOverwrite($("#deviceRuleName").val(), "device")) {
+				return;
+			}
+
 			$.ajax({
 				type: "POST",
 				url: "/scripts/offer/rules/device/add.php",
@@ -484,46 +933,30 @@ foreach ($rules->rules as $rule) {
 		function resetGeoModal() {
 			
 			
-			var rows = $('#toAdd > tbody > tr');
-			
 			$("#geoRuleName").val("");
 			$("#geoRuleID").val("");
+			$("#geoOriginalRuleName").val("");
 			$("#geoRedirectOffer").val("");
+			$("#geoPredefinedRule").val("");
+			$("#searchCountryList").val("");
+			searchCountryList("");
 			$("#geoRuleTitle").text("New Geo Rule");
-			$("#geoIsAllowed").attr("checked", false);
-			$("#geoIsActive").attr("checked", true);
-			
-			$("#geoCancelButton").click(function () {
-				resetGeoModal()
-			});
-
-			$("#geoModal").click(function() {
-				resetGeoModal();
-			});
-
-			$("button.close").click(function() {
-				resetGeoModal();
-			});
+			$("#geoIsAllowed").prop("checked", false);
+			$("#geoIsActive").prop("checked", true);
+			resetGeoPredefinedRuleForm("create");
+			setGeoSubmissionState(false);
 			
 			$("#geoCreateButton").show();
+			$("#geoUpdateButton").off("click");
 			$("#geoUpdateButton").hide();
-
-			for (var i = 0; i < rows.length; i++) {
-				rows[i].lastChild.remove();
-				$("#countryListBody").append(rows[i]);
-				
-				$("#_" + rows[i].id).attr("onclick", "addCountry(\"" + rows[i].id + "\")");
-				
-				$("#" + rows[i].id + "_img").attr("src", "images/icons/add.png");
-			}
 			
-			sortCountries("a", "asc");
+			clearSelectedGeoCountries();
 			
 			
 		}
 		
-		$("#geoCancelButton").click(function () {
-			resetGeoModal()
+		$('#geoModal').on('hidden.bs.modal', function () {
+			resetGeoModal();
 		});
 		
 		$("#deviceCancelButton").click(function () {
@@ -535,7 +968,7 @@ foreach ($rules->rules as $rule) {
 			var selectedDeviceTR = $("#" + deviceName);
 			
 			
-			$("#deviceList tbody").remove(selectedDeviceTR);
+			selectedDeviceTR.remove();
 			
 			$("#deviceToAdd tbody").append(selectedDeviceTR);
 			
@@ -599,9 +1032,11 @@ foreach ($rules->rules as $rule) {
 			
 			var countriesNotAllowed = document.getElementById("geoIsAllowed").checked;
 			
+			var geoIsActive = document.getElementById("geoIsActive").checked;
+			
 			var parsed = [];
 			if (!onlyCountries)
-				parsed = [offerID, geoRuleName, redirectOffer, countriesNotAllowed];
+				parsed = [offerID, geoRuleName, redirectOffer, countriesNotAllowed, geoIsActive];
 			
 			for (var i = 0; i < rows.length; i++) {
 				parsed.push([
@@ -649,7 +1084,7 @@ foreach ($rules->rules as $rule) {
 
 			var c = $("#" + countryName);
 			
-			$("#countryList tbody").remove(c);
+			c.remove();
 		
 			if(!document.getElementById(countryName + '_capIsActive')) {
 				const html =

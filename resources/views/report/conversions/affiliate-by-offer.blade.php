@@ -46,8 +46,8 @@
 					<td>{{$row->total_clicks}}</td>
                     <td>{{$row->unique_clicks}}</td>
 					<td>
-                        @if ($row->conversions != 0 && ( (isset( $_GET['role'] ) && $_GET['role'] == 3) || !isset( $_GET['role']) ))
-                            <a href='/user/{{$user->idrep}}/{{$row->idoffer}}/conversions-by-subid?{{$params}}'>{{$row->conversions}}
+                        @if ( $row->conversions != 0 && (isset( $_GET['role'] ) && $_GET['role'] == 3 || !isset( $_GET['role']) ))
+                            <a href='/user/{{$user->idrep}}/{{$row->idoffer}}/conversions-by-country?{{$params}}'>{{$row->conversions}}
                             </a>
                         @else
                             {{$row->conversions}}

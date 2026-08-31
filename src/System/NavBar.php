@@ -2,6 +2,8 @@
 
 namespace LeadMax\TrackYourStats\System;
 
+
+use function Couchbase\defaultDecoder;
 use LeadMax\TrackYourStats\Table\Date;
 use LeadMax\TrackYourStats\User\Permissions;
 
@@ -130,7 +132,8 @@ class NavBar
 	            "required_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN],
             ],
 
-            "Payout Report" => ['url' => '/report/payout', "required_user_types" => [\App\Privilege::ROLE_AFFILIATE]],
+
+           /* "Payout Report" => ['url' => '/report/payout', "required_user_types" => [\App\Privilege::ROLE_AFFILIATE]],*/
 
             "Blacklist Report" => ["url" => "/report/blacklist", "required_user_types" => [\App\Privilege::ROLE_GOD]],
 
@@ -151,9 +154,9 @@ class NavBar
      //           'required_user_types' => [\App\Privilege::ROLE_AFFILIATE],
      //       ],
 
-            "Daily Report" => [
+            /*"Daily Report" => [
                 'url' => '/report/daily',
-            ]
+            ]*/
 
         ],
 
@@ -173,8 +176,6 @@ class NavBar
             "css" => "fas fa-building",
 
             "My Account" => ['url' => '/account'],
-
-//            "SMS Chat" => ['url' => '/sms', 'required_user_types' => [\App\Privilege::ROLE_AFFILIATE], 'required_permissions' => [Permissions::SMS_CHAT]],
 
             "Verification" => ['url' => '/verification', 'required_user_types' => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_AFFILIATE], 'required_permissions' => [Permissions::SMS_CHAT]],
 

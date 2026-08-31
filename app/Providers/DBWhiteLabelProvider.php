@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Company;
+use App\Http\Controllers\DB;
 use App\Services\DBWhiteLabelService;
 use Illuminate\Support\ServiceProvider;
 

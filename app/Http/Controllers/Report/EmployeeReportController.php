@@ -19,7 +19,7 @@ class EmployeeReportController extends ReportController
     {
         $repository->SHOW_AFF_TYPE = $request->query('role', 3);
         $isGodUser = Session::userType() === Privilege::ROLE_GOD;
-	    $SmsStatsPermission = Session::permissions()->can('view_sms_stats');
+		$SmsStatsPermission = Session::permissions()->can('view_sms_stats');
 
         $reporter = new \LeadMax\TrackYourStats\Report\Reporter($repository);
 
@@ -65,7 +65,7 @@ class EmployeeReportController extends ReportController
                 foreach ($data as $key => &$row) {
                     if (isset($row['Clicks']) && is_numeric($row['idrep'])) {
                         $queryString = http_build_query(request()->query());
-                        $row['Clicks'] = "<a href='/user/{$row['idrep']}/clicks?{$queryString}'>{$row['Clicks']}</a>";
+                        $row['Clicks'] = "<a class='load_click' href='/user/{$row['idrep']}/clicks-by-country?{$queryString}'>{$row['Clicks']}</a>";
                     }
                 }
 
@@ -83,10 +83,10 @@ class EmployeeReportController extends ReportController
                 $repository = new GodEmployeeRepository(\DB::getPdo());
                 break;
             case Privilege::ROLE_ADMIN:
-	            $repository = Session::permissions()->can('view_all_users') ?
-		            new GodEmployeeRepository(\DB::getPdo())
-		            :
-		            new AdminEmployeeRepository(\DB::getPdo());
+                $repository = Session::permissions()->can('view_all_users') ?
+	                new GodEmployeeRepository(\DB::getPdo())
+	                :
+	                new AdminEmployeeRepository(\DB::getPdo());
                 break;
             case Privilege::ROLE_MANAGER:
                 $repository = new ManagerEmployeeRepository(\DB::getPdo());
@@ -95,13 +95,18 @@ class EmployeeReportController extends ReportController
                 abort(400, 'Unknown user.');
         }
 
-	        $dates = self::getDates();
-		    ['startDate' => $startDate, 'endDate' => $endDate, 'dateSelect' => $dateSelect] = $this->reportDateContext($dates);
-	        $reporter = $this->report($repository, $request);
+        $dates = self::getDates();
+	    ['startDate' => $startDate, 'endDate' => $endDate, 'dateSelect' => $dateSelect] = $this->reportDateContext($dates);
+	    $role = request()->query('role', 3);
+        $reporter = $this->report($repository, $request);
 
-        return view('report.employee',
-	        compact('reporter', 'dates', 'startDate', 'endDate', 'dateSelect'));
+        return view('report.employee', compact(
+			'reporter',
+			'dates',
+	        'startDate',
+	        'endDate',
+	        'dateSelect',
+	        'role'
+        ));
     }
-
-
 }

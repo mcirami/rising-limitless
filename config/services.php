@@ -35,18 +35,13 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
-    'geo' => [
-	    'ip_database' => env('GEO_IP_DATABASE'),
-    ],
+	'geo' => [
+		'ip_database' => env('GEO_IP_DATABASE'),
+	],
 
     'smspool' => [
 	    'key' => env('SMSPOOL_API_KEY'),
 	    'base_url' => env('SMSPOOL_BASE_URL', 'https://api.smspool.net'),
-    ],
-
-    'postback_value_sale' => [
-	    'value' => env('POSTBACK_VALUE_SALE_VALUE', 35),
-	    'offer_id' => env('POSTBACK_VALUE_SALE_OFFER_ID'),
     ],
 
 ];

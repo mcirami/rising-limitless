@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Observers\UserObserver;
 use App\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use LeadMax\TrackYourStats\System\NavBar;

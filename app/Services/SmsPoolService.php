@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Services;
-
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
@@ -57,7 +56,7 @@ class SmsPoolService {
 	{
 		$payload = [
 			'country' => $country,
-			'service' =>  $service ?? "Instagram / Threads",
+			'service' => $service ?? "Instagram / Threads",
 		];
 
 		if ($pool) {

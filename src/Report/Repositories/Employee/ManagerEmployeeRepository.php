@@ -268,6 +268,7 @@ class ManagerEmployeeRepository extends Repository
 
 		return $result;
 	}
+
     public function query($dateFrom, $dateTo): \PDOStatement
     {
         // TODO: Implement query() method.

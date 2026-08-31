@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\ClickGeoCache;
 use Illuminate\Console\Command;
+use App\ClickGeoCache;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use LeadMax\TrackYourStats\Clicks\ClickGeo;
-
 class BackfillClicksGeoFromIp extends Command
 {
     /**
@@ -27,84 +26,83 @@ class BackfillClicksGeoFromIp extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
-    {
-        $hours = max(1, (int) $this->option('hours'));
-        $from = Carbon::now()->subHours($hours);
+    public function handle(): int {
+	    $hours = max(1, (int) $this->option('hours'));
+	    $from = Carbon::now()->subHours($hours);
 
-        $this->info("Processing clicks since {$from->toDateTimeString()} with NULL country_code...");
+	    $this->info("Processing clicks since {$from->toDateTimeString()} with NULL country_code...");
 
-        $totalProcessed = 0;
-        $totalUpdated = 0;
-        $totalCached = 0;
-        $totalCachePatched = 0;
+	    $totalProcessed = 0;
+	    $totalUpdated = 0;
+	    $totalCached = 0;
+	    $totalCachePatched = 0;
 
-        DB::table('clicks')
-            ->select('idclicks', 'ip_address')
-            ->whereNull('country_code')
-            ->whereNotNull('ip_address')
-            ->where('first_timestamp', '>=', $from)
-            ->orderBy('idclicks')
-            ->chunkById(500, function ($rows) use (&$totalProcessed, &$totalUpdated, &$totalCached, &$totalCachePatched) {
-                foreach ($rows as $row) {
-                    $totalProcessed++;
+	    DB::table('clicks')
+	      ->select('idclicks', 'ip_address')
+	      ->whereNull('country_code')
+	      ->whereNotNull('ip_address')
+	      ->where('first_timestamp', '>=', $from)
+	      ->orderBy('idclicks')
+	      ->chunkById(500, function ($rows) use (&$totalProcessed, &$totalUpdated, &$totalCached, &$totalCachePatched) {
+		      foreach ($rows as $row) {
+			      $totalProcessed++;
 
-                    $geo = ClickGeo::findGeo($row->ip_address);
-                    $isoCode = $geo['isoCode'] ?? null;
+			      $geo = ClickGeo::findGeo($row->ip_address);
+			      $isoCode = $geo['isoCode'] ?? null;
 
-                    if (empty($isoCode)) {
-                        continue;
-                    }
+			      if (empty($isoCode)) {
+				      continue;
+			      }
 
-                    $updated = DB::table('clicks')
-                        ->where('idclicks', $row->idclicks)
-                        ->whereNull('country_code')
-                        ->update(['country_code' => $isoCode]);
+			      $updated = DB::table('clicks')
+			                   ->where('idclicks', $row->idclicks)
+			                   ->whereNull('country_code')
+			                   ->update(['country_code' => $isoCode]);
 
-                    $totalUpdated += $updated;
+			      $totalUpdated += $updated;
 
-                    $cache = [
-                        'ip_address' => $row->ip_address,
-                        'country_code' => $isoCode,
-                        'subDivision' => $geo['subDivision'] ?? null,
-                        'city' => $geo['city'] ?? null,
-                        'postal' => $geo['postal'] ?? null,
-                        'latitude' => $geo['latitude'] ?? null,
-                        'longitude' => $geo['longitude'] ?? null,
-                        'resolved_at' => Carbon::now(),
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ];
+			      $cache = [
+				      'ip_address' => $row->ip_address,
+				      'country_code' => $isoCode,
+				      'subDivision' => $geo['subDivision'] ?? null,
+				      'city' => $geo['city'] ?? null,
+				      'postal' => $geo['postal'] ?? null,
+				      'latitude' => $geo['latitude'] ?? null,
+				      'longitude' => $geo['longitude'] ?? null,
+				      'resolved_at' => Carbon::now(),
+				      'created_at' => Carbon::now(),
+				      'updated_at' => Carbon::now(),
+			      ];
 
-                    $created = ClickGeoCache::query()->firstOrCreate(
-                        ['ip_address' => $row->ip_address],
-                        $cache
-                    );
+			      $created = ClickGeoCache::query()->firstOrCreate(
+				      ['ip_address' => $row->ip_address],
+				      $cache
+			      );
 
-                    if ($created->wasRecentlyCreated) {
-                        $totalCached++;
-                        continue;
-                    }
+			      if ($created->wasRecentlyCreated) {
+				      $totalCached++;
+				      continue;
+			      }
 
-                    $cacheUpdates = [];
-                    foreach (['subDivision', 'city', 'postal', 'latitude', 'longitude'] as $field) {
-                        if (is_null($created->{$field}) && !is_null($cache[$field])) {
-                            $cacheUpdates[$field] = $cache[$field];
-                        }
-                    }
+			      $cacheUpdates = [];
+			      foreach (['subDivision', 'city', 'postal', 'latitude', 'longitude'] as $field) {
+				      if (is_null($created->{$field}) && !is_null($cache[$field])) {
+					      $cacheUpdates[$field] = $cache[$field];
+				      }
+			      }
 
-                    if (!empty($cacheUpdates)) {
-                        $cacheUpdates['updated_at'] = Carbon::now();
-                        ClickGeoCache::query()
-                            ->whereKey($created->getKey())
-                            ->update($cacheUpdates);
-                        $totalCachePatched++;
-                    }
-                }
-            }, 'idclicks');
+			      if (!empty($cacheUpdates)) {
+				      $cacheUpdates['updated_at'] = Carbon::now();
+				      ClickGeoCache::query()
+				                   ->whereKey($created->getKey())
+				                   ->update($cacheUpdates);
+				      $totalCachePatched++;
+			      }
+		      }
+	      }, 'idclicks');
 
-        $this->info("Done. Processed: {$totalProcessed}, Clicks updated: {$totalUpdated}, Cache inserted: {$totalCached}, Cache patched: {$totalCachePatched}");
+	    $this->info("Done. Processed: {$totalProcessed}, Clicks updated: {$totalUpdated}, Cache inserted: {$totalCached}, Cache patched: {$totalCachePatched}");
 
-        return self::SUCCESS;
+	    return self::SUCCESS;
     }
 }
