@@ -52,6 +52,16 @@ Route::post('email/incoming', [RelevanceReactorController::class, 'incomingEmail
 Route::post('email/incoming/distribute', [RelevanceReactorController::class, 'distributeEmail']);
 Route::group(['middleware' => 'legacy.auth'], function () {
     Route::get('dashboard', [DashboardController::class, 'home']);
+    Route::get('account', [DashboardController::class, 'account']);
+    Route::get('announcements/{announcement}/attachment', [\App\Http\Controllers\AnnouncementController::class, 'download'])->name('announcements.attachment');
+    Route::middleware(['role:0,1', 'permissions:' . Permissions::CREATE_ANNOUNCEMENTS])->group(function () {
+        Route::get('announcements', [\App\Http\Controllers\AnnouncementController::class, 'index'])->name('announcements.index');
+        Route::get('announcements/create', [\App\Http\Controllers\AnnouncementController::class, 'create'])->name('announcements.create');
+        Route::post('announcements', [\App\Http\Controllers\AnnouncementController::class, 'store'])->name('announcements.store');
+        Route::get('announcements/{announcement}/edit', [\App\Http\Controllers\AnnouncementController::class, 'edit'])->name('announcements.edit');
+        Route::put('announcements/{announcement}', [\App\Http\Controllers\AnnouncementController::class, 'update'])->name('announcements.update');
+        Route::delete('announcements/{announcement}', [\App\Http\Controllers\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+    });
 	Route::get('verification', [SmsOrderController::class, 'show'])->middleware(
 		'role:0,3',
 		'permissions:' . Permissions::SMS_CHAT

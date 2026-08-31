@@ -36,6 +36,7 @@ class Permissions
     const VIEW_FRAUD_DATA = "view_fraud_data";
     const EDIT_AFF_PAYOUT = "edit_aff_payout";
     const CREATE_NOTIFICATIONS = "create_notifications";
+    const CREATE_ANNOUNCEMENTS = "create_announcements";
     const CREATE_BONUSES = "create_bonuses";
     const ASSIGN_BONUSES = "assign_bonuses";
     const EDIT_SALARIES = "edit_salaries";
@@ -119,6 +120,11 @@ class Permissions
         self::CREATE_NOTIFICATIONS => [
             "description" => "Can Create Notifications",
             "allowed_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN, Privilege::ROLE_MANAGER],
+        ],
+
+        self::CREATE_ANNOUNCEMENTS => [
+            "description" => "Can Create Announcements",
+            "allowed_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN],
         ],
 
         self::CREATE_BONUSES => [
