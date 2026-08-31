@@ -270,6 +270,20 @@ check(str_contains($permissionSource, 'rl-permission-option') && str_contains(fi
 check(str_contains($networkCss, 'label.rl-role-option input[type=radio]{') && str_contains($networkCss, 'appearance:none') && str_contains($networkCss, 'input[type=radio]:checked'), 'User role cards are missing visible aligned radio circles');
 check(str_contains($userSource, "array_key_exists('email', \$_POST)") && str_contains($userSource, "currentUser->company_name"), 'Removed Edit User fields are not preserved server-side');
 check(str_contains($networkCss, '.white_box form .button_wrap{display:flex;align-items:center;justify-content:flex-end') && str_contains($networkCss, 'background:var(--rl-soft)'), 'Shared form action bars are not separated and right aligned');
+$removedReportColumns = ['Free Sign Ups', 'Pending Conversions', 'Deductions', 'Codes', 'Bonus Revenue', 'Referral Revenue'];
+foreach (['offer/admin.blade.php', 'offer/affiliate.blade.php', 'employee.blade.php', 'advertiser.blade.php', 'daily.blade.php'] as $reportView) {
+    $reportSource = file_get_contents($root . '/resources/views/report/' . $reportView);
+    foreach ($removedReportColumns as $removedColumn) {
+        check(!str_contains($reportSource, $removedColumn), "{$reportView} still renders the {$removedColumn} column");
+    }
+}
+$themeInit = file_get_contents($root . '/resources/views/layouts/partials/network-theme-init.blade.php');
+$networkJs = file_get_contents($root . '/public/js/network.js');
+check(str_contains($themeInit, "localStorage.getItem('rl-theme') === 'light' ? 'light' : 'dark'") && str_contains($networkJs, "localStorage.getItem('rl-theme') === 'light' ? 'light' : 'dark'"), 'Dark mode is not the default for users without a saved preference');
+$advertiserCreateSource = file_get_contents($root . '/legacy/campaign_create.php');
+$offerUrlCreateSource = file_get_contents($root . '/legacy/add_offer_url.php');
+check(str_contains($advertiserCreateSource, 'rl-compact-form-card') && str_contains($advertiserCreateSource, 'rl-compact-form-actions'), 'Create Advertiser is missing shared form styling');
+check(str_contains($offerUrlCreateSource, 'rl-compact-form-card') && str_contains($offerUrlCreateSource, 'rl-form-note') && str_contains($offerUrlCreateSource, 'rl-compact-form-actions'), 'Create Offer URL is missing shared form styling');
 // Manager directory view: existing role permissions still control every action.
 context(2, '/user/manage', ['edit_affiliates', 'create_affiliates', 'create_managers']);
 $managerAccounts = collect(range(1, 8))->map(fn($i) => (object) [

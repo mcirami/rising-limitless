@@ -7,7 +7,6 @@ use App\Offer;
 use App\Services\CountryReportBuilderService;
 use App\Services\Repositories\Offer\OfferAffiliateClicksRepository;
 use Carbon\Carbon;
-use LeadMax\TrackYourStats\Report\Affiliate;
 use LeadMax\TrackYourStats\Report\Reporter;
 use LeadMax\TrackYourStats\Report\Repositories\Offer\AdminOfferRepository;
 use LeadMax\TrackYourStats\Report\Repositories\Offer\AffiliateOfferRepository;
@@ -74,9 +73,6 @@ class OfferReportController extends ReportController
     public function affiliate()
     {
         $dates = self::getDates();
-        $report = new Affiliate();
-        $report->fetchBonuses($dates['startDate'], $dates['endDate']);
-
         $repo = new AffiliateOfferRepository(\DB::getPdo());
         $repo->setAffiliateId(Session::userID());
 
@@ -88,7 +84,7 @@ class OfferReportController extends ReportController
             return response($reporter->fetchReport($dates['startDate'], $dates['endDate']));
         }
 
-        return view('report.offer.affiliate', compact('reporter', 'report', 'dates'));
+        return view('report.offer.affiliate', compact('reporter', 'dates'));
     }
 
     public function show()

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('layouts.partials.network-theme-init')
     <title>Sign in · {{ config('app.network_name', 'Rising Limitless') }}</title>
     <link rel="stylesheet" href="{{ $webroot }}css/font-awesome/css/all.css">
     <link rel="stylesheet" href="{{ $webroot }}css/network.css?v={{ filemtime(public_path('css/network.css')) }}">

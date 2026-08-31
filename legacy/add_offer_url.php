@@ -33,38 +33,26 @@ if (isset($_POST['submit'])) {
 
         </div>
 
-        <div class="white_box_x_scroll white_box  value_span8 ">
-            <div class="left_con01">
-
-                <div class="" style="margin-bottom:20px">
-                    <span class="alert alert-info">Point URL to this IP: <?= $_SERVER["SERVER_ADDR"] ?></span>
-                </div>
-
-                <form action="add_offer_url.php" method="post">
-                    <p>
-                        <label for="url">URL:</label>
-                        <input type="text" name="url" value="">
+        <div class="white_box value_span8 rl-compact-form-card">
+            <form action="add_offer_url.php" method="post" class="rl-compact-form">
+                <div class="rl-compact-form-body">
+                    <div class="rl-form-note"><i class="fas fa-info-circle" aria-hidden="true"></i><span>Point the offer URL to this server IP: <strong><?= htmlspecialchars($_SERVER["SERVER_ADDR"] ?? '', ENT_QUOTES, 'UTF-8') ?></strong></span></div>
+                    <p class="rl-user-field">
+                        <label class="rl-field-label" for="url">Offer URL</label>
+                        <input id="url" type="text" name="url" value="" placeholder="https://example.com" inputmode="url" required>
                     </p>
-
-                    <p>
-                        <label for="status">Status:</label>
-                        <select name="status">
-                            <?php
-
-
-                            echo "<option  value=\"1\"><span color='green'>Active</span></option>";
-                            echo "<option value=\"0\"><span color='red'>In-Active</span></option>";
-
-                            ?>
-
+                    <p class="rl-user-field">
+                        <label class="rl-field-label" for="status">Status</label>
+                        <select id="status" name="status">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
                         </select>
                     </p>
-
-
-                    <input class="btn btn-default btn-success" type="submit" value="Create" name="submit">
-
-                </form>
-            </div>
+                </div>
+                <div class="button_wrap rl-compact-form-actions">
+                    <span class="btn_yellow"><input type="submit" value="Create Offer URL" name="submit"></span>
+                </div>
+            </form>
         </div>
     </div>
     <!--right_panel-->

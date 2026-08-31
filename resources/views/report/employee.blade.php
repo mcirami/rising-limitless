@@ -5,11 +5,9 @@
     $canViewRevenue = $userType === Privilege::ROLE_GOD || ($userType === Privilege::ROLE_ADMIN && Session::permissions()->can('view_payouts'));
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
-    $reportColumns = ['idrep' => 'Rep ID', 'user_name' => 'Rep', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'FreeSignUps' => 'Free Sign Ups', 'PendingConversions' => 'Pending Conversions', 'Conversions' => 'Conversions'];
+    $reportColumns = ['idrep' => 'Rep ID', 'user_name' => 'Rep', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];
     if ($canViewRevenue) $reportColumns['Revenue'] = 'Sales Revenue';
-    if ($userType === Privilege::ROLE_ADMIN && $canViewRevenue && !Session::permissions()->can('view_sms_stats')) $reportColumns['Deductions'] = 'Deductions';
-    if ($userType === Privilege::ROLE_GOD || Session::permissions()->can('view_sms_stats')) $reportColumns['Codes'] = 'Codes';
-    if ($canViewRevenue) $reportColumns += ['EPC' => 'EPC', 'BonusRevenue' => 'Bonus Revenue', 'ReferralRevenue' => 'Referral Revenue', 'TOTAL' => 'Total'];
+    if ($canViewRevenue) $reportColumns += ['EPC' => 'EPC', 'TOTAL' => 'Total'];
 @endphp
 @extends('report.template')
 @section('report-title', 'Affiliate Reports')
@@ -32,6 +30,6 @@
 @endsection
 @section('footer')
     <script>
-        $(function () { $('#mainTable').tablesorter({sortList: [[6, 1]], widgets: ['staticRow']}); });
+        $(function () { $('#mainTable').tablesorter({sortList: [[4, 1]], widgets: ['staticRow']}); });
     </script>
 @endsection

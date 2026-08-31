@@ -23,7 +23,7 @@ class AggregateReportController extends ReportController
         $repo = new AggregateReportRepository(\DB::getPdo());
         $repo->setUser(Session::user());
         $reporter = new Reporter($repo);
-        $reporter->addFilter(new DollarSign(['revenue', 'deductions']));
+        $reporter->addFilter(new DollarSign(['revenue']));
         $report = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
 
         return view('report.daily', compact('report'));

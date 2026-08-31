@@ -5,8 +5,8 @@
     $canViewRevenue = $userType === Privilege::ROLE_GOD || ($userType === Privilege::ROLE_ADMIN && Session::permissions()->can('view_payouts'));
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
-    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'FreeSignUps' => 'Free Sign Ups', 'PendingConversions' => 'Pending Conversions', 'Conversions' => 'Conversions'];
-    if ($canViewRevenue) $reportColumns += ['Revenue' => 'Revenue', 'Deductions' => 'Deductions', 'EPC' => 'EPC'];
+    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];
+    if ($canViewRevenue) $reportColumns += ['Revenue' => 'Revenue', 'EPC' => 'EPC'];
 @endphp
 @extends('report.template')
 @section('report-title', 'Offer Reports')
@@ -28,6 +28,6 @@
 @endsection
 @section('footer')
     <script>
-        $(function () { $('#mainTable').tablesorter({sortList: [[6, 1]], widgets: ['staticRow']}); });
+        $(function () { $('#mainTable').tablesorter({sortList: [[4, 1]], widgets: ['staticRow']}); });
     </script>
 @endsection

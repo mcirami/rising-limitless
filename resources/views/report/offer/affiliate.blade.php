@@ -2,7 +2,7 @@
     $canViewRevenue = true; // Agents already see their own earnings on this report.
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
-    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'FreeSignUps' => 'Free Sign Ups', 'PendingConversions' => 'Pending Conversions', 'Conversions' => 'Conversions', 'Revenue' => 'Revenue', 'Deductions' => 'Deductions', 'EPC' => 'EPC', 'TOTAL' => 'Total'];
+    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions', 'Revenue' => 'Revenue', 'EPC' => 'EPC', 'TOTAL' => 'Total'];
 @endphp
 @extends('report.template')
 
@@ -23,19 +23,6 @@
 
 @section('table')
     @include('report.partials.performance-table', ['reportCaption' => 'Your offer performance'])
-    @if($report->bonuses)
-        <table class="table table-bordered table_01">
-            <thead>
-            <tr>
-                <td>Bonus Name</td>
-                <td>Bonus Revenue</td>
-            </tr>
-            </thead>
-            <tbody>
-            @php($report->printBonuses())
-            </tbody>
-        </table>
-    @endif
 @endsection
 
 
@@ -46,7 +33,7 @@
         $(document).ready(function () {
             $('#mainTable').tablesorter(
                 {
-                    sortList: [[6, 1]],
+                    sortList: [[4, 1]],
                     widgets: ['staticRow'],
                 });
         });
