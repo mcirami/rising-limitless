@@ -88,21 +88,21 @@ class Create
 
     public function printRadios()
     {
-        echo "  <p class='value_span9'>";
+        echo '<div class="rl-role-options">';
 
 
         switch (Session::userType()) {
             case \App\Privilege::ROLE_GOD:
-                echo "<input {$this->type["is_rep"]} onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox value_span9\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_AFFILIATE."\">Agent
-                    <input {$this->type["is_manager"]} onclick=\"admin();appendManager();\" class=\"fixCheckBox value_span9\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_MANAGER."\">" . env('ACCOUNT_TYPE_TEXT') .
-                    "<input {$this->type["is_admin"]} onclick=\"god();appendAdmin();\" class=\"fixCheckBox value_span9\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\">Admin";
+                echo "<label class=\"rl-role-option\"><input {$this->type["is_rep"]} onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_AFFILIATE."\"><span>Agent</span></label>
+                    <label class=\"rl-role-option\"><input {$this->type["is_manager"]} onclick=\"admin();appendManager();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_MANAGER."\"><span>" . e(env('ACCOUNT_TYPE_TEXT') ?: 'Manager') . "</span></label>
+                    <label class=\"rl-role-option\"><input {$this->type["is_admin"]} onclick=\"god();appendAdmin();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\"><span>Admin</span></label>";
                 break;
 
             case \App\Privilege::ROLE_ADMIN:
-                echo "<input {$this->type["is_rep"]} onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox value_span9\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_AFFILIATE."\">Agent
-                    <input {$this->type["is_manager"]} onclick=\"admin();appendManager();\" class=\"fixCheckBox value_span9\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_MANAGER."\">" . env( 'ACCOUNT_TYPE_TEXT' );
+                echo "<label class=\"rl-role-option\"><input {$this->type["is_rep"]} onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_AFFILIATE."\"><span>Agent</span></label>
+                    <label class=\"rl-role-option\"><input {$this->type["is_manager"]} onclick=\"admin();appendManager();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_MANAGER."\"><span>" . e(env('ACCOUNT_TYPE_TEXT') ?: 'Manager') . "</span></label>";
                 if (\LeadMax\TrackYourStats\System\Session::permissions()->can("create_admins")) {
-                    echo "<input {$this->type["is_admin"]} onclick=\"god();appendAdmin();\" class=\"fixCheckBox value_span9\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\">Admin";
+                    echo "<label class=\"rl-role-option\"><input {$this->type["is_admin"]} onclick=\"god();appendAdmin();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\"><span>Admin</span></label>";
                 }
 
                 break;
@@ -110,16 +110,16 @@ class Create
             case \App\Privilege::ROLE_MANAGER:
 
                 if (\LeadMax\TrackYourStats\System\Session::permissions()->can("create_affiliates")) {
-                    echo "<input {$this->type["is_rep"]} onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox value_span9\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_AFFILIATE."\">Agent ";
+                    echo "<label class=\"rl-role-option\"><input {$this->type["is_rep"]} onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_AFFILIATE."\"><span>Agent</span></label>";
                 }
                 if (\LeadMax\TrackYourStats\System\Session::permissions()->can("create_managers")) {
-                    echo "<input {$this->type["is_manager"]} onclick=\"admin();appendManager();\" class=\"fixCheckBox value_span9\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_MANAGER."\">" . env( 'ACCOUNT_TYPE_TEXT' );
+                    echo "<label class=\"rl-role-option\"><input {$this->type["is_manager"]} onclick=\"admin();appendManager();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".\App\Privilege::ROLE_MANAGER."\"><span>" . e(env('ACCOUNT_TYPE_TEXT') ?: 'Manager') . "</span></label>";
                 }
                 break;
         }
 
 
-        echo "</p>";
+        echo '</div>';
     }
 
 

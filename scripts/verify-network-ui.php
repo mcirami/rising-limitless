@@ -253,6 +253,23 @@ BLADE;
 file_put_contents($output . '/legacy-form.blade.php', $fixture);
 $view->addLocation($output);
 file_put_contents($output . '/legacy-form.html', $view->make('legacy-form')->render());
+$createUserSource = file_get_contents($root . '/legacy/aff_add.php');
+$editUserSource = file_get_contents($root . '/legacy/aff_update.php');
+$permissionSource = file_get_contents($root . '/src/User/Permissions.php');
+$userSource = file_get_contents($root . '/src/User/User.php');
+check(!preg_match('/name\s*=\s*["\']email["\']/', $createUserSource), 'Create User still renders an email field');
+check(!str_contains($createUserSource, 'referralCheckBox') && !str_contains($createUserSource, 'printAffiliatesToSelectBox'), 'Create User still renders referrals');
+check(str_contains($createUserSource, 'rl-name-grid') && str_contains($createUserSource, 'rl-user-form-actions'), 'Create User layout/action bar hooks missing');
+foreach (['email', 'cell_phone', 'company_name', 'skype'] as $removedField) {
+    check(!preg_match('/name\s*=\s*["\']'.preg_quote($removedField, '/').'["\']/', $editUserSource), "Edit User still renders {$removedField}");
+}
+check(!str_contains($editUserSource, 'Edit My Referrals') && !str_contains($editUserSource, 'printSelectBoxForEditAffiliate'), 'Edit User still renders referrals');
+check(str_contains($editUserSource, 'rl-user-tabs-bar') && str_contains($editUserSource, 'rl-login-as-user'), 'Edit User tabs/login styling hooks missing');
+check(str_contains($editUserSource, 'rl-name-grid') && str_contains($editUserSource, 'rl-user-form-actions'), 'Edit User layout/action bar hooks missing');
+check(str_contains($permissionSource, 'rl-permission-option') && str_contains(file_get_contents($root . '/src/User/Create.php'), 'rl-role-option') && str_contains(file_get_contents($root . '/src/User/Update.php'), 'rl-role-option'), 'Restyled user role/permission controls missing');
+check(str_contains($networkCss, 'label.rl-role-option input[type=radio]{') && str_contains($networkCss, 'appearance:none') && str_contains($networkCss, 'input[type=radio]:checked'), 'User role cards are missing visible aligned radio circles');
+check(str_contains($userSource, "array_key_exists('email', \$_POST)") && str_contains($userSource, "currentUser->company_name"), 'Removed Edit User fields are not preserved server-side');
+check(str_contains($networkCss, '.white_box form .button_wrap{display:flex;align-items:center;justify-content:flex-end') && str_contains($networkCss, 'background:var(--rl-soft)'), 'Shared form action bars are not separated and right aligned');
 // Manager directory view: existing role permissions still control every action.
 context(2, '/user/manage', ['edit_affiliates', 'create_affiliates', 'create_managers']);
 $managerAccounts = collect(range(1, 8))->map(fn($i) => (object) [

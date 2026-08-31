@@ -214,8 +214,19 @@ consistent labels, section dividers, spacing, multi-select heights and action
 buttons. Both wrapped create forms and direct-column edit forms use responsive
 grid layouts, stacking below 1001px. These overrides are scoped to forms inside
 legacy cards, avoiding report tables and read-only detail sections. Create Offer
-also has explicit section headings and a matching action row. No form field names,
-submission handlers, or business records were changed.
+also has explicit section headings and a matching action row. Existing submission
+handlers and business records remain in place.
+
+Create User and Edit User now use the newer two-column account layout and a
+separated, right-aligned action footer. First/last name share a row; credentials
+are grouped on the left and status, role cards, permissions and manager assignment
+are grouped on the right. The edit tabs and Login action use the shared workspace
+styling. Email is omitted when creating an admin-managed user and stored as null;
+referral controls are also removed from Create User. Email, cell phone, company,
+Skype and referral controls are removed from Edit User. The four stored profile
+values are retained by the update handler when absent from
+the form. Role choices and generated permission checkboxes use accessible label
+cards and remain wired to the existing permission/owner JavaScript.
 
 Verified My Account, Create User, Create Offer, Create Advertiser and Edit User at
 1440px, 1000px and 390px: no page overflow and no gray inner form panels. Inspected

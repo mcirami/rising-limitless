@@ -328,8 +328,10 @@ class Permissions
             $isChecked = $this->can($permission) ? ", 'checked':'checked'" : "";
         }
 
-        echo " $('<input/>').attr({type:'checkbox',name:'permissions[]', class:'fixCheckBox value_span9', value:'{$permission}' {$isChecked} }).appendTo('#permissionsP');
-         p.append(\"".self::$permissionsArray[$permission]["description"]." <br/>\");";
+        $description = json_encode(self::$permissionsArray[$permission]["description"]);
+        echo "var option = $('<label/>').addClass('rl-permission-option').appendTo(p);
+         $('<input/>').attr({type:'checkbox',name:'permissions[]', class:'fixCheckBox', value:'{$permission}' {$isChecked} }).appendTo(option);
+         $('<span/>').text({$description}).appendTo(option);";
     }
 
 

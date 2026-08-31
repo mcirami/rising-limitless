@@ -386,7 +386,7 @@ class Update
     public function printRadios()
     {
         $this->findUserType();
-        echo "<p class='value_span10'>";
+        echo '<div class="rl-role-options">';
 
         $cannotDownGrade = "";
         if (Tree::findChildren($this->selectedUser->lft, $this->selectedUser->rgt) !== 0) {
@@ -411,37 +411,37 @@ class Update
 
             case \App\Privilege::ROLE_ADMIN:
                 if ($this->per->can("create_affiliates")) {
-                    echo "<input {$cannotDownGrade}  onclick=\"manager();appendPermissions();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\"  id=\"affRadio\" value=\"".Privilege::ROLE_AFFILIATE."\">Agent";
+                    echo "<label class=\"rl-role-option\"><input {$cannotDownGrade} onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" id=\"affRadio\" value=\"".Privilege::ROLE_AFFILIATE."\"><span>Agent</span></label>";
                 }
                 if ($this->per->can("create_managers")) {
-                    echo "<input {$cannotDownGrade}  onclick=\"admin();appendPermissions();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_MANAGER."\">Manager";
+                    echo "<label class=\"rl-role-option\"><input {$cannotDownGrade} onclick=\"admin();appendManager();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_MANAGER."\"><span>Manager</span></label>";
                 }
                 if ($this->per->can("create_admins")) {
-                    echo "<input  checked onclick=\"god();appendPermissions();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\">Admin";
+                    echo "<label class=\"rl-role-option\"><input checked onclick=\"god();appendAdmin();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\"><span>Admin</span></label>";
                 }
                 break;
 
             case Privilege::ROLE_MANAGER:
                 if ($this->per->can("create_affiliates")) {
-                    echo "<input {$cannotDownGrade}  onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\"  id=\"affRadio\" value=\"".Privilege::ROLE_AFFILIATE."\">Agent";
+                    echo "<label class=\"rl-role-option\"><input {$cannotDownGrade} onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" id=\"affRadio\" value=\"".Privilege::ROLE_AFFILIATE."\"><span>Agent</span></label>";
                 }
                 if ($this->per->can("create_managers")) {
-                    echo "<input  checked onclick=\"admin();appendManager();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_MANAGER."\">Manager";
+                    echo "<label class=\"rl-role-option\"><input checked onclick=\"admin();appendManager();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_MANAGER."\"><span>Manager</span></label>";
                 }
                 if ($this->per->can("create_admins")) {
-                    echo "<input   onclick=\"god();appendAdmin();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\">Admin";
+                    echo "<label class=\"rl-role-option\"><input onclick=\"god();appendAdmin();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\"><span>Admin</span></label>";
                 }
                 break;
 
             case Privilege::ROLE_AFFILIATE:
                 if ($this->per->can("create_affiliates")) {
-                    echo "<input  checked onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\"  id=\"affRadio\" value=\"".Privilege::ROLE_AFFILIATE."\">Agent";
+                    echo "<label class=\"rl-role-option\"><input checked onclick=\"manager();appendAffiliate();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" id=\"affRadio\" value=\"".Privilege::ROLE_AFFILIATE."\"><span>Agent</span></label>";
                 }
                 if ($this->per->can("create_managers")) {
-                    echo "<input  {$cannotUpgrade} onclick=\"admin();appendManager();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_MANAGER."\">Manager";
+                    echo "<label class=\"rl-role-option\"><input {$cannotUpgrade} onclick=\"admin();appendManager();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_MANAGER."\"><span>Manager</span></label>";
                 }
                 if ($this->per->can("create_admins")) {
-                    echo "<input  {$cannotUpgrade}   onclick=\"god();appendAdmin();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\">Admin";
+                    echo "<label class=\"rl-role-option\"><input {$cannotUpgrade} onclick=\"god();appendAdmin();\" class=\"fixCheckBox\" type=\"radio\" name=\"priv\" value=\"".Privilege::ROLE_ADMIN."\"><span>Admin</span></label>";
                 }
                 break;
 
@@ -451,7 +451,7 @@ class Update
 
 
 
-        echo "</p>";
+        echo '</div>';
 
     }
 
