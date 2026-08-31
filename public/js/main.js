@@ -110,7 +110,7 @@ jQuery(document).ready(function ($) {
                 for (let i = 0; i < tabContents.children.length; i++) {
 
                     tabTogglers[i].parentElement.classList.remove("border-t",
-                        "border-r", "border-l", "-mb-px", "value_span6-1");
+                        "border-r", "border-l", "-mb-px", "value_span6-1", "is-active");
                     tabTogglers[i].classList.remove("value_span2");
                     tabContents.children[i].classList.remove("hidden");
                     if ("#" + tabContents.children[i].id === tabName) {
@@ -121,7 +121,7 @@ jQuery(document).ready(function ($) {
                 }
 
                 e.target.parentElement.classList.add("border-t", "border-r",
-                    "border-l", "-mb-px", "value_span6-1");
+                    "border-l", "-mb-px", "value_span6-1", "is-active");
                 e.target.classList.add("value_span2");
             });
         });

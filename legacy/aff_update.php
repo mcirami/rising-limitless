@@ -84,11 +84,11 @@ $update->dumpPermissionsToJavascript();
 <!--right_panel-->
 <div class = "right_panel">
 	<div class = "white_box_outer">
-		<div class="rounded mx-auto mt-10 columns-1">
-			<div class="top_section_user_edit border-b">
+		<div class="rounded mx-auto mt-10 columns-1 rl-user-edit-shell">
+			<div class="top_section_user_edit border-b rl-user-tabs-bar">
 				<!-- Tabs -->
 				<ul id="tabs" class="inline-flex pt-2 px-1">
-					<li class="px-10 py-4 font-semibold rounded-t-xl -mb-px value_span6-1 value_span4">
+					<li class="px-10 py-4 font-semibold rounded-t-xl -mb-px value_span6-1 value_span4 is-active">
 						<a class="value_span2" id="default-tab" href="#account">Account</a>
 					</li>
 					<?php if( Session::permissions()->can("edit_affiliates")) : ?>
@@ -103,7 +103,7 @@ $update->dumpPermissionsToJavascript();
 					<?php endif; ?>
 				</ul>
 				<?php if( Session::userType() != \App\Privilege::ROLE_AFFILIATE) : ?>
-					<a class="btn btn-default btn-sm value_span4 value_span6-1 value_span2"
+					<a class="rl-button rl-login-as-user"
 					   data-toggle='tooltip'
 					   title="Login into this user"
 					   href="#"
@@ -114,194 +114,39 @@ $update->dumpPermissionsToJavascript();
 			</div>
 			<!-- Tab Contents -->
 			<div id="user_info" class="columns-1">
-				<div id="account" class="p-4 columns-1">
-					<div class = "heading_holder value_span9">
-						<span class = "lft">
-							Edit User
-							<?php echo $update->selectedUser->first_name . " " . $update->selectedUser->last_name; ?>
-						</span>
-					</div>
-					<div class = "white_box value_span8">
+				<div id="account" class="p-4 columns-1 rl-user-account-tab">
+					<div class="rl-page-heading"><div><h1>Edit User</h1><p>Update <?php echo htmlspecialchars(trim($update->selectedUser->first_name . " " . $update->selectedUser->last_name)); ?>'s account and access.</p></div></div>
+					<div class = "white_box value_span8 rl-user-form-card">
 						<span class = "small_txt value_span10"><?PHP echo $error; ?></span>
 
-						<form action = "<?php htmlspecialchars($_SERVER['PHP_SELF']); ?>" method = "post" id = "form"
-						      enctype = "multipart/form-data">
-							<input type = "hidden" name = "idrep" value = "<?php echo $update->selectedUser->idrep; ?>">
-							<div class = "left_con01">
-								<p>
-									<label class = "value_span9">First Name</label>
-
-									<input type = "text" class = "form-control" name = "first_name" maxlength = "155"
-									       value = "<?php echo $update->selectedUser->first_name; ?>" id = "first_name"/>
-								</p>
-								<p>
-									<label class = "value_span9">Last Name</label>
-
-									<input type = "text" class = "form-control" name = "last_name" maxlength = "155"
-									       value = "<?php echo $update->selectedUser->last_name; ?>" id = "last_name"/>
-								</p>
-								<p>
-									<label class = "value_span9">Email</label>
-
-									<input type = "text" class = "form-control input-sm" name = "email" maxlength = "155"
-									       value = "<?php echo $update->selectedUser->email; ?>" id = "email"/>
-								</p>
-								<p>
-									<label class = "value_span9">Cell Phone</label>
-
-									<input type = "text" class = "form-control input-sm" name = "cell_phone" maxlength = "155"
-									       placeholder = "(Optional)"
-									       value = "<?php echo $update->selectedUser->cell_phone; ?>" id = "cell_phone"/>
-								</p>
-								<p>
-									<label class = "value_span9">Company</label>
-									<!-- TODO Link Referrer Payout -->
-									<input type = "text" class = "form-control" name = "company_name" minlength = "5" maxlength = "255"
-									       placeholder = "(Optional)"
-									       v value = "<?php echo $update->selectedUser->company_name; ?>" id = "company_name"/>
-								</p>
-								<p>
-									<label class = "value_span9">Skype</label>
-									<!-- TODO Link Referrer Payout -->
-									<input type = "text" class = "form-control" name = "skype" minlength = "5" maxlength = "255"
-									       placeholder = "(Optional)" value = "<?php echo $update->selectedUser->skype; ?>" id = "skype"/>
-								</p>
-
-
+						<form action="<?php htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" id="form" class="rl-user-form" enctype="multipart/form-data">
+							<input type="hidden" name="idrep" value="<?php echo $update->selectedUser->idrep; ?>">
+							<div class="column_wrap rl-user-form-grid">
+								<div class="left_con01">
+									<h3>User Details</h3>
+									<div class="rl-name-grid">
+										<p><label class="value_span9">First Name</label><input type="text" class="form-control" name="first_name" maxlength="155" value="<?php echo htmlspecialchars($update->selectedUser->first_name); ?>" id="first_name"></p>
+										<p><label class="value_span9">Last Name</label><input type="text" class="form-control" name="last_name" maxlength="155" value="<?php echo htmlspecialchars($update->selectedUser->last_name); ?>" id="last_name"></p>
+									</div>
+									<p><label class="value_span9">Username</label><input type="text" class="form-control" name="user_name" maxlength="155" value="<?php echo htmlspecialchars($update->selectedUser->user_name); ?>" id="user_name" <?php echo Session::userType() == \App\Privilege::ROLE_GOD ? '' : 'readonly'; ?>></p>
+									<p><label class="value_span9">Password</label><input type="password" class="form-control" name="password" minlength="5" maxlength="255" value="" id="password" autocomplete="new-password"></p>
+									<p><label class="value_span9">Re-Enter Password</label><input type="password" class="form-control" name="confirmpassword" minlength="5" maxlength="255" value="" id="confirmpassword" autocomplete="new-password"></p>
+								</div>
+								<div class="right_con01">
+									<h3>Account Details</h3>
+									<p><label class="value_span9">Status</label><select class="form-control input-sm" id="status" name="status"><option value="1" <?php echo $update->selectedUser->status == 1 ? 'selected' : ''; ?>>Active</option><option value="0" <?php echo $update->selectedUser->status == 0 ? 'selected' : ''; ?>>Disabled</option></select></p>
+									<?php if ($ezGawd): ?>
+										<div class="rl-user-field"><span class="rl-field-label">Account Type</span><?php $update->printRadios(); ?></div>
+										<?php $update->notifyIfCanChangePriviliges(); ?>
+									<?php endif; ?>
+									<div class="rl-user-field"><span class="rl-field-label">Permissions</span><div class="value_span10 rl-permissions-list" id="permissionsP"></div></div>
+									<?php if (Session::userType() == \App\Privilege::ROLE_GOD || Session::userType() == \App\Privilege::ROLE_ADMIN) { $update->printReferrer(); } ?>
+								</div>
 							</div>
-							<div class = "right_con01">
-
-								<?php
-								if ( Session::userType() == \App\Privilege::ROLE_GOD)
-								{
-									echo "
-                                   <p>
-                        <label class=\"value_span9\">Username</label>
-
-                        <input type=\"text\" class=\"form-control\" name=\"user_name\" maxlength=\"155\"
-                               value=\"{$update->selectedUser->user_name}\" id=\"user_name\"/>
-                    </p>
-                            ";
-								}
-								else
-								{
-									echo "<input type=\"hidden\" name=\"user_name\" value=\"{$update->selectedUser->user_name}\" id=\"user_name\">";
-								}
-								?>
-
-
-
-								<?PHP
-
-
-								if ($ezGawd)
-								{
-
-
-									$update->printRadios();
-
-									$update->notifyIfCanChangePriviliges();
-
-
-								}
-
-
-								?>
-
-								<p class="value_span10" id = "permissionsP">
-
-								</p>
-
-								<?php
-
-								if ( Session::userType() == \App\Privilege::ROLE_GOD || Session::userType() == \App\Privilege::ROLE_ADMIN)
-								{
-									$update->printReferrer();
-								}
-								?>
-								<?php
-
-								if ( Session::permissions()->can("edit_referrals") && $update->selectedUserType == \App\Privilege::ROLE_AFFILIATE)
-								{
-									echo " <p id=\"referralP\">
-
-                        <label class=\"value_span9\">Referrals</label>
-                        <a class=\"btn btn-default btn-sm\" href=\"aff_edit_ref.php?affid=$idrep\">
-                            <img src=\"/images/icons/user_edit.png\">
-                            Edit My Referrals
-                        </a>
-                        
-                        
-                      
-
-
-                    </p>
-                   
-                    
-                    ";
-									\LeadMax\TrackYourStats\User\Referrals::printSelectBoxForEditAffiliate($idrep);
-								}
-
-
-								?>
-
-
-								<?php
-
-								?>
-
-								<p>
-									<label class = "value_span9">Status</label>
-									<?php if ($update->selectedUser->status == 1)
-									{
-
-										echo "<select class=\"form-control input-sm \" id=\"status\" name=\"status\" value=\"1\"><option selected value=\"1\">Active</option>;<option value=\"0\">Disabled</option>;</select>";
-									}
-									else
-									{
-
-										echo "<select class=\"form-control input-sm \" id=\"status\" name=\"status\" value=\"1\"><option value=\"1\">Active</option>;<option selected value=\"0\">Disabled</option>;</select>";
-
-									}
-									?>
-
-
-								</p>
-
-
-								<p>
-									<label class = "value_span9">Password</label>
-
-									<input type = "text" class = "form-control" name = "password" minlength = "5" maxlength = "255"
-									       value = ""
-									       id = "password"/>
-								</p>
-								<p>
-									<label class = "value_span9">Re-Enter Password</label>
-
-									<input type = "text" class = "form-control" name = "confirmpassword" minlength = "5" maxlength = "255"
-									       value = "" id = "confirmpassword"/>
-								</p>
-								<!--                    <!-- TODO Impliment Change Password-->
-								<!--                    <span class="btn_yellow"> <input type="submit" name="buttonChangePassword"-->
-								<!--                                                     class="value_span6-2 value_span2 value_span1-2"
-								<!--                                                     value="Change Password"/></span>-->
-
+							<div class="button_wrap rl-user-form-actions">
+								<span class="btn_yellow"><a onclick="history.go(-1);" class="value_span6-2 value_span2 value_span1-2">Cancel</a></span>
+								<span class="btn_yellow"><input type="submit" name="button" class="value_span6-2 value_span2 value_span1-2" value="Save Changes"></span>
 							</div>
-							<span class = "btn_yellow"> <input type = "submit" name = "button"
-							                                   class = "value_span6-2 value_span2 value_span1-2"
-							                                   value = "Update"/></span>
-							<span class = "btn_yellow" style = "margin-left:2%;"> <a onclick = "history.go(-1);"
-							                                                         class = "value_span6-2 value_span2 value_span1-2"
-								>Cancel</a></span>
-
-
-							<!--
-				<span class = "btn_yellow" style = "margin-left:2%;"> <a
-							onclick = "window.location = 'aff_update.php?clearAtt=1&idrep=<?PHP echo $update->selectedUser->idrep; ?>';"
-							class = "value_span6-2 value_span2 value_span1-2"
-					>Clear login attempts.</a></span>
--->
 						</form>
 
 

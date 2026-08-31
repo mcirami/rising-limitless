@@ -506,12 +506,10 @@ class User extends Login
             }
 
 
-            $prep = $db->prepare("SELECT * FROM rep WHERE user_name = :repname OR email = :email");
-            $repName = post("user_name");
-            $EMAIL = post("EMAIL");
+			$prep = $db->prepare("SELECT * FROM rep WHERE user_name = :repname");
+			$repName = post("user_name");
 
-            $prep->bindParam(":repname", $repName);
-            $prep->bindParam(":email", $EMAIL);
+			$prep->bindParam(":repname", $repName);
 
             $prep->execute();
 
@@ -538,7 +536,7 @@ class User extends Login
                     $first_name = filter_var(post('first_name'), FILTER_SANITIZE_STRING);
                     $last_name = filter_var(post('last_name'), FILTER_SANITIZE_STRING);
                     $cell_phone = filter_var(post('cell_phone'), FILTER_SANITIZE_STRING);
-                    $email = filter_var(post('email'), FILTER_SANITIZE_EMAIL);
+					$email = null;
                     $user_name = filter_var(post('user_name'), FILTER_SANITIZE_STRING);
                     $password = post('password');
                     $status = filter_var(post('status'), FILTER_SANITIZE_STRING);
@@ -790,17 +788,18 @@ class User extends Login
     public function Update($redirect_to, $isGod = false)
     {
         $id = post('idrep');
+		$currentUser = $id ? self::SelectOne($id) : null;
         $first_name = filter_var(post('first_name'), FILTER_SANITIZE_STRING);
         $last_name = filter_var(post('last_name'), FILTER_SANITIZE_STRING);
-        $cell_phone = filter_var(post('cell_phone'), FILTER_SANITIZE_STRING);
+		$cell_phone = filter_var(array_key_exists('cell_phone', $_POST) ? $_POST['cell_phone'] : ($currentUser->cell_phone ?? ''), FILTER_SANITIZE_STRING);
         $user_name = filter_var(post('user_name'), FILTER_SANITIZE_STRING);
         $password = post('password');
         $status = filter_var(post('status'), FILTER_SANITIZE_STRING);
         $referrer_repid = filter_var(post('referrer_repid'), FILTER_SANITIZE_STRING);
-        $email = filter_var(post('email'), FILTER_SANITIZE_EMAIL);
+		$email = filter_var(array_key_exists('email', $_POST) ? $_POST['email'] : ($currentUser->email ?? null), FILTER_SANITIZE_EMAIL);
 
-        $skype = filter_var(post('skype'), FILTER_SANITIZE_EMAIL);
-        $company_name = filter_var(post('company_name'), FILTER_SANITIZE_EMAIL);
+		$skype = filter_var(array_key_exists('skype', $_POST) ? $_POST['skype'] : ($currentUser->skype ?? ''), FILTER_SANITIZE_STRING);
+		$company_name = filter_var(array_key_exists('company_name', $_POST) ? $_POST['company_name'] : ($currentUser->company_name ?? ''), FILTER_SANITIZE_STRING);
 
 
         $priviliges = new Privileges();
