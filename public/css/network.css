@@ -292,6 +292,9 @@ body.rl-app .ui-datepicker .ui-state-active{background:var(--rl-accent);color:#f
 /* Country targeting lives beside the offer ID; saved offer names are unchanged. */
 .rl-offer-meta{display:flex;align-items:baseline;gap:8px;margin-top:6px;max-width:370px}
 .rl-offer-meta:has(.rl-offer-countries){min-width:240px}
+.rl-offer-id.is-leading{margin:0 0 5px;text-align:left;line-height:1.2}
+.rl-offer-meta.is-agent{display:block;margin-top:8px}
+.rl-country-label{display:block;margin-bottom:4px;color:var(--rl-muted);font-size:10px;font-weight:700;line-height:1.2;text-transform:uppercase;letter-spacing:.35px}
 .rl-country-details{min-width:0}
 .rl-country-rule-note{display:block;margin-top:3px}
 .rl-offer-meta .rl-offer-id{display:inline-block;flex-shrink:0;margin:0;line-height:22px}

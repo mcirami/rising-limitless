@@ -17,7 +17,7 @@
     $contextUrl = function ($path) {
         return $path . (request()->has('adminLogin') ? (str_contains($path, '?') ? '&' : '?') . 'adminLogin=1' : '');
     };
-    $columns = 6 + ($showPayout ? 1 : 0) + ($showAccess ? 1 : 0);
+    $columns = ($isAgent ? 5 : 6) + ($showPayout ? 1 : 0) + ($showAccess ? 1 : 0);
 @endphp
 <div class="right_panel">
     <div class="rl-page-heading"><div><h1>Offers</h1><p>{{ $showPayout ? "Manage your network's offer inventory and payout rules" : "Browse your network's offer inventory" }}</p></div>
@@ -28,6 +28,8 @@
         <div class="rl-metric is-green"><span class="rl-metric-label">{{ $inactive ? 'Inactive' : 'Active' }}</span><strong>{{ $offerList->where('status', $inactive ? 0 : 1)->count() }}</strong><small>In the current inventory</small></div>
         @if($showPayout)
             <div class="rl-metric is-coral"><span class="rl-metric-label">Avg Payout</span><strong>${{ number_format($payouts->avg() ?? 0, 2) }}</strong><small>${{ number_format($payouts->min() ?? 0, 2) }} – ${{ number_format($payouts->max() ?? 0, 2) }} range</small></div>
+        @elseif($isAgent)
+            <div class="rl-metric is-coral"><span class="rl-metric-label">Available GEOs</span><strong>{{ $availableGeoCount ?? 0 }}</strong><small>Across your available offers</small></div>
         @else
             <div class="rl-metric is-coral"><span class="rl-metric-label">Advertisers</span><strong>{{ $offerList->pluck('campaign_id')->filter()->unique()->count() }}</strong><small>Across available offers</small></div>
         @endif
@@ -55,7 +57,7 @@
                     @if($isAgent)<th>Offer Link</th>@endif
                     @if($showPayout)<th><button class="rl-sort" data-offer-sort="payout">Payout ↕</button></th>@endif
                     <th>Advertiser</th><th>Status</th>
-                    @if($isAgent)<th>Postback</th>@else<th><button class="rl-sort" data-offer-sort="created">Created ↕</button></th><th>Actions</th>@endif
+                    @if(!$isAgent)<th><button class="rl-sort" data-offer-sort="created">Created ↕</button></th><th>Actions</th>@endif
                 </tr></thead>
                 <tbody id="offers_container">
                 @foreach($offerList as $offer)
@@ -66,15 +68,23 @@
                         $trackingLink = 'https://' . preg_replace('#^https?://#', '', rtrim($offerDomain, '/')) . '/?repid=' . $session::userID() . '&offerid=' . $offer->idoffer . '&sub1=';
                     @endphp
                     <tr data-offer-row data-name="{{ $countryInfo['name'] }}" data-search="{{ $name . ' ' . $offer->idoffer . ' ' . $offer->campaign_name . ' ' . implode(' ', array_keys($countryInfo['countries'])) . ' ' . implode(' ', $countryInfo['countries']) }}" data-type="{{ $offer->offer_type }}" @if($showPayout) data-payout="{{ $payout }}" @endif data-created="{{ $offer->offer_timestamp }}">
-                        <td><span class="rl-offer-name">{{ $countryInfo['name'] }}</span>@include('offer.partials.country-meta')</td>
+                        <td>
+                            @if($isAgent)
+                                <span class="rl-offer-id is-leading">#{{ $offer->idoffer }}</span>
+                                <span class="rl-offer-name">{{ $countryInfo['name'] }}</span>
+                                @include('offer.partials.country-meta', ['showOfferId' => false, 'countryLabel' => 'Available GEOs', 'agentLayout' => true])
+                            @else
+                                <span class="rl-offer-name">{{ $countryInfo['name'] }}</span>
+                                @include('offer.partials.country-meta')
+                            @endif
+                        </td>
                         <td><span class="rl-badge is-type">{{ $typeNames[$offer->offer_type] ?? 'Other' }}</span></td>
                         @if($showAccess)<td><a class="rl-button" href="{{ $contextUrl('/offer_access.php?id=' . $offer->idoffer) }}"><i class="fas fa-lock" aria-hidden="true"></i> Affiliate Access</a></td>@endif
-                        @if($isAgent)<td><button type="button" class="rl-button" data-copy-text="{{ $trackingLink }}">Copy My Link</button><details class="rl-note"><summary>View link</summary><code style="overflow-wrap:anywhere">{{ $trackingLink }}</code></details></td>@endif
+                        @if($isAgent)<td><button type="button" class="rl-button" data-copy-text="{{ $trackingLink }}">Copy My Link</button></td>@endif
                         @if($showPayout)<td class="rl-money">${{ number_format($payout, 2) }}</td>@endif
                         <td>{{ $offer->campaign_name ?: '—' }}</td>
                         <td><span class="rl-badge {{ (int) $offer->status === 1 ? 'is-active' : 'is-inactive' }}">● {{ (int) $offer->status === 1 ? 'Active' : 'Inactive' }}</span></td>
-                        @if($isAgent)<td><a class="rl-button" href="{{ $contextUrl('/offer_edit_pb.php?offid=' . $offer->idoffer) }}">Edit Postback</a></td>
-                        @else
+                        @if(!$isAgent)
                             <td class="rl-date">{{ substr((string) $offer->offer_timestamp, 0, 10) }}</td>
                             <td class="action_column">
                                 @if($permissions->can('create_offers'))<a class="btn btn-sm" href="{{ $contextUrl('/offer_update.php?idoffer=' . $offer->idoffer) }}">Edit</a>@endif
@@ -98,7 +108,7 @@
         <section class="rl-card"><header class="rl-card-header"><h2>Requestable Offers</h2></header><div class="rl-table-scroll"><table class="table"><thead><tr><th>Offer</th><th>Access</th></tr></thead><tbody>
         @foreach($requestableOffers as $offer)
             @php $countryInfo = $offerCountries[$offer->idoffer] ?? \App\Support\OfferCountryBadges::present(html_entity_decode($offer->offer_name, ENT_QUOTES, 'UTF-8')); @endphp
-            <tr><td><span class="rl-offer-name">{{ $countryInfo['name'] }}</span>@include('offer.partials.country-meta')</td><td><button class="rl-button" data-request-offer="{{ $contextUrl('/offer/' . $offer->idoffer . '/request') }}">Request Offer</button></td></tr>
+            <tr><td><span class="rl-offer-id is-leading">#{{ $offer->idoffer }}</span><span class="rl-offer-name">{{ $countryInfo['name'] }}</span>@include('offer.partials.country-meta', ['showOfferId' => false, 'countryLabel' => 'Available GEOs', 'agentLayout' => true])</td><td><button class="rl-button" data-request-offer="{{ $contextUrl('/offer/' . $offer->idoffer . '/request') }}">Request Offer</button></td></tr>
         @endforeach
         </tbody></table></div></section>
     @endif

@@ -64,7 +64,11 @@ $offers = collect(range(1, 45))->map(fn($i) => (object) [
     'offer_type' => $i % 2, 'status' => 1, 'payout' => $i / 10, 'campaign_id' => 1, 'campaign_name' => 'Partner Network',
     'offer_timestamp' => '2026-08-' . str_pad(($i % 27) + 1, 2, '0', STR_PAD_LEFT) . ' 12:00:00', 'pivot' => ['payout' => 0.65],
 ]);
-$offerData = ['offers' => $offers, 'urls' => ['tracking.example.test'], 'requestableOffers' => collect([(object) ['idoffer' => 999, 'offer_name' => 'Request access example', 'payout' => 2.5]])];
+$offerCountries = [
+    1001 => ['name' => "Partner's & <script> offer", 'countries' => ['US' => 'United States', 'CA' => 'Canada'], 'source' => 'rules', 'mode' => 'allowed', 'note' => ''],
+    1002 => ['name' => 'France Exclusive 2', 'countries' => ['CA' => 'Canada', 'AU' => 'Australia'], 'source' => 'rules', 'mode' => 'allowed', 'note' => ''],
+];
+$offerData = ['offers' => $offers, 'urls' => ['tracking.example.test'], 'requestableOffers' => collect([(object) ['idoffer' => 999, 'offer_name' => 'Request access example', 'payout' => 2.5]]), 'offerCountries' => $offerCountries, 'availableGeoCount' => 3];
 context(0, '/offer/manage', ['create_offers', 'edit_offer_rules', 'edit_affiliates', 'view_adv_reports']);
 $html = $view->make('offer.manage', $offerData)->render();
 check(str_contains($html, 'data-offer-row'), 'Offer rows were not rendered');
@@ -81,6 +85,11 @@ check(!str_contains($html, 'Create New Offer'), 'Agent has create control');
 check(!str_contains($html, 'Payout') && !str_contains($html, '$0.65') && !str_contains($html, '$2.50'), 'Agent offer inventory exposes payout information');
 check(str_contains($html, 'data-copy-text="https://tracking.example.test/'), 'Agent tracking link missing');
 check(str_contains($html, 'data-request-offer'), 'Requestable offers missing');
+check(str_contains($html, '<span class="rl-metric-label">Available GEOs</span><strong>3</strong>'), 'Agent unique GEO metric missing or incorrect');
+check(!str_contains($html, '<th>Postback</th>') && !str_contains($html, 'offer_edit_pb.php'), 'Agent Postback column still visible');
+check(!str_contains($html, '<summary>View link</summary>'), 'Agent View link disclosure still visible');
+check(preg_match('/<span class="rl-offer-id is-leading">#1001<\/span>\s*<span class="rl-offer-name">/', $html) === 1, 'Agent offer ID is not above the offer title');
+check(preg_match('/<span class="rl-country-label">Available GEOs<\/span>\s*<span class="rl-offer-countries"/', $html) === 1, 'Available GEOs label is not above the country badges');
 $menu = $view->shared('navBar')->getVisibleMenu();
 check(!in_array('Users', array_column($menu, 'label')), 'Agent can see Users navigation');
 check(!in_array('Advertisers', array_column($menu, 'label')), 'Agent can see Advertisers navigation');
@@ -91,6 +100,7 @@ $html = $view->make('offer.manage', $offerData)->render();
 check(!str_contains($html, 'data-offer-sort="payout"'), 'Manager payout column exposed');
 check(!str_contains($html, 'Avg Payout'), 'Manager payout metric exposed');
 check(!str_contains($html, 'data-payout='), 'Manager payout data exposed');
+check(str_contains($html, '<span class="rl-metric-label">Advertisers</span>') && !str_contains($html, '<span class="rl-metric-label">Available GEOs</span>'), 'Manager summary metric changed with the agent layout');
 file_put_contents($output . '/manager-offers.html', $html);
 context(0, '/offer/manage');
 $html = $view->make('offer.manage', ['offers' => collect(), 'urls' => []])->render();

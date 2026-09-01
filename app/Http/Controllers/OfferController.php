@@ -124,6 +124,10 @@ class OfferController extends Controller
 
 		$data = array_merge(compact('offers'), $data);
 		$data['offerCountries'] = \App\Support\OfferCountryBadges::forOffers($offers->concat($data['requestableOffers'] ?? []));
+		$data['availableGeoCount'] = $offers
+			->flatMap(fn ($offer) => array_keys($data['offerCountries'][$offer->idoffer]['countries'] ?? []))
+			->unique()
+			->count();
 		return view('offer.manage', $data)->with(['data' => $data]);
 	}
 
