@@ -184,8 +184,6 @@ class NavBar
 
             "IP Blacklist" => ['url' => '/ip_black_list.php', "required_user_types" => [\App\Privilege::ROLE_GOD]],
 
-            "Notifications" => ['url' => '/notifications.php'],
-
 //            "Salaries" => ["url" => "/salaries.php", "possible_permissions" => ["pay_salaries"]],
 
 //            "Bonuses" => ["url" => "/bonus.php", "possible_permissions" => ["create_bonuses", "assign_bonuses"]],

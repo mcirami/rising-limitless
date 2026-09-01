@@ -19,8 +19,18 @@
         <small>@if($canViewRevenue) EPC ${{ number_format($reportSummary['EPC'], 2) }} @else Completed conversions @endif</small>
     </div>
     <div class="rl-metric {{ $canViewRevenue ? 'is-green' : '' }}">
-        <span class="rl-metric-label"><i class="fas {{ $canViewRevenue ? 'fa-dollar-sign' : 'fa-hourglass-half' }}" aria-hidden="true"></i> {{ $canViewRevenue ? 'Total Revenue' : 'Pending Conversions' }}</span>
-        <strong>@if($canViewRevenue)${{ number_format($reportSummary['Revenue'], 2) }}@else{{ number_format($reportSummary['PendingConversions']) }}@endif</strong>
-        <small>{{ $canViewRevenue ? 'Sales revenue' : 'Awaiting completion' }}</small>
+        @if($canViewRevenue)
+            <span class="rl-metric-label"><i class="fas fa-dollar-sign" aria-hidden="true"></i> Total Revenue</span>
+            <strong>${{ number_format($reportSummary['Revenue'], 2) }}</strong>
+            <small>Sales revenue</small>
+        @elseif(isset($yesterdayConversions))
+            <span class="rl-metric-label"><i class="fas fa-calendar-check" aria-hidden="true"></i> Yesterday's Conversions</span>
+            <strong>{{ number_format($yesterdayConversions) }}</strong>
+            <small>{{ $yesterdayDate }}</small>
+        @else
+            <span class="rl-metric-label"><i class="fas fa-hourglass-half" aria-hidden="true"></i> Pending Conversions</span>
+            <strong>{{ number_format($reportSummary['PendingConversions']) }}</strong>
+            <small>Awaiting completion</small>
+        @endif
     </div>
 </div>

@@ -94,6 +94,7 @@ $menu = $view->shared('navBar')->getVisibleMenu();
 check(!in_array('Users', array_column($menu, 'label')), 'Agent can see Users navigation');
 check(!in_array('Advertisers', array_column($menu, 'label')), 'Agent can see Advertisers navigation');
 check(!collect($menu)->flatMap(fn($section) => $section['items'])->contains(fn($item) => $item['url'] === '/global_postback.php'), 'Agent can see Global Postback navigation');
+check(!collect($menu)->flatMap(fn($section) => $section['items'])->contains(fn($item) => $item['url'] === '/notifications.php'), 'Agent can see Notifications navigation');
 file_put_contents($output . '/agent-offers.html', $html);
 context(2, '/offer/manage');
 $html = $view->make('offer.manage', $offerData)->render();
@@ -249,9 +250,11 @@ check(!str_contains($html, '$240.00') && !str_contains($html, 'Export Data'), 'M
 check(str_contains($html, '/report/offer/17/user-conversions'), 'Offer conversion drill-down missing');
 file_put_contents($output . '/manager-offer-report.html', $html);
 context(3, '/report/offer');
-$html = $view->make('report.offer.affiliate', $offerData + ['report' => (object) ['bonuses' => []]])->render();
+$html = $view->make('report.offer.affiliate', array_replace($offerData, ['report' => (object) ['bonuses' => []], 'yesterdayConversions' => 7, 'yesterdayDate' => 'Aug 31, 2026']))->render();
 check(!str_contains($html, '$240.00') && !str_contains($html, '>Revenue<') && !str_contains($html, '>EPC<') && !str_contains($html, '>Total<'), 'Agent report exposes payout columns or values');
 check(str_contains($html, '/user/42/17/conversions-by-country'), 'Agent report lost country drill-down');
+check(str_contains($html, "Yesterday's Conversions") && str_contains($html, '<strong>7</strong>') && str_contains($html, 'Aug 31, 2026'), 'Agent yesterday conversion metric missing');
+check(!str_contains($html, 'Pending Conversions'), 'Agent offer report still shows Pending Conversions');
 file_put_contents($output . '/agent-report.html', $html);
 
 $restrictedRows = \App\Support\PayoutVisibility::withoutPayoutFields($offerRows);

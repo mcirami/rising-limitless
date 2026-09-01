@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Report;
 
+use App\Conversion;
 use App\Privilege;
 use App\Offer;
 use App\Services\CountryReportBuilderService;
@@ -86,7 +87,17 @@ class OfferReportController extends ReportController
             return response(\App\Support\PayoutVisibility::withoutPayoutFields($rows));
         }
 
-        return view('report.offer.affiliate', compact('reporter', 'dates'));
+        $yesterday = Carbon::yesterday('America/New_York');
+        $yesterdayConversions = Conversion::query()
+            ->where('user_id', Session::userID())
+            ->whereBetween('timestamp', [
+                $yesterday->copy()->startOfDay()->format('Y-m-d H:i:s'),
+                $yesterday->copy()->endOfDay()->format('Y-m-d H:i:s'),
+            ])
+            ->count();
+        $yesterdayDate = $yesterday->format('M j, Y');
+
+        return view('report.offer.affiliate', compact('reporter', 'dates', 'yesterdayConversions', 'yesterdayDate'));
     }
 
     public function show()
