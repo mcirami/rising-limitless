@@ -5,6 +5,7 @@ ini_set('zend.exception_ignore_args', '1');
 require __DIR__.'/../vendor/autoload.php';
 use App\Support\NetworkTheme;
 use App\Http\Controllers\NetworkSettingsController;
+use App\Services\DBWhiteLabelService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ use LeadMax\TrackYourStats\System\Company as LegacyCompany;
 $app = require __DIR__.'/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 // Override both connections BEFORE any database operation.
-config(['database.connections.master'=>['driver'=>'sqlite','database'=>':memory:','prefix'=>''], 'database.default'=>'master','session.driver'=>'array']);
+config(['database.connections.master'=>['driver'=>'sqlite','database'=>':memory:','prefix'=>''], 'database.connections.mysql.database'=>'risinglimitless', 'database.default'=>'master','session.driver'=>'array']);
 DB::purge('master');
 $db = DB::connection('master');
 $reflection = new ReflectionProperty(LeadMax\TrackYourStats\Database\DatabaseConnection::class, 'instanceMaster');
@@ -23,12 +24,22 @@ LeadMax\TrackYourStats\Database\DatabaseConnection::changeConnection($db->getPdo
 $_SESSION = ['COMPANY_SUBDOMAIN'=>'settings_fixture'];
 $_SERVER['REQUEST_URI'] = '/settings.php';
 $db->statement('CREATE TABLE company (id INTEGER PRIMARY KEY, subDomain TEXT UNIQUE, shortHand TEXT, colors TEXT, email TEXT, skype TEXT, login_url TEXT, landing_page TEXT)');
+$db->statement('CREATE TABLE offer_urls (id INTEGER PRIMARY KEY, url TEXT, company_id INTEGER)');
 $db->table('company')->insert([
     ['id'=>1,'subDomain'=>'settings_fixture','shortHand'=>'Fixture','colors'=>'','email'=>'','skype'=>'','login_url'=>'','landing_page'=>''],
     ['id'=>2,'subDomain'=>'other_fixture','shortHand'=>'Other','colors'=>'','email'=>'','skype'=>'','login_url'=>'','landing_page'=>''],
 ]);
 $checks = 0;
 function checkSettings($condition, $message) { global $checks; if (!$condition) throw new RuntimeException($message); $checks++; }
+checkSettings(DBWhiteLabelService::getSubDomain('www.risinglimitless.com') === 'risinglimitless', 'WWW host was treated as a tenant database');
+checkSettings(DBWhiteLabelService::getSubDomain('127.0.0.1:8000') === 'risinglimitless', 'IP host did not use the configured database');
+checkSettings(DBWhiteLabelService::getSubDomain('settings_fixture.example.com') === 'settings_fixture', 'Valid tenant hostname was not preserved');
+$unknownHost = new DBWhiteLabelService('unknown.example.com');
+$unknownHost->findCompanySubDomain();
+checkSettings($unknownHost->subDomain === 'risinglimitless', 'Unknown hostname selected an unconfigured database');
+$knownHost = new DBWhiteLabelService('settings_fixture.example.com');
+$knownHost->findCompanySubDomain();
+checkSettings($knownHost->subDomain === 'settings_fixture', 'Known tenant hostname did not select its database');
 checkSettings(NetworkTheme::colors('') === NetworkTheme::DEFAULTS, 'Empty palette must have eleven defaults');
 checkSettings(NetworkTheme::colors(false) === NetworkTheme::DEFAULTS, 'False palette must be safe');
 checkSettings(NetworkTheme::colors('#abc123;invalid')[0] === 'ABC123', 'Color normalization failed');
