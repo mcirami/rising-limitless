@@ -122,7 +122,7 @@ return [
     |
     */
 
-    'cookie' => 'laravel_session',
+    'cookie' => env('SESSION_COOKIE', 'risinglimitless_session'),
 
     /*
     |--------------------------------------------------------------------------
@@ -175,5 +175,17 @@ return [
     */
 
     'http_only' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Same-Site Cookies
+    |--------------------------------------------------------------------------
+    |
+    | Lax keeps the session cookie attached to normal same-site form posts
+    | while protecting it from most cross-site requests.
+    |
+    */
+
+    'same_site' => env('SESSION_SAME_SITE', 'lax'),
 
 ];

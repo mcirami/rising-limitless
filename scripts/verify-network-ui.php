@@ -323,6 +323,9 @@ foreach (['offer/admin.blade.php', 'offer/affiliate.blade.php', 'employee.blade.
 $themeInit = file_get_contents($root . '/resources/views/layouts/partials/network-theme-init.blade.php');
 $networkJs = file_get_contents($root . '/public/js/network.js');
 check(str_contains($themeInit, "localStorage.getItem('rl-theme') === 'light' ? 'light' : 'dark'") && str_contains($networkJs, "localStorage.getItem('rl-theme') === 'light' ? 'light' : 'dark'"), 'Dark mode is not the default for users without a saved preference');
+$sessionConfig = file_get_contents($root . '/config/session.php');
+check(str_contains($sessionConfig, "env('SESSION_COOKIE', 'risinglimitless_session')"), 'Session cookie is not isolated from sibling Laravel applications');
+check(str_contains($sessionConfig, "env('SESSION_SAME_SITE', 'lax')"), 'Session cookie SameSite policy is missing');
 $advertiserCreateSource = file_get_contents($root . '/legacy/campaign_create.php');
 $offerUrlCreateSource = file_get_contents($root . '/legacy/add_offer_url.php');
 check(str_contains($advertiserCreateSource, 'rl-compact-form-card') && str_contains($advertiserCreateSource, 'rl-compact-form-actions'), 'Create Advertiser is missing shared form styling');
