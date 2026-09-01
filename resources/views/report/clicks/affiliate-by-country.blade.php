@@ -6,7 +6,7 @@
 @extends('report.template')
 
 @section('report-title')
-    {{$user->user_name}}'s Clicks By Country
+    {{$user->user_name}}'s {{ ($uniqueOnly ?? false) ? 'Unique Clicks' : 'Clicks' }} By Country
 @endsection
 
 @section('table-options')

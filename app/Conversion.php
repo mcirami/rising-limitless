@@ -88,13 +88,15 @@ class Conversion extends Model
 		string $endDate,
 		?int $userId = null,
 		?int $offerId = null,
-		?int $role = null
+		?int $role = null,
+		bool $uniqueOnly = false
 	): Builder {
 		$geoCountryCode = Click::GEO_COUNTRY_CODE_SQL;
 
 		return $query
 			->whereBetween('timestamp', [$startDate, $endDate])
 			->leftJoin('clicks', 'clicks.idclicks', '=', 'conversions.click_id')
+			->when($uniqueOnly, fn (Builder $builder) => $builder->where('clicks.click_type', Click::TYPE_UNIQUE))
 			->leftJoin('click_geo_cache as geo', 'geo.ip_address', '=', 'clicks.ip_address')
 			->when(!is_null($userId), fn (Builder $builder) => $builder->forUserReportRole($userId, $role, 'conversions.user_id'))
 			->when(!is_null($offerId), fn (Builder $builder) => $builder->where('clicks.offer_idoffer', '=', $offerId))

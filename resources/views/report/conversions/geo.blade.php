@@ -70,7 +70,11 @@
                         @endif
                     </td>
                     <td>
-                        {{$row['unique_clicks']}}
+                        @if ($row['unique_clicks'] > 0 && (Session::userType() == Privilege::ROLE_GOD || Session::userType() == Privilege::ROLE_ADMIN))
+                            <a class='load_click' href="/report/geo/clicks-in-country?{{$params}}&country={{$key}}&unique=1">{{$row['unique_clicks']}}</a>
+                        @else
+                            {{$row['unique_clicks']}}
+                        @endif
                     </td>
                     <td>
                         @if ($row['total_conversions'] > 0 && (Session::userType() == Privilege::ROLE_GOD || Session::userType() == Privilege::ROLE_ADMIN))

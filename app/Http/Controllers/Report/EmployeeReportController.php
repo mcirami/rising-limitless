@@ -61,16 +61,9 @@ class EmployeeReportController extends ReportController
             ))
             ->addFilter(new Filters\EarningPerClick())
             ->addFilter(new Filters\DollarSign($currencyColumns))
-            ->addFilter(new Filters\UserToolTip())->addFilter(function ($data) {
-                foreach ($data as $key => &$row) {
-                    if (isset($row['Clicks']) && is_numeric($row['idrep'])) {
-                        $queryString = http_build_query(request()->query());
-                        $row['Clicks'] = "<a class='load_click' href='/user/{$row['idrep']}/clicks-by-country?{$queryString}'>{$row['Clicks']}</a>";
-                    }
-                }
-
-                return $data;
-            });
+            ->addFilter(new Filters\UserToolTip())
+            ->addFilter(new Filters\ClickLink($request, 'Clicks', 'idrep', '/user/{id}/clicks-by-country', []))
+            ->addFilter(new Filters\ClickLink($request, 'UniqueClicks', 'idrep', '/user/{id}/clicks-by-country', ['unique' => 1]));
 
 
         return $reporter;

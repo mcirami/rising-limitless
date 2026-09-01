@@ -9,7 +9,7 @@
 @extends('report.template')
 
 @section('report-title')
-    Clicks in {{$geoCode}}
+    {{ ($uniqueOnly ?? false) ? 'Unique Clicks' : 'Clicks' }} in {{$geoCode}}
 @endsection
 
 @section('table-options')
@@ -24,7 +24,7 @@
 			font-size: 18px;
 			border-radius: 6px;
 			color: #676767;"
-               class="btn btn-default btn-sm" href="/report/geo/clicks-in-country/export?d_from={{$startDate}}&d_to={{$endDate}}&dateSelect={{$dateSelect}}&country={{$geoCode}}">
+               class="btn btn-default btn-sm" href="/report/geo/clicks-in-country/export?d_from={{$startDate}}&d_to={{$endDate}}&dateSelect={{$dateSelect}}&country={{$geoCode}}{{ ($uniqueOnly ?? false) ? '&unique=1' : '' }}">
                 Export Data
             </a>
         </div>

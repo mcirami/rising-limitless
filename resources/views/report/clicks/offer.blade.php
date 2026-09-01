@@ -7,7 +7,7 @@
 @extends('report.template')
 
 @section('report-title')
-	{{$offer->offer_name}}'s Clicks
+	{{$offer->offer_name}}'s {{ ($uniqueOnly ?? false) ? 'Unique Clicks' : 'Clicks' }}
 @endsection
 
 @section('table-options')
@@ -83,6 +83,7 @@
 				<input type="hidden" name="d_to" value="{{$endDate}}">
 				<input type="hidden" name="dateSelect" value="{{$dateSelect}}">
 				<input type="hidden" name="searchType" value="offer">
+				@if($uniqueOnly ?? false)<input type="hidden" name="unique" value="1">@endif
 
 			</form>
 		@endif
@@ -167,7 +168,7 @@
 		@endsection
 
 		@section('extra')
-			{{ $reportCollection->links() }}
+			{{ $reportCollection->appends(($uniqueOnly ?? false) ? ['unique' => 1] : [])->links() }}
 		@endsection
 
 		@section('footer')

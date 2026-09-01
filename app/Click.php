@@ -77,12 +77,14 @@ class Click extends Model
 		string $startDate,
 		string $endDate,
 		?int $userId = null,
-		?int $role = null
+		?int $role = null,
+		bool $uniqueOnly = false
 	): Collection
 	{
 		return static::query()
 		             ->whereBetween('first_timestamp', [$startDate, $endDate])
 		             ->where('click_type', '!=', self::TYPE_BLACKLISTED)
+		             ->when($uniqueOnly, fn (Builder $builder) => $builder->where('click_type', self::TYPE_UNIQUE))
 		             ->when(!is_null($userId), fn (Builder $builder) => $builder->forUserReportRole($userId, $role))
 		             ->whereNull('country_code')
 		             ->distinct()
@@ -175,7 +177,8 @@ class Click extends Model
 		Builder $query,
 		string $startDate,
 		string $endDate,
-		?string $geoCode = null
+		?string $geoCode = null,
+		bool $uniqueOnly = false
 	): Builder {
 		return $query
 			->leftJoin('click_vars', 'click_vars.click_id', '=', 'clicks.idclicks')
@@ -185,6 +188,7 @@ class Click extends Model
 			->leftJoin('offer', 'offer.idoffer', '=', 'clicks.offer_idoffer')
 			->whereBetween('first_timestamp', [$startDate, $endDate])
 			->where('clicks.click_type', '!=', self::TYPE_BLACKLISTED)
+			->when($uniqueOnly, fn (Builder $builder) => $builder->where('clicks.click_type', self::TYPE_UNIQUE))
 			->when($geoCode, function (Builder $builder) use ($geoCode) {
 				$builder->whereRaw(
 					self::GEO_COUNTRY_CODE_SQL . ' = ?',
@@ -238,13 +242,15 @@ class Click extends Model
 		string $endDate,
 		?int $repId = null,
 		?int $offerId = null,
-		?int $role = null
+		?int $role = null,
+		bool $uniqueOnly = false
 	): Builder {
 		$geoCountryCode = self::GEO_COUNTRY_CODE_SQL;
 
 		return $query
 			->whereBetween('first_timestamp', [$startDate, $endDate])
 			->where('clicks.click_type', '!=', self::TYPE_BLACKLISTED)
+			->when($uniqueOnly, fn (Builder $builder) => $builder->where('clicks.click_type', self::TYPE_UNIQUE))
 			->when(!is_null($repId), fn (Builder $builder) => $builder->forUserReportRole($repId, $role, 'clicks.rep_idrep'))
 			->when(!is_null($offerId), fn (Builder $builder) => $builder->where('offer_idoffer', '=', $offerId))
 			->leftJoin('click_geo_cache as geo', 'geo.ip_address', '=', 'clicks.ip_address')

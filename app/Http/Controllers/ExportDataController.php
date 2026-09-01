@@ -29,9 +29,11 @@ class ExportDataController extends ReportController
 
 		$dates = self::getDates();
 		$selectedRole = (int) request()->query('role', Privilege::ROLE_AFFILIATE);
+		$uniqueOnly = request()->boolean('unique');
 
 		$reportCollection = Click::query()
 			->userClicksReportByRole($userId, $dates['startDate'], $dates['endDate'], $selectedRole)
+			->when($uniqueOnly, fn ($query) => $query->where('clicks.click_type', Click::TYPE_UNIQUE))
 			->get();
 		$report = $this->formatResults($reportCollection);
 		return Excel::download(new ClicksExport($report), 'clicks.xlsx');
@@ -69,13 +71,14 @@ class ExportDataController extends ReportController
 	public function exportCountryClicks(ClickGeoCacheService $geoCache) {
 		$dates = self::getDates();
 		$geoCode = request()->query('country');
+		$uniqueOnly = request()->boolean('unique');
 
-		$ips = Click::missingCountryCodeIps($dates['startDate'], $dates['endDate']);
+		$ips = Click::missingCountryCodeIps($dates['startDate'], $dates['endDate'], null, null, $uniqueOnly);
 
 		$geoCache->warm($ips);
 
 		$report = Click::query()
-		               ->countryClicksInGeo($dates['startDate'], $dates['endDate'], $geoCode)
+		               ->countryClicksInGeo($dates['startDate'], $dates['endDate'], $geoCode, $uniqueOnly)
 		               ->get();
 
 		return Excel::download(new CountryClicksExport($report), 'country-clicks.xlsx');

@@ -93,5 +93,17 @@ verify($info[12]['mode'] === 'excluded', 'Deny flag was lost in query');
 verify($offers[0]->offer_name === 'Sample - US/CA', 'Saved offer name was mutated');
 $db->flushQueryLog();
 verify(OfferCountryBadges::forOffers([]) === [] && !$db->getQueryLog(), 'Empty inventory should not query');
+$db->statement('CREATE TABLE campaigns (id INTEGER PRIMARY KEY, name TEXT)');
+$db->statement('CREATE TABLE offer (idoffer INTEGER PRIMARY KEY, campaign_id INTEGER)');
+$db->table('campaigns')->insert([['id' => 7, 'name' => 'ADV-CODE']]);
+$db->table('offer')->insert([['idoffer' => 10, 'campaign_id' => 7], ['idoffer' => 11, 'campaign_id' => null]]);
+$advertiserRows = (new \LeadMax\TrackYourStats\Report\Filters\Advertiser())->filter([
+    ['idoffer' => 10, 'EPC' => '$1.00'],
+    ['idoffer' => 11, 'EPC' => '$2.00'],
+    ['idoffer' => 'TOTAL', 'EPC' => '$3.00'],
+]);
+verify($advertiserRows[0]['Advertiser'] === 'ADV-CODE', 'Advertiser code was not mapped to its offer');
+verify($advertiserRows[1]['Advertiser'] === '—', 'Offer without an advertiser has no safe fallback');
+verify($advertiserRows[2]['Advertiser'] === '', 'Totals row received an advertiser code');
 $db->disconnect();
 echo "Passed {$checks} country badge assertions (isolated SQLite).\n";

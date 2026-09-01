@@ -34,17 +34,20 @@ class OfferClicksRepository implements Repository
      */
     public $user;
 
+    public bool $uniqueOnly;
+
     /**
      * OfferClicksRepository constructor.
      * @param $offerId
      * @param User $user
      * @param bool $showFraudData
      */
-    public function __construct($offerId, User $user, $showFraudData = false)
+    public function __construct($offerId, User $user, $showFraudData = false, bool $uniqueOnly = false)
     {
         $this->offerId = $offerId;
         $this->user = $user;
         $this->showFraudData = $showFraudData;
+        $this->uniqueOnly = $uniqueOnly;
     }
 
 	/**
@@ -83,6 +86,7 @@ class OfferClicksRepository implements Repository
 		                ->leftJoin('conversions', 'conversions.click_id', 'clicks.idclicks')
 		                ->join('rep', 'rep.idrep', 'clicks.rep_idrep')
 		                ->where('offer_idoffer', $this->offerId)
+		                ->when($this->uniqueOnly, fn ($query) => $query->where('clicks.click_type', Click::TYPE_UNIQUE))
 		                ->whereBetween('clicks.first_timestamp', [$start, $end])
 		                ->select($select)
 		                ->orderBy('paid', 'DESC')
@@ -92,6 +96,7 @@ class OfferClicksRepository implements Repository
 		                ->leftJoin('conversions', 'conversions.click_id', 'clicks.idclicks')
 		                ->join('rep', 'rep.idrep', 'clicks.rep_idrep')
 		                ->where('offer_idoffer', $this->offerId)
+		                ->when($this->uniqueOnly, fn ($query) => $query->where('clicks.click_type', Click::TYPE_UNIQUE))
 		                ->where('rep.lft', '>', $this->user->lft)
 		                ->where('rep.rgt', '<', $this->user->rgt)
 		                ->whereBetween('clicks.first_timestamp', [$start, $end])

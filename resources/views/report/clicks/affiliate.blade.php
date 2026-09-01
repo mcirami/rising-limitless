@@ -10,7 +10,7 @@
 @extends('report.template')
 
 @section('report-title')
-    {{$user->user_name}}'s Clicks
+    {{$user->user_name}}'s {{ ($uniqueOnly ?? false) ? 'Unique Clicks' : 'Clicks' }}
 @endsection
 
 @section('table-options')
@@ -24,7 +24,7 @@
 			font-size: 18px;
 			border-radius: 6px;
 			color: #676767;" 
-			class="btn btn-default btn-sm" href="/user/{{$user->idrep}}/clicks/export?d_from={{$startDate}}&d_to={{$endDate}}&dateSelect={{$dateSelect}}@if(request()->has('role'))&role={{request()->query('role')}}@endif">
+			class="btn btn-default btn-sm" href="/user/{{$user->idrep}}/clicks/export?d_from={{$startDate}}&d_to={{$endDate}}&dateSelect={{$dateSelect}}{{ request()->has('role') ? '&role='.request()->query('role') : '' }}{{ ($uniqueOnly ?? false) ? '&unique=1' : '' }}">
 				Export Data
 			</a>
 		</div>
@@ -45,6 +45,7 @@
 				<input type="hidden" name="d_to" value="{{$endDate}}">
 				<input type="hidden" name="dateSelect" value="{{$dateSelect}}">
 				<input type="hidden" name="searchType" value="user">
+				@if($uniqueOnly ?? false)<input type="hidden" name="unique" value="1">@endif
 			</form>
 		@endif
 	</div>

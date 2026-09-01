@@ -6,7 +6,10 @@
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
     $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];
-    if ($canViewRevenue) $reportColumns += ['Revenue' => 'Revenue', 'EPC' => 'EPC'];
+    if ($canViewRevenue) {
+        $reportColumns['Revenue'] = 'Revenue';
+        $reportColumns[$userType === Privilege::ROLE_ADMIN ? 'Advertiser' : 'EPC'] = $userType === Privilege::ROLE_ADMIN ? 'Advertiser' : 'EPC';
+    }
 @endphp
 @extends('report.template')
 @section('report-title', 'Offer Reports')

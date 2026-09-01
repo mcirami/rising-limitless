@@ -53,9 +53,10 @@ class ClickReportController extends ReportController
 
 	    $start = Carbon::parse( $dates['startDate'], 'America/New_York' );
 	    $end   = Carbon::parse( $dates['endDate'], 'America/New_York' );
+	    $uniqueOnly = request()->boolean('unique');
 
 	    $repo          = new OfferClicksRepository( $id, Session::user(),
-		    Session::permissions()->can( Permissions::VIEW_FRAUD_DATA ) );
+		    Session::permissions()->can( Permissions::VIEW_FRAUD_DATA ), $uniqueOnly );
 	    $reportCollection      = $repo->between( $start, $end );
 		$report                = $reportCollection->items();
 
@@ -67,7 +68,8 @@ class ClickReportController extends ReportController
 			'id', 
 			'startDate', 
 			'endDate', 
-			'dateSelect'
+			'dateSelect',
+			'uniqueOnly'
 		));
     } 
 
@@ -105,11 +107,13 @@ class ClickReportController extends ReportController
         $dates = self::getDates();
 		['startDate' => $startDate, 'endDate' => $endDate, 'dateSelect' => $dateSelect] = $this->reportDateContext($dates);
 		$selectedRole = (int) request()->query('role', Privilege::ROLE_AFFILIATE);
+		$uniqueOnly = request()->boolean('unique');
 
         $user = $this->findReportUser($userId);
 
 		$reportCollection = Click::query()
 			->userClicksReportByRole($userId, $dates['startDate'], $dates['endDate'], $selectedRole)
+			->when($uniqueOnly, fn ($query) => $query->where('clicks.click_type', Click::TYPE_UNIQUE))
 			->paginate(100);
 
 		$report = $this->formatResults($reportCollection);
@@ -122,7 +126,8 @@ class ClickReportController extends ReportController
 			'startDate', 
 			'endDate', 
 			'dateSelect',
-			'selectedRole'
+			'selectedRole',
+			'uniqueOnly'
 		));
     }
 
@@ -134,6 +139,7 @@ class ClickReportController extends ReportController
 		$dates = self::getDates();
 		['startDate' => $startDate, 'endDate' => $endDate, 'dateSelect' => $dateSelect] = $this->reportDateContext($dates);
 		$selectedRole = (int) request()->query('role', Privilege::ROLE_AFFILIATE);
+		$uniqueOnly = request()->boolean('unique');
 
 		$user = $this->findReportUser($userId);
 
@@ -141,15 +147,16 @@ class ClickReportController extends ReportController
 			$dates['startDate'],
 			$dates['endDate'],
 			$user->idrep,
-			$selectedRole
+			$selectedRole,
+			$uniqueOnly
 		);
 		$geoCache->warm($ipsMissingGeo);
 
 		$clicksSubquery = Click::query()
-			->countryClicksByIpInGeo($dates['startDate'], $dates['endDate'], $user->idrep, null, $selectedRole);
+			->countryClicksByIpInGeo($dates['startDate'], $dates['endDate'], $user->idrep, null, $selectedRole, $uniqueOnly);
 
 		$conversionsSubquery = \App\Conversion::query()
-			->countryConversionsByIpInGeo($dates['startDate'], $dates['endDate'], $user->idrep, null, $selectedRole);
+			->countryConversionsByIpInGeo($dates['startDate'], $dates['endDate'], $user->idrep, null, $selectedRole, $uniqueOnly);
 
 		$countryReports = $countryReportBuilderService
 			->buildFromIpSubqueries($clicksSubquery, $conversionsSubquery);
@@ -162,7 +169,8 @@ class ClickReportController extends ReportController
 				'startDate',
 				'endDate',
 				'dateSelect',
-				'selectedRole'
+				'selectedRole',
+				'uniqueOnly'
 			));
 	}
 
@@ -208,6 +216,7 @@ class ClickReportController extends ReportController
 		$dates = self::getDates();
 		['startDate' => $startDate, 'endDate' => $endDate, 'dateSelect' => $dateSelect] = $this->reportDateContext($dates);
 		$searchType = request()->query('searchType');
+		$uniqueOnly = request()->boolean('unique');
 		$user = null;
 		$offer = null;
 
@@ -222,6 +231,7 @@ class ClickReportController extends ReportController
 						}
 					}
 				]])->whereBetween( 'clicks.first_timestamp', [ $dates['startDate'], $dates['endDate'] ] )
+			   ->when($uniqueOnly, fn ($query) => $query->where('clicks.click_type', Click::TYPE_UNIQUE))
 			       ->leftJoin( 'click_vars', 'click_vars.click_id', '=', 'clicks.idclicks' )
 			       ->leftJoin( 'conversions', 'conversions.click_id', '=', 'clicks.idclicks' )
 			       ->leftJoin( 'offer', 'offer.idoffer', '=', 'clicks.offer_idoffer' )
@@ -251,6 +261,7 @@ class ClickReportController extends ReportController
 						$query->orWhere( 'idclicks', 'LIKE', '%' . $s . '%' )->orWhere('click_vars.encoded', 'LIKE', '%' . $s . '%' );
 					}
 				}]])->whereBetween( 'clicks.first_timestamp', [ $dates['startDate'], $dates['endDate'] ] )
+			    ->when($uniqueOnly, fn ($query) => $query->where('clicks.click_type', Click::TYPE_UNIQUE))
 			        ->leftJoin( 'click_vars', 'click_vars.click_id', '=', 'clicks.idclicks' )
 			        ->leftJoin( 'conversions', 'conversions.click_id', '=', 'clicks.idclicks' )
 			        ->leftJoin( 'offer', 'offer.idoffer', '=', 'clicks.offer_idoffer' )
@@ -277,23 +288,24 @@ class ClickReportController extends ReportController
 		$report = $this->formatResults($reportCollection);
 
 		if ($searchType == "user") {
-			return view('report.clicks.affiliate', compact('user', 'report', 'reportCollection', 'startDate', 'endDate', 'dateSelect'));
+			return view('report.clicks.affiliate', compact('user', 'report', 'reportCollection', 'startDate', 'endDate', 'dateSelect', 'uniqueOnly'));
 		} else {
-			return view('report.clicks.offer', compact('offer', 'report', 'reportCollection', 'startDate', 'endDate', 'dateSelect'));
+			return view('report.clicks.offer', compact('offer', 'report', 'reportCollection', 'startDate', 'endDate', 'dateSelect', 'uniqueOnly'));
 		}
 	}
 
 	public function clicksInCountry(ClickGeoCacheService $geoCache) {
 		$dates = self::getDates();
 		$geoCode = request()->query('country');
+		$uniqueOnly = request()->boolean('unique');
 		['startDate' => $startDate, 'endDate' => $endDate, 'dateSelect' => $dateSelect] = $this->reportDateContext($dates);
 
-		$ips = Click::missingCountryCodeIps($dates['startDate'], $dates['endDate']);
+		$ips = Click::missingCountryCodeIps($dates['startDate'], $dates['endDate'], null, null, $uniqueOnly);
 
 		$geoCache->warm($ips);
 
 		$report = Click::query()
-		               ->countryClicksInGeo($dates['startDate'], $dates['endDate'], $geoCode)
+		               ->countryClicksInGeo($dates['startDate'], $dates['endDate'], $geoCode, $uniqueOnly)
 		               ->paginate(100);
 
 		return view('report.clicks.clicks-in-country',
@@ -302,7 +314,8 @@ class ClickReportController extends ReportController
 				'geoCode',
 				'startDate',
 				'endDate',
-				'dateSelect'
+				'dateSelect',
+				'uniqueOnly'
 			));
 	}
 
