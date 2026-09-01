@@ -307,7 +307,8 @@ body.rl-app .rl-primary,body.rl-app input[type=submit],body.rl-app .btn-primary{
 body.rl-app .rl-primary:hover,body.rl-app input[type=submit]:hover,body.rl-app .btn-primary:hover{background:var(--rl-button-hover,var(--rl-accent));border-color:var(--rl-button-hover,var(--rl-accent))}
 .rl-app .rl-subnav a[aria-current=page]{border-left-color:var(--rl-brand-accent,var(--rl-accent))}
 .rl-app .rl-brand-mark{background:var(--rl-button,var(--rl-accent));color:var(--rl-button-ink,#fff)}
-.rl-brand-logo{width:36px;height:36px;object-fit:contain;flex-shrink:0}
+.rl-app .rl-brand.has-logo{gap:0;padding:12px 18px}
+.rl-app .rl-brand.has-logo .rl-brand-logo{display:block;width:100%;height:54px;object-fit:contain;object-position:left center;flex:1 1 auto}
 .rl-settings fieldset{border:0;padding:0;margin:0;min-width:0}
 .rl-settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
 .rl-settings-card{padding:24px;margin-bottom:24px;min-width:0}

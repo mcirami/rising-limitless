@@ -45,7 +45,7 @@
             <label class="rl-search"><i class="fas fa-search" aria-hidden="true"></i><input type="search" id="searchBox" data-offer-search placeholder="Search offers, IDs, advertisers…" aria-label="Search offers"></label>
             <select data-offer-type aria-label="Filter by offer type"><option value="">All types</option>@foreach($availableTypes as $type)<option value="{{ $type }}">{{ $typeNames[$type] ?? 'Other' }}</option>@endforeach</select>
             <div class="rl-toolbar-end">
-                <label for="offers-page-size">Rows</label><select id="offers-page-size" data-offer-page-size><option>20</option><option>50</option><option>100</option></select>
+                <label for="offers-page-size">Rows</label><select id="offers-page-size" data-offer-page-size><option>20</option><option selected>50</option><option>100</option></select>
                 @if(!$isAgent)<a class="rl-button" href="{{ request()->fullUrlWithQuery(['showInactive' => $inactive ? 0 : 1]) }}">{{ $inactive ? 'Show Active' : 'Show Inactive' }}</a>@endif
             </div>
         </div>

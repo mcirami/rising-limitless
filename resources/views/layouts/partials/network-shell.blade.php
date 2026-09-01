@@ -14,7 +14,13 @@
 <a class="rl-skip" href="#network-content">Skip to content</a>
 <button type="button" class="rl-overlay" data-nav-close aria-label="Close navigation" tabindex="-1" hidden></button>
 <aside class="rl-sidebar" id="network-navigation" aria-label="Network sidebar">
-    <a class="rl-brand" href="/dashboard">@if($hasBrandLogo)<img class="rl-brand-logo" src="/{{ $brandLogo }}?v={{ filemtime(public_path($brandLogo)) }}" alt="">@else<span class="rl-brand-mark">{{ mb_strtoupper(mb_substr($brandName, 0, 2)) }}</span>@endif<span>{{ $brandName }}</span></a>
+    <a class="rl-brand{{ $hasBrandLogo ? ' has-logo' : '' }}" href="/dashboard" data-brand-name="{{ $brandName }}" aria-label="{{ $brandName }} dashboard">
+        @if($hasBrandLogo)
+            <img class="rl-brand-logo" src="/{{ $brandLogo }}?v={{ filemtime(public_path($brandLogo)) }}" alt="{{ $brandName }}">
+        @else
+            <span class="rl-brand-mark">{{ mb_strtoupper(mb_substr($brandName, 0, 2)) }}</span><span>{{ $brandName }}</span>
+        @endif
+    </a>
     <nav class="rl-navigation" aria-label="Main navigation">
         @foreach(['Main' => ['Dashboard'], 'Management' => ['Users', 'Offers', 'Reports', 'Announcements'], 'Settings' => ['Advertisers', 'Account']] as $group => $labels)
             @php $groupSections = array_filter($sections, fn($section) => in_array($section['label'], $labels)); @endphp

@@ -50,7 +50,8 @@
         var breadcrumb = document.querySelector('[data-page-title]');
         if (heading && breadcrumb) {
             if (!breadcrumb.hasAttribute('data-page-title-fixed')) breadcrumb.textContent = heading.textContent.trim();
-            document.title = heading.textContent.trim() + ' · ' + (document.querySelector('.rl-brand').textContent.trim().replace(/^RL\s*/, ''));
+            var brand = document.querySelector('.rl-brand');
+            document.title = heading.textContent.trim() + ' · ' + (brand.dataset.brandName || brand.textContent.trim().replace(/^RL\s*/, ''));
         }
         // Shared feedback and clipboard behavior for account links and offer links.
         var flash = document.createElement('div');
