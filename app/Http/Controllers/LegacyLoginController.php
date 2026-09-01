@@ -16,7 +16,7 @@ class LegacyLoginController extends Controller
 		$company = Company::loadFromSession();
 		$company->reloadSettings();
 
-		if ($user->is_loggedin() && $user->verify_login_session()) {
+		if ($user->is_loggedin() && $user->verify_login_session(false)) {
 			return redirect('dashboard');
 		}
 
@@ -83,7 +83,7 @@ class LegacyLoginController extends Controller
 			'error' => $error,
 		]);
 	}
-    public function logout()
+    public function logout(Request $request)
     {
         if (isset($_GET["adminLogin"])) {
             unset($_SESSION["adminLogin"]);
@@ -95,6 +95,10 @@ class LegacyLoginController extends Controller
         $user_logout = new \LeadMax\TrackYourStats\User\User();
 
         $user_logout->logout();
+
+        // Laravel's CSRF session is separate from the legacy PHP login session.
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect('/login');
     }

@@ -176,18 +176,13 @@ class Login
 
     public function verify_login_session($logoutOnFailure = true)
     {
-
-
-        $db = DatabaseConnection::getInstance();
-
-        $sql = "SELECT * FROM logins WHERE session_id= :sesh AND repid = :repid";
-
-        $prep = $db->prepare($sql);
-
-        if (!isset($_SESSION["salt"])) {
+        if (empty($_SESSION["salt"]) || !isset($_SESSION["repid"])) {
             return false;
         }
 
+        $db = DatabaseConnection::getInstance();
+        $sql = "SELECT * FROM logins WHERE session_id= :sesh AND repid = :repid";
+        $prep = $db->prepare($sql);
         $oof = hash("sha256", $_SESSION["salt"]);
 
         $prep->bindParam(":sesh", $oof);
@@ -224,54 +219,82 @@ class Login
 
                 $prep->bindParam(":sesh", $oof);
                 $prep->bindParam(":date", $date);
-                $prep->bindParam(":ip", $_SERVER["REMOTE_ADDR"]);
+                $remoteAddress = $_SERVER["REMOTE_ADDR"] ?? '';
+                $prep->bindParam(":ip", $remoteAddress);
                 $prep->execute();
 
                 return true;
             }
-        } else {
-            return false;
         }
 
-
+        return false;
     }
 
     public function logout()
     {
+        $adminId = $_SESSION["admin_id"] ?? null;
 
+        // Expired sessions may contain only part of their former login state.
+        // Updating the login audit row is best-effort and must not block logout.
+        if (!empty($_SESSION["salt"]) && isset($_SESSION["repid"])) {
+            try {
+                $db = DatabaseConnection::getInstance();
+                $salt = hash("sha256", $_SESSION["salt"]);
+                $salt2 = "($salt)";
+                $remoteAddress = $_SERVER["REMOTE_ADDR"] ?? '';
+                $repid = $_SESSION["repid"];
+                $deleteSQL = "UPDATE logins SET success = 2, session_id = :hashUpdate WHERE ip = :ip AND repid = :repid AND session_id = :salt";
 
-        $db = DatabaseConnection::getInstance();
-        $salt = hash("sha256", $_SESSION["salt"]);
+                $statement = $db->prepare($deleteSQL);
+                $statement->bindParam(":ip", $remoteAddress, \PDO::PARAM_STR);
+                $statement->bindParam(":repid", $repid, \PDO::PARAM_INT);
+                $statement->bindParam(":salt", $salt, \PDO::PARAM_STR);
+                $statement->bindParam(":hashUpdate", $salt2, \PDO::PARAM_STR);
+                $statement->execute();
+            } catch (\Throwable $exception) {
+                error_log('Unable to update the legacy login record during logout: '.$exception->getMessage());
+            }
+        }
 
+        self::clearAuthenticationSession();
 
-        $deleteSQL = "UPDATE logins SET success = 2, session_id = :hashUpdate WHERE ip = :ip AND repid = :repid AND session_id = :salt";
+        if ($adminId !== null) {
+            try {
+                if ($this->adminLogin($adminId)) {
+                    return true;
+                }
+            } catch (\Throwable $exception) {
+                error_log('Unable to restore the admin session during logout: '.$exception->getMessage());
+            }
+        }
 
-        $salt2 = "($salt)";
-
-
-        $oof = $db->prepare($deleteSQL);
-        $oof->bindParam(":ip", $_SERVER["REMOTE_ADDR"], \PDO::PARAM_STR);
-        $oof->bindParam(":repid", $_SESSION["repid"], \PDO::PARAM_INT);
-        $oof->bindParam(":salt", $salt, \PDO::PARAM_STR);
-        $oof->bindParam(":hashUpdate", $salt2, \PDO::PARAM_STR);
-
-        $oof->execute();
-
-        unset($_SESSION['user_session']);
-        unset($_SESSION['email']);
-        unset($_SESSION['repid']);
-        unset($_SESSION['permissions']);
-        unset($_SESSION["colors"]);
-
-
-        if (isset($_SESSION["admin_id"])) {
-            $this->adminLogin($_SESSION["admin_id"]);
-        } else {
+        if (session_status() === PHP_SESSION_ACTIVE) {
             session_destroy();
         }
 
-
         return true;
+    }
+
+    /**
+     * Remove authentication data without assuming a complete session exists.
+     */
+    public static function clearAuthenticationSession(): void
+    {
+        foreach ([
+            'user_session',
+            'email',
+            'repid',
+            'permissions',
+            'colors',
+            'salt',
+            'userData',
+            'usr',
+            'userType',
+            'admin_id',
+            'adminLogin',
+        ] as $key) {
+            unset($_SESSION[$key]);
+        }
     }
 
 

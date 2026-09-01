@@ -18,7 +18,9 @@ class LegacyUserAuth
      */
     public function handle( Request $request, Closure $next): mixed {
         $user = new User();
-        if ($user->verify_login_session()) {
+        // Failed access checks should redirect without trying to clean up an
+        // already-expired or partially missing legacy session.
+        if ($user->verify_login_session(false)) {
             return $next($request);
         } else {
             return redirect('/login');

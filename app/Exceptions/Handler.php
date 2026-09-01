@@ -8,6 +8,8 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
+use LeadMax\TrackYourStats\User\Login;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -64,6 +66,17 @@ class Handler extends ExceptionHandler
 	 * @throws Throwable
 	 */
 	public function render($request, Throwable $exception): Response {
+		if ($exception instanceof TokenMismatchException) {
+			Login::clearAuthenticationSession();
+
+			if ($request->hasSession()) {
+				$request->session()->invalidate();
+				$request->session()->regenerateToken();
+			}
+
+			return redirect('/login');
+		}
+
 		return parent::render($request, $exception);
 	}
 
