@@ -79,6 +79,9 @@ check(str_contains($html, 'network.css'), 'Shared stylesheet missing');
 check(substr_count($html, 'data-offer-row') === 45, 'Expected 45 offers');
 check(preg_match('/<a class="rl-brand has-logo"[^>]*>\s*<img class="rl-brand-logo"[^>]*>\s*<\/a>/', $html) === 1, 'Uploaded sidebar logo is not displayed without duplicate brand text');
 check(preg_match('/<select id="offers-page-size"[^>]*>.*?<option selected>50<\/option>/s', $html) === 1, 'Manage Offers does not default to 50 rows');
+check(preg_match('/<span class="rl-offer-id is-leading">#1001<\/span>\s*<span class="rl-offer-name">/', $html) === 1, 'God offer ID is not above the offer title');
+check(preg_match('/<span class="rl-country-label">Available GEOs<\/span>\s*<span class="rl-offer-countries"/', $html) === 1, 'God offer rows are missing the Available GEOs label');
+check(str_contains($html, '<span class="rl-advertiser-name">Partner Network</span>'), 'Advertiser values are missing shared blue text styling');
 file_put_contents($output . '/offers.html', $html);
 $missingLogoCompany = new Company();
 $missingLogoCompany->subDomain = 'no-sidebar-logo';
@@ -110,6 +113,7 @@ check(!str_contains($html, 'data-offer-sort="payout"'), 'Manager payout column e
 check(!str_contains($html, 'Avg Payout'), 'Manager payout metric exposed');
 check(!str_contains($html, 'data-payout='), 'Manager payout data exposed');
 check(str_contains($html, '<span class="rl-metric-label">Advertisers</span>') && !str_contains($html, '<span class="rl-metric-label">Available GEOs</span>'), 'Manager summary metric changed with the agent layout');
+check(preg_match('/<span class="rl-offer-id is-leading">#1001<\/span>\s*<span class="rl-offer-name">/', $html) === 1 && str_contains($html, '<span class="rl-country-label">Available GEOs</span>'), 'Manager offer cells do not use the shared layout');
 file_put_contents($output . '/manager-offers.html', $html);
 context(0, '/offer/manage');
 $html = $view->make('offer.manage', ['offers' => collect(), 'urls' => []])->render();
@@ -385,6 +389,7 @@ check(str_contains($networkCss, 'label.rl-role-option input[type=radio]{') && st
 check(str_contains($userSource, "array_key_exists('email', \$_POST)") && str_contains($userSource, "currentUser->company_name"), 'Removed Edit User fields are not preserved server-side');
 check(str_contains($networkCss, '.white_box form .button_wrap{display:flex;align-items:center;justify-content:flex-end') && str_contains($networkCss, 'background:var(--rl-soft)'), 'Shared form action bars are not separated and right aligned');
 check(str_contains($networkCss, 'body.rl-app .modal-content{background:var(--rl-surface)') && str_contains($networkCss, 'body.rl-app .modal .table-striped>tbody>tr:nth-of-type(odd){background:var(--rl-soft)'), 'Legacy offer rule dialogs do not follow the active theme');
+check(str_contains($networkCss, '.rl-country-label{display:block;margin-bottom:4px;color:var(--rl-accent)') && str_contains($networkCss, '.rl-advertiser-name{color:#3864a3;font-weight:700}') && str_contains($networkCss, ':root[data-theme=dark] .rl-advertiser-name{color:#9cbfff}'), 'Shared offer GEO label or advertiser colors are missing');
 $removedReportColumns = ['Free Sign Ups', 'Pending Conversions', 'Deductions', 'Codes', 'Bonus Revenue', 'Referral Revenue'];
 foreach (['offer/admin.blade.php', 'offer/affiliate.blade.php', 'employee.blade.php', 'advertiser.blade.php', 'daily.blade.php'] as $reportView) {
     $reportSource = file_get_contents($root . '/resources/views/report/' . $reportView);

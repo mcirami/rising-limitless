@@ -69,20 +69,15 @@
                     @endphp
                     <tr data-offer-row data-name="{{ $countryInfo['name'] }}" data-search="{{ $name . ' ' . $offer->idoffer . ' ' . $offer->campaign_name . ' ' . implode(' ', array_keys($countryInfo['countries'])) . ' ' . implode(' ', $countryInfo['countries']) }}" data-type="{{ $offer->offer_type }}" @if($showPayout) data-payout="{{ $payout }}" @endif data-created="{{ $offer->offer_timestamp }}">
                         <td>
-                            @if($isAgent)
-                                <span class="rl-offer-id is-leading">#{{ $offer->idoffer }}</span>
-                                <span class="rl-offer-name">{{ $countryInfo['name'] }}</span>
-                                @include('offer.partials.country-meta', ['showOfferId' => false, 'countryLabel' => 'Available GEOs', 'agentLayout' => true])
-                            @else
-                                <span class="rl-offer-name">{{ $countryInfo['name'] }}</span>
-                                @include('offer.partials.country-meta')
-                            @endif
+                            <span class="rl-offer-id is-leading">#{{ $offer->idoffer }}</span>
+                            <span class="rl-offer-name">{{ $countryInfo['name'] }}</span>
+                            @include('offer.partials.country-meta', ['showOfferId' => false, 'countryLabel' => 'Available GEOs', 'agentLayout' => true])
                         </td>
                         <td><span class="rl-badge is-type">{{ $typeNames[$offer->offer_type] ?? 'Other' }}</span></td>
                         @if($showAccess)<td><a class="rl-button" href="{{ $contextUrl('/offer_access.php?id=' . $offer->idoffer) }}"><i class="fas fa-lock" aria-hidden="true"></i> Affiliate Access</a></td>@endif
                         @if($isAgent)<td><button type="button" class="rl-button" data-copy-text="{{ $trackingLink }}">Copy My Link</button></td>@endif
                         @if($showPayout)<td class="rl-money">${{ number_format($payout, 2) }}</td>@endif
-                        <td>{{ $offer->campaign_name ?: '—' }}</td>
+                        <td><span class="rl-advertiser-name">{{ $offer->campaign_name ?: '—' }}</span></td>
                         <td><span class="rl-badge {{ (int) $offer->status === 1 ? 'is-active' : 'is-inactive' }}">● {{ (int) $offer->status === 1 ? 'Active' : 'Inactive' }}</span></td>
                         @if(!$isAgent)
                             <td class="rl-date">{{ substr((string) $offer->offer_timestamp, 0, 10) }}</td>

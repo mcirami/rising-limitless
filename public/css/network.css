@@ -306,14 +306,16 @@ body.rl-app .modal .btn-default:hover,body.rl-app .modal .btn-default:focus{back
 .rl-offer-meta:has(.rl-offer-countries){min-width:240px}
 .rl-offer-id.is-leading{margin:0 0 5px;text-align:left;line-height:1.2}
 .rl-offer-meta.is-agent{display:block;margin-top:8px}
-.rl-country-label{display:block;margin-bottom:4px;color:var(--rl-muted);font-size:10px;font-weight:700;line-height:1.2;text-transform:uppercase;letter-spacing:.35px}
+.rl-country-label{display:block;margin-bottom:4px;color:var(--rl-accent);font-size:10px;font-weight:700;line-height:1.2;text-transform:uppercase;letter-spacing:.35px}
 .rl-country-details{min-width:0}
 .rl-country-rule-note{display:block;margin-top:3px}
 .rl-offer-meta .rl-offer-id{display:inline-block;flex-shrink:0;margin:0;line-height:22px}
 .rl-offer-countries{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;min-width:0}
 .rl-country-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;padding:2px 5px;border:1px solid var(--rl-border);border-radius:3px;background:var(--rl-soft);color:#3864a3;font:700 10px/16px Network,system-ui,sans-serif;letter-spacing:.25px}
+.rl-advertiser-name{color:#3864a3;font-weight:700}
 .rl-country-note{font-size:10px;color:var(--rl-muted);line-height:22px}
 :root[data-theme=dark] .rl-country-badge{color:#9cbfff;background:#293344;border-color:#354155}
+:root[data-theme=dark] .rl-advertiser-name{color:#9cbfff}
 /* Company branding uses the saved palette; dark surfaces remain mode-specific. */
 body.rl-app .rl-primary,body.rl-app input[type=submit],body.rl-app .btn-primary{background:var(--rl-button,var(--rl-accent));border-color:var(--rl-button,var(--rl-accent));color:var(--rl-button-ink,#fff)!important}
 body.rl-app .rl-primary:hover,body.rl-app input[type=submit]:hover,body.rl-app .btn-primary:hover{background:var(--rl-button-hover,var(--rl-accent));border-color:var(--rl-button-hover,var(--rl-accent))}
