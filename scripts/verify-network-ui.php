@@ -66,7 +66,7 @@ $offers = collect(range(1, 45))->map(fn($i) => (object) [
 ]);
 $offerCountries = [
     1001 => ['name' => "Partner's & <script> offer", 'countries' => ['US' => 'United States', 'CA' => 'Canada'], 'source' => 'rules', 'mode' => 'allowed', 'note' => ''],
-    1002 => ['name' => 'France Exclusive 2', 'countries' => ['CA' => 'Canada', 'AU' => 'Australia'], 'source' => 'rules', 'mode' => 'allowed', 'note' => ''],
+    1002 => ['name' => 'France Exclusive 2', 'countries' => array_combine(['AU', 'AT', 'BE', 'CA', 'CH', 'DE', 'DK', 'ES', 'FI', 'FR', 'GB', 'IE', 'IT', 'LU', 'NL', 'NO', 'NZ', 'SE'], ['Australia', 'Austria', 'Belgium', 'Canada', 'Switzerland', 'Germany', 'Denmark', 'Spain', 'Finland', 'France', 'United Kingdom', 'Ireland', 'Italy', 'Luxembourg', 'Netherlands', 'Norway', 'New Zealand', 'Sweden']), 'source' => 'rules', 'mode' => 'allowed', 'note' => ''],
 ];
 $offerData = ['offers' => $offers, 'urls' => ['tracking.example.test'], 'requestableOffers' => collect([(object) ['idoffer' => 999, 'offer_name' => 'Request access example', 'payout' => 2.5]]), 'offerCountries' => $offerCountries, 'availableGeoCount' => 3];
 context(0, '/offer/manage', ['create_offers', 'edit_offer_rules', 'edit_affiliates', 'view_adv_reports']);
@@ -82,6 +82,7 @@ check(preg_match('/<select id="offers-page-size"[^>]*>.*?<option selected>50<\/o
 check(preg_match('/<span class="rl-offer-id is-leading">#1001<\/span>\s*<span class="rl-offer-name">/', $html) === 1, 'God offer ID is not above the offer title');
 check(preg_match('/<span class="rl-country-label">Available GEOs<\/span>\s*<span class="rl-offer-countries"/', $html) === 1, 'God offer rows are missing the Available GEOs label');
 check(str_contains($html, '<span class="rl-advertiser-name">Partner Network</span>'), 'Advertiser values are missing shared blue text styling');
+check(substr_count($html, 'data-geo-extra hidden') === 6 && str_contains($html, 'data-collapsed-label="Show all 18"'), 'Long GEO lists are not collapsed after 12 countries');
 file_put_contents($output . '/offers.html', $html);
 $missingLogoCompany = new Company();
 $missingLogoCompany->subDomain = 'no-sidebar-logo';
@@ -390,6 +391,7 @@ check(str_contains($userSource, "array_key_exists('email', \$_POST)") && str_con
 check(str_contains($networkCss, '.white_box form .button_wrap{display:flex;align-items:center;justify-content:flex-end') && str_contains($networkCss, 'background:var(--rl-soft)'), 'Shared form action bars are not separated and right aligned');
 check(str_contains($networkCss, 'body.rl-app .modal-content{background:var(--rl-surface)') && str_contains($networkCss, 'body.rl-app .modal .table-striped>tbody>tr:nth-of-type(odd){background:var(--rl-soft)'), 'Legacy offer rule dialogs do not follow the active theme');
 check(str_contains($networkCss, '.rl-country-label{display:block;margin-bottom:4px;color:var(--rl-accent)') && str_contains($networkCss, '.rl-advertiser-name{color:#3864a3;font-weight:700}') && str_contains($networkCss, ':root[data-theme=dark] .rl-advertiser-name{color:#9cbfff}'), 'Shared offer GEO label or advertiser colors are missing');
+check(str_contains(file_get_contents($root . '/public/js/network-offers.js'), "closest('.rl-country-details').querySelectorAll('[data-geo-extra]')") && str_contains($networkCss, 'body.rl-app button.rl-geo-toggle{'), 'Long GEO list expansion control is missing');
 $removedReportColumns = ['Free Sign Ups', 'Pending Conversions', 'Deductions', 'Codes', 'Bonus Revenue', 'Referral Revenue'];
 foreach (['offer/admin.blade.php', 'offer/affiliate.blade.php', 'employee.blade.php', 'advertiser.blade.php', 'daily.blade.php'] as $reportView) {
     $reportSource = file_get_contents($root . '/resources/views/report/' . $reportView);

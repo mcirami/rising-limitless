@@ -312,9 +312,12 @@ body.rl-app .modal .btn-default:hover,body.rl-app .modal .btn-default:focus{back
 .rl-offer-meta .rl-offer-id{display:inline-block;flex-shrink:0;margin:0;line-height:22px}
 .rl-offer-countries{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;min-width:0}
 .rl-country-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;padding:2px 5px;border:1px solid var(--rl-border);border-radius:3px;background:var(--rl-soft);color:#3864a3;font:700 10px/16px Network,system-ui,sans-serif;letter-spacing:.25px}
+body.rl-app button.rl-geo-toggle{display:inline;width:auto;min-width:0;height:auto;align-self:center;margin:0 0 0 3px;padding:0!important;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;color:#3864a3;font:700 10px/20px Network,system-ui,sans-serif;text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:nowrap}
+body.rl-app button.rl-geo-toggle:hover,body.rl-app button.rl-geo-toggle:focus{background:transparent!important;color:var(--rl-accent)}
 .rl-advertiser-name{color:#3864a3;font-weight:700}
 .rl-country-note{font-size:10px;color:var(--rl-muted);line-height:22px}
 :root[data-theme=dark] .rl-country-badge{color:#9cbfff;background:#293344;border-color:#354155}
+:root[data-theme=dark] body.rl-app button.rl-geo-toggle{color:#9cbfff}
 :root[data-theme=dark] .rl-advertiser-name{color:#9cbfff}
 /* Company branding uses the saved palette; dark surfaces remain mode-specific. */
 body.rl-app .rl-primary,body.rl-app input[type=submit],body.rl-app .btn-primary{background:var(--rl-button,var(--rl-accent));border-color:var(--rl-button,var(--rl-accent));color:var(--rl-button-ink,#fff)!important}

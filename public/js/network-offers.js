@@ -60,6 +60,15 @@
         var url = new URL(window.location.href); url.searchParams.set('url', domain.value); window.location.assign(url.href);
     });
     document.addEventListener('click', function (event) {
+        var geoToggle = event.target.closest('[data-geo-toggle]');
+        if (geoToggle) {
+            var expanded = geoToggle.getAttribute('aria-expanded') === 'true';
+            geoToggle.closest('.rl-country-details').querySelectorAll('[data-geo-extra]').forEach(function (badge) {
+                badge.hidden = expanded;
+            });
+            geoToggle.setAttribute('aria-expanded', String(!expanded));
+            geoToggle.textContent = expanded ? geoToggle.dataset.collapsedLabel : 'Show fewer';
+        }
         var deletion = event.target.closest('[data-delete-offer]');
         if (deletion && !window.confirm('Are you sure you want to delete this offer? This cannot be undone.')) event.preventDefault();
     });
