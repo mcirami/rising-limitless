@@ -5,6 +5,7 @@
     $role = (int) $session::userType();
     $permissions = $session::permissions();
     $isAgent = $role === 3;
+    $showActions = $role === 0;
     $showPayout = \App\Support\PayoutVisibility::forCurrentUser();
     $showAccess = !$isAgent && in_array($role, [0, 1]) && $permissions->can('edit_affiliates');
     $typeNames = [0 => 'CPA', 1 => 'CPC', 2 => 'Blacklisted', 3 => 'Pending'];
@@ -17,7 +18,7 @@
     $contextUrl = function ($path) {
         return $path . (request()->has('adminLogin') ? (str_contains($path, '?') ? '&' : '?') . 'adminLogin=1' : '');
     };
-    $columns = ($isAgent ? 5 : 6) + ($showPayout ? 1 : 0) + ($showAccess ? 1 : 0);
+    $columns = 5 + ($showPayout ? 1 : 0) + ($showAccess ? 1 : 0) + ($showActions ? 1 : 0);
 @endphp
 <div class="right_panel">
     <div class="rl-page-heading"><div><h1>Offers</h1><p>{{ $showPayout ? "Manage your network's offer inventory and payout rules" : "Browse your network's offer inventory" }}</p></div>
@@ -57,7 +58,8 @@
                     @if($isAgent)<th>Offer Link</th>@endif
                     @if($showPayout)<th><button class="rl-sort" data-offer-sort="payout">Payout ↕</button></th>@endif
                     <th>Advertiser</th><th>Status</th>
-                    @if(!$isAgent)<th><button class="rl-sort" data-offer-sort="created">Created ↕</button></th><th>Actions</th>@endif
+                    @if(!$isAgent)<th><button class="rl-sort" data-offer-sort="created">Created ↕</button></th>@endif
+                    @if($showActions)<th>Actions</th>@endif
                 </tr></thead>
                 <tbody id="offers_container">
                 @foreach($offerList as $offer)
@@ -79,8 +81,8 @@
                         @if($showPayout)<td class="rl-money">${{ number_format($payout, 2) }}</td>@endif
                         <td><span class="rl-advertiser-name">{{ $offer->campaign_name ?: '—' }}</span></td>
                         <td><span class="rl-badge {{ (int) $offer->status === 1 ? 'is-active' : 'is-inactive' }}">● {{ (int) $offer->status === 1 ? 'Active' : 'Inactive' }}</span></td>
-                        @if(!$isAgent)
-                            <td class="rl-date">{{ substr((string) $offer->offer_timestamp, 0, 10) }}</td>
+                        @if(!$isAgent)<td class="rl-date">{{ substr((string) $offer->offer_timestamp, 0, 10) }}</td>@endif
+                        @if($showActions)
                             <td class="action_column">
                                 @if($permissions->can('create_offers'))<a class="btn btn-sm" href="{{ $contextUrl('/offer_update.php?idoffer=' . $offer->idoffer) }}">Edit</a>@endif
                                 @if($permissions->can('edit_offer_rules'))<a class="btn btn-sm" href="{{ $contextUrl('/offer_edit_rules.php?offid=' . $offer->idoffer) }}">Rules</a>@endif
