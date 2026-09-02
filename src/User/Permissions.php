@@ -23,7 +23,7 @@ class Permissions
     public $repID = null;
     public $userType;
 
-    public $affiliateOnlyPermissions = [self::SMS_CHAT];
+    public $affiliateOnlyPermissions = [];
 
     const CREATE_ADMINS = "create_admins";
     const CREATE_MANAGERS = "create_managers";
@@ -71,19 +71,19 @@ class Permissions
         ],
 
         self::EDIT_AFFILIATES => [
-            "description" => "Can Edit Agent Accounts",
+            "description" => "Can Change Their Own Password",
             /*"required_permissions" => [self::CREATE_AFFILIATES],*/
             "allowed_user_types" => [\App\Privilege::ROLE_GOD, \App\Privilege::ROLE_ADMIN, Privilege::ROLE_MANAGER, Privilege::ROLE_AFFILIATE],
         ],
 
         self::SMS_CHAT => [
 			'description' => 'Can use SMS Verification',
-			'allowed_user_types' => [Privilege::ROLE_GOD, Privilege::ROLE_AFFILIATE]
+			'allowed_user_types' => [Privilege::ROLE_GOD]
         ],
 
         self::VIEW_SMS_STATS => [
 	        'description' => 'Can View SMS Stats',
-	        'allowed_user_types' => [Privilege::ROLE_GOD, Privilege::ROLE_ADMIN, Privilege::ROLE_MANAGER]
+	        'allowed_user_types' => [Privilege::ROLE_GOD]
         ],
 
         self::VIEW_ALL_USERS => [
@@ -270,7 +270,7 @@ class Permissions
 				p.empty();         	 ";
 
         foreach (self::$permissionsArray as $permission => $val) {
-            if ($permission != "aff_id" && $permission !== "sms_chat") {
+            if (!in_array($permission, ["aff_id", self::SMS_CHAT, self::VIEW_SMS_STATS], true)) {
                 if ($this->canPrintPermission($permission, Privilege::ROLE_ADMIN)) {
                     $this->printPermission($permission, $checkCheckBoxes);
                 }
@@ -290,7 +290,7 @@ class Permissions
 				p.empty();         	 ";
 
         foreach (self::$permissionsArray as $permission => $val) {
-            if ($permission != "aff_id" && $permission !== "sms_chat") {
+            if (!in_array($permission, ["aff_id", self::SMS_CHAT, self::VIEW_SMS_STATS], true)) {
                 if ($this->canPrintPermission($permission, Privilege::ROLE_MANAGER)) {
                     $this->printPermission($permission, $checkCheckBoxes);
                 }
@@ -309,7 +309,7 @@ class Permissions
 				p.empty();         	 ";
 
         foreach (self::$permissionsArray as $permission => $val) {
-            if ($permission != "aff_id") {
+            if (!in_array($permission, ["aff_id", self::SMS_CHAT], true)) {
                 if ($this->canPrintPermission($permission, Privilege::ROLE_AFFILIATE)) {
                     $this->printPermission($permission, $checkCheckBoxes);
                 }

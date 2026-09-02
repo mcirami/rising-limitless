@@ -364,6 +364,13 @@ $createUserSource = file_get_contents($root . '/legacy/aff_add.php');
 $editUserSource = file_get_contents($root . '/legacy/aff_update.php');
 $permissionSource = file_get_contents($root . '/src/User/Permissions.php');
 $userSource = file_get_contents($root . '/src/User/User.php');
+check(Permissions::$permissionsArray[Permissions::SMS_CHAT]['allowed_user_types'] === [\App\Privilege::ROLE_GOD], 'SMS Verification is still available to Agent accounts');
+check(Permissions::$permissionsArray[Permissions::VIEW_SMS_STATS]['allowed_user_types'] === [\App\Privilege::ROLE_GOD], 'SMS Stats is still available to Office or Admin accounts');
+check(Permissions::$permissionsArray[Permissions::EDIT_AFFILIATES]['description'] === 'Can Change Their Own Password', 'Agent password permission label was not updated');
+$permissionDefaults = (new ReflectionClass(Permissions::class))->newInstanceWithoutConstructor();
+check(!in_array(Permissions::SMS_CHAT, $permissionDefaults->affiliateOnlyPermissions, true), 'SMS Verification still bypasses Agent role filtering');
+check(substr_count($permissionSource, '["aff_id", self::SMS_CHAT, self::VIEW_SMS_STATS]') === 2, 'Office or Admin permission builders still render SMS Stats');
+check(str_contains($permissionSource, '["aff_id", self::SMS_CHAT]'), 'Agent permission builder still renders SMS Verification');
 check(!preg_match('/name\s*=\s*["\']email["\']/', $createUserSource), 'Create User still renders an email field');
 check(!str_contains($createUserSource, 'referralCheckBox') && !str_contains($createUserSource, 'printAffiliatesToSelectBox'), 'Create User still renders referrals');
 check(str_contains($createUserSource, 'rl-name-grid') && str_contains($createUserSource, 'rl-user-form-actions'), 'Create User layout/action bar hooks missing');
@@ -377,6 +384,7 @@ check(str_contains($permissionSource, 'rl-permission-option') && str_contains(fi
 check(str_contains($networkCss, 'label.rl-role-option input[type=radio]{') && str_contains($networkCss, 'appearance:none') && str_contains($networkCss, 'input[type=radio]:checked'), 'User role cards are missing visible aligned radio circles');
 check(str_contains($userSource, "array_key_exists('email', \$_POST)") && str_contains($userSource, "currentUser->company_name"), 'Removed Edit User fields are not preserved server-side');
 check(str_contains($networkCss, '.white_box form .button_wrap{display:flex;align-items:center;justify-content:flex-end') && str_contains($networkCss, 'background:var(--rl-soft)'), 'Shared form action bars are not separated and right aligned');
+check(str_contains($networkCss, 'body.rl-app .modal-content{background:var(--rl-surface)') && str_contains($networkCss, 'body.rl-app .modal .table-striped>tbody>tr:nth-of-type(odd){background:var(--rl-soft)'), 'Legacy offer rule dialogs do not follow the active theme');
 $removedReportColumns = ['Free Sign Ups', 'Pending Conversions', 'Deductions', 'Codes', 'Bonus Revenue', 'Referral Revenue'];
 foreach (['offer/admin.blade.php', 'offer/affiliate.blade.php', 'employee.blade.php', 'advertiser.blade.php', 'daily.blade.php'] as $reportView) {
     $reportSource = file_get_contents($root . '/resources/views/report/' . $reportView);
