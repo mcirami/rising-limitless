@@ -270,7 +270,7 @@ class Permissions
 				p.empty();         	 ";
 
         foreach (self::$permissionsArray as $permission => $val) {
-            if (!in_array($permission, ["aff_id", self::SMS_CHAT, self::VIEW_SMS_STATS], true)) {
+            if (!in_array($permission, ["aff_id", self::SMS_CHAT, self::VIEW_SMS_STATS, self::EDIT_AFFILIATES], true)) {
                 if ($this->canPrintPermission($permission, Privilege::ROLE_ADMIN)) {
                     $this->printPermission($permission, $checkCheckBoxes);
                 }
@@ -290,7 +290,7 @@ class Permissions
 				p.empty();         	 ";
 
         foreach (self::$permissionsArray as $permission => $val) {
-            if (!in_array($permission, ["aff_id", self::SMS_CHAT, self::VIEW_SMS_STATS], true)) {
+            if (!in_array($permission, ["aff_id", self::SMS_CHAT, self::VIEW_SMS_STATS, self::EDIT_AFFILIATES], true)) {
                 if ($this->canPrintPermission($permission, Privilege::ROLE_MANAGER)) {
                     $this->printPermission($permission, $checkCheckBoxes);
                 }

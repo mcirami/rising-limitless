@@ -369,7 +369,7 @@ check(Permissions::$permissionsArray[Permissions::VIEW_SMS_STATS]['allowed_user_
 check(Permissions::$permissionsArray[Permissions::EDIT_AFFILIATES]['description'] === 'Can Change Their Own Password', 'Agent password permission label was not updated');
 $permissionDefaults = (new ReflectionClass(Permissions::class))->newInstanceWithoutConstructor();
 check(!in_array(Permissions::SMS_CHAT, $permissionDefaults->affiliateOnlyPermissions, true), 'SMS Verification still bypasses Agent role filtering');
-check(substr_count($permissionSource, '["aff_id", self::SMS_CHAT, self::VIEW_SMS_STATS]') === 2, 'Office or Admin permission builders still render SMS Stats');
+check(substr_count($permissionSource, '["aff_id", self::SMS_CHAT, self::VIEW_SMS_STATS, self::EDIT_AFFILIATES]') === 2, 'Office or Admin permission builders render Agent-only permissions');
 check(str_contains($permissionSource, '["aff_id", self::SMS_CHAT]'), 'Agent permission builder still renders SMS Verification');
 check(!preg_match('/name\s*=\s*["\']email["\']/', $createUserSource), 'Create User still renders an email field');
 check(!str_contains($createUserSource, 'referralCheckBox') && !str_contains($createUserSource, 'printAffiliatesToSelectBox'), 'Create User still renders referrals');
