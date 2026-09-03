@@ -22,25 +22,20 @@ class ReportBase
 
     public static function createUserTooltip($userName, $userID)
     {
+        $escapedName = htmlspecialchars((string) $userName, ENT_QUOTES, 'UTF-8');
+        $userID = (int) $userID;
 
-        $padding = "style='margin-left:5px;'";
-
-        $logintouser = "<a href='#'  onclick='adminLogin({$userID});'>Login</a>";
-        $edituser = "<a {$padding} href='/aff_update.php?idrep={$userID}' target='_blank'>edit</a>";
-
-        $returnstr =
-            "<a href=\"#\" data-toggle=\"popover\" data-trigger=\"focus\"
-                placement=\"top\" data-html=\"true\"
-                data-content=\"";
-        if (session::permissions()->can("create_affiliates")) {
-            $returnstr .= "
-            {$logintouser}{$edituser}";
+        if (!Session::permissions()->can("create_affiliates")) {
+            return $escapedName;
         }
 
+        $actions = "<span class='rl-user-popover-actions'>"
+            . "<a class='rl-user-popover-action is-login' href='#' onclick='adminLogin({$userID}); return false;'><i class='fas fa-sign-in-alt' aria-hidden='true'></i> Login</a>"
+            . "<a class='rl-user-popover-action is-edit' href='/aff_update.php?idrep={$userID}' target='_blank' rel='noopener'><i class='fas fa-pen' aria-hidden='true'></i> Edit</a>"
+            . "</span>";
 
-        $returnstr .= " \">{$userName}";
-
-        return $returnstr;
+        return "<a class='rl-user-popover-trigger' href='#' role='button' data-toggle='popover' data-trigger='focus' data-placement='top' data-html='true' data-content=\"{$actions}\">"
+            . "{$escapedName}<i class='fas fa-chevron-down' aria-hidden='true'></i><span class='sr-only'> Open user actions</span></a>";
     }
 
 

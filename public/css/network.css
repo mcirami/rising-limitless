@@ -279,6 +279,21 @@ body.rl-app .rl-performance-table [data-report-field=Clicks] a{color:#2559b8}
 body.rl-app .rl-performance-table td[data-report-field=Conversions].is-positive,body.rl-app .rl-performance-table td[data-report-field=Conversions].is-positive a,body.rl-app .rl-performance-table td[data-report-field=TOTAL].is-positive{color:var(--rl-green)}
 body.rl-app .rl-performance-table td[data-report-field=TOTAL]{font-weight:700}
 body.rl-app .rl-performance-table td.is-zero,body.rl-app .rl-performance-table td[data-report-field=EPC]{color:var(--rl-muted)}
+body.rl-app .rl-performance-table .rl-user-popover-trigger{display:inline-flex;align-items:center;gap:7px;color:var(--rl-accent);font-weight:700;line-height:1.35}
+body.rl-app .rl-performance-table .rl-user-popover-trigger>i{font-size:8px;opacity:.7;transition:transform .15s ease}
+body.rl-app .rl-performance-table .rl-user-popover-trigger[aria-describedby]>i{transform:rotate(180deg)}
+body.rl-app .rl-performance-table .popover{min-width:174px;padding:0;border:1px solid var(--rl-border);border-radius:8px;background:var(--rl-surface);box-shadow:0 12px 30px #11182724;color:var(--rl-text)}
+body.rl-app .rl-performance-table .popover-content{padding:9px}
+body.rl-app .rl-performance-table .popover.top>.arrow{border-top-color:var(--rl-border)}
+body.rl-app .rl-performance-table .popover.top>.arrow:after{border-top-color:var(--rl-surface)}
+body.rl-app .rl-performance-table .popover.bottom>.arrow{border-bottom-color:var(--rl-border)}
+body.rl-app .rl-performance-table .popover.bottom>.arrow:after{border-bottom-color:var(--rl-surface)}
+body.rl-app .rl-performance-table .rl-user-popover-actions{display:flex;align-items:center;gap:7px}
+body.rl-app .rl-performance-table .rl-user-popover-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:72px;padding:7px 10px;border:1px solid var(--rl-border);border-radius:6px;background:var(--rl-soft);color:var(--rl-text);font-size:11px;font-weight:700;line-height:1.2;white-space:nowrap}
+body.rl-app .rl-performance-table .rl-user-popover-action.is-login{border-color:var(--rl-accent);background:var(--rl-accent);color:#fff}
+body.rl-app .rl-performance-table .rl-user-popover-action:hover{border-color:var(--rl-accent);color:var(--rl-accent)}
+body.rl-app .rl-performance-table .rl-user-popover-action.is-login:hover{filter:brightness(.94);color:#fff}
+:root[data-theme=dark] body.rl-app .rl-performance-table .popover{box-shadow:0 15px 34px #0008}
 body.rl-app .rl-performance-table .rl-report-empty td{padding:45px 20px;text-align:center;white-space:normal}
 .rl-report-empty i{display:block;font-size:24px;color:var(--rl-muted);margin-bottom:12px}
 .rl-report-empty strong,.rl-report-empty span{display:block;color:var(--rl-text)}

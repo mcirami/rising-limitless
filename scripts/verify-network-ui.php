@@ -217,6 +217,14 @@ $fakeReporter = new class($affiliateRows) {
     public function between($from, $to, $format): void { throw new RuntimeException('Report was queried twice'); }
 };
 $reportDates = ['startDate' => '2026-08-28 00:00:00', 'endDate' => '2026-08-28 23:59:59', 'originalStart' => '2026-08-28', 'originalEnd' => '2026-08-28'];
+context(1, '/report/affiliate', ['create_affiliates']);
+$userPopover = \LeadMax\TrackYourStats\Table\ReportBase::createUserTooltip('Agent <sample>', 17);
+check(str_contains($userPopover, 'rl-user-popover-trigger') && str_contains($userPopover, 'rl-user-popover-actions'), 'Affiliate report user action popover hooks missing');
+check(str_contains($userPopover, 'rl-user-popover-action is-login') && str_contains($userPopover, 'rl-user-popover-action is-edit'), 'Affiliate report user action buttons missing');
+check(str_contains($userPopover, 'data-placement=\'top\'') && str_contains($userPopover, 'rel=\'noopener\''), 'Affiliate report user popover placement or safe edit target missing');
+check(str_contains($userPopover, 'Agent &lt;sample&gt;') && str_ends_with($userPopover, '</a>'), 'Affiliate report username popover is not escaped or closed');
+context(2, '/report/affiliate');
+check(\LeadMax\TrackYourStats\Table\ReportBase::createUserTooltip('Agent <sample>', 17) === 'Agent &lt;sample&gt;', 'Users without account permissions receive an empty action popover');
 context(2, '/report/affiliate', ['create_managers']);
 $html = $view->make('report.employee', ['reporter' => $fakeReporter, 'dates' => $reportDates, 'startDate' => '2026-08-28', 'endDate' => '2026-08-28', 'dateSelect' => 0])->render();
 check($fakeReporter->fetches === 1, 'Affiliate summary triggered an extra report fetch');
@@ -403,6 +411,7 @@ check(str_contains($userSource, "array_key_exists('email', \$_POST)") && str_con
 check(str_contains($networkCss, '.white_box form .button_wrap{display:flex;align-items:center;justify-content:flex-end') && str_contains($networkCss, 'background:var(--rl-soft)'), 'Shared form action bars are not separated and right aligned');
 check(str_contains($networkCss, 'body.rl-app .modal-content{background:var(--rl-surface)') && str_contains($networkCss, 'body.rl-app .modal .table-striped>tbody>tr:nth-of-type(odd){background:var(--rl-soft)'), 'Legacy offer rule dialogs do not follow the active theme');
 check(str_contains($networkCss, '.rl-country-label{display:block;margin-bottom:4px;color:var(--rl-accent)') && str_contains($networkCss, '.rl-advertiser-name{color:#3864a3;font-weight:700}') && str_contains($networkCss, ':root[data-theme=dark] .rl-advertiser-name{color:#9cbfff}'), 'Shared offer GEO label or advertiser colors are missing');
+check(str_contains($networkCss, '.rl-performance-table .rl-user-popover-trigger{') && str_contains($networkCss, '.rl-performance-table .popover{') && str_contains($networkCss, '.rl-user-popover-action.is-login{') && str_contains($networkCss, ':root[data-theme=dark] body.rl-app .rl-performance-table .popover{'), 'Affiliate report user actions are missing themed popover styling');
 check(str_contains(file_get_contents($root . '/public/js/network-offers.js'), "closest('.rl-country-details').querySelectorAll('[data-geo-extra]')") && str_contains($networkCss, 'body.rl-app button.rl-geo-toggle{'), 'Long GEO list expansion control is missing');
 $removedReportColumns = ['Free Sign Ups', 'Pending Conversions', 'Deductions', 'Codes', 'Bonus Revenue', 'Referral Revenue'];
 foreach (['offer/admin.blade.php', 'offer/affiliate.blade.php', 'employee.blade.php', 'advertiser.blade.php', 'daily.blade.php'] as $reportView) {
