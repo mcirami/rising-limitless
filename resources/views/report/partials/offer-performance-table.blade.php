@@ -48,7 +48,7 @@
     @if($reportSummary['count'])
         <tfoot><tr class="static">
             @foreach($reportColumns as $key => $label)
-                <td>@if($loop->first)—@elseif($loop->index === 1)TOTALS@else{{ strip_tags((string) (end($reportRows)[$key] ?? '')) }}@endif</td>
+                <td>@if($loop->first)—@elseif($loop->index === 1) TOTALS @else{{ strip_tags((string) (end($reportRows)[$key] ?? '')) }}@endif</td>
             @endforeach
         </tr></tfoot>
     @endif
