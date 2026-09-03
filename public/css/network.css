@@ -290,9 +290,9 @@ body.rl-app .rl-performance-table .popover.bottom>.arrow{border-bottom-color:var
 body.rl-app .rl-performance-table .popover.bottom>.arrow:after{border-bottom-color:var(--rl-surface)}
 body.rl-app .rl-performance-table .rl-user-popover-actions{display:flex;align-items:center;gap:7px}
 body.rl-app .rl-performance-table .rl-user-popover-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:72px;padding:7px 10px;border:1px solid var(--rl-border);border-radius:6px;background:var(--rl-soft);color:var(--rl-text);font-size:11px;font-weight:700;line-height:1.2;white-space:nowrap}
-body.rl-app .rl-performance-table .rl-user-popover-action.is-login{border-color:var(--rl-accent);background:var(--rl-accent);color:#fff}
+body.rl-app .rl-performance-table .rl-user-popover-action.is-login{border-color:var(--rl-button,var(--rl-accent));background:var(--rl-button,var(--rl-accent));color:var(--rl-button-ink,#fff)}
 body.rl-app .rl-performance-table .rl-user-popover-action:hover{border-color:var(--rl-accent);color:var(--rl-accent)}
-body.rl-app .rl-performance-table .rl-user-popover-action.is-login:hover{filter:brightness(.94);color:#fff}
+body.rl-app .rl-performance-table .rl-user-popover-action.is-login:hover{border-color:var(--rl-button-hover,var(--rl-accent));background:var(--rl-button-hover,var(--rl-accent));color:var(--rl-button-hover-ink,#fff)}
 :root[data-theme=dark] body.rl-app .rl-performance-table .popover{box-shadow:0 15px 34px #0008}
 body.rl-app .rl-performance-table .rl-report-empty td{padding:45px 20px;text-align:center;white-space:normal}
 .rl-report-empty i{display:block;font-size:24px;color:var(--rl-muted);margin-bottom:12px}
