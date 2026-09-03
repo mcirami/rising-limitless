@@ -20,9 +20,9 @@
             <th class="value_span9">Name</th>
             <th class="value_span9">Raw</th>
             <th class="value_span9">Unique</th>
-            <th class="value_span9">Conversion</th>
+            <th class="value_span9">Sales</th>
             @if($canViewPayouts)
-                <th class="value_span9">Revenue</th>
+                <th class="value_span9">Pay</th>
                 <th class="value_span9">EPC</th>
                 <th class="value_span9">TOTAL</th>
             @endif

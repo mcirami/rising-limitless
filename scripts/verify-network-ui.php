@@ -222,7 +222,8 @@ $html = $view->make('report.employee', ['reporter' => $fakeReporter, 'dates' => 
 check($fakeReporter->fetches === 1, 'Affiliate summary triggered an extra report fetch');
 check(str_contains($html, 'Total Raw Clicks') && str_contains($html, '1,234'), 'Report summary is not based on the filtered rows');
 check(str_contains($html, 'Pending Conversions') && !str_contains($html, 'Total Revenue'), 'Manager report exposed a revenue summary');
-check(!str_contains($html, '$240.00') && !str_contains($html, 'Sales Revenue'), 'Manager report exposed financial data');
+check(!str_contains($html, '$240.00') && !str_contains($html, 'data-report-field="Revenue"'), 'Manager report exposed financial data');
+check(str_contains($html, 'data-report-field="Conversions">Sales</th>'), 'Affiliate report does not label conversions as Sales');
 check(str_contains($html, '/user/17/clicks'), 'Existing click drill-down was removed');
 check(str_contains($html, '<tfoot>') && str_contains($html, 'TOTALS'), 'Report totals row is missing');
 preg_match('#<tfoot>(.*?)</tfoot>#s', $html, $totalsMatch);
@@ -274,13 +275,15 @@ $adminAdvertiserReporter = new class($offerRows) {
 };
 $html = $view->make('report.offer.admin', array_replace($offerData, ['reporter' => $adminAdvertiserReporter]))->render();
 check(str_contains($html, 'data-report-field="Advertiser">Pay Code</th>') && str_contains($html, 'ADV-CODE'), 'Permitted Admin offer report is missing Pay Code');
+check(str_contains($html, 'data-report-field="Conversions">Sales</th>') && str_contains($html, 'data-report-field="Revenue">Pay</th>'), 'Permitted Admin offer report is missing Sales or Pay labels');
 check(!str_contains($html, 'data-report-field="EPC"'), 'Permitted Admin offer report still shows EPC');
 context(0, '/report/offer');
 $html = $view->make('report.offer.admin', $offerData)->render();
 check(str_contains($html, 'data-report-field="EPC"') && str_contains($html, 'data-report-field="Advertiser">Pay Code</th>'), 'God offer report lost EPC or Pay Code');
 context(3, '/report/offer');
 $html = $view->make('report.offer.affiliate', array_replace($offerData, ['report' => (object) ['bonuses' => []], 'yesterdayConversions' => 7, 'yesterdayDate' => 'Aug 31, 2026']))->render();
-check(!str_contains($html, '$240.00') && !str_contains($html, '>Revenue<') && !str_contains($html, '>EPC<') && !str_contains($html, '>Total<'), 'Agent report exposes payout columns or values');
+check(!str_contains($html, '$240.00') && !str_contains($html, 'data-report-field="Revenue"') && !str_contains($html, '>EPC<') && !str_contains($html, '>Total<'), 'Agent report exposes payout columns or values');
+check(str_contains($html, 'data-report-field="Conversions">Sales</th>'), 'Agent offer report does not label conversions as Sales');
 check(str_contains($html, 'data-report-field="Advertiser">Pay Code</th>') && str_contains($html, 'ADV-CODE') && str_contains($html, 'Show all 18'), 'Agent offer report is missing Pay Code or expandable GEOs');
 check(str_contains($html, '/user/42/17/conversions-by-country'), 'Agent report lost country drill-down');
 check(str_contains($html, "Yesterday's Conversions") && str_contains($html, '<strong>7</strong>') && str_contains($html, 'Aug 31, 2026'), 'Agent yesterday conversion metric missing');
@@ -318,20 +321,20 @@ foreach (['Revenue', 'Deductions', 'EPC', 'TOTAL', 'BonusRevenue', 'ReferralReve
 
 context(1, '/report/daily');
 $html = $view->make('report.daily', ['report' => $report])->render();
-check(!str_contains($html, '>Revenue<') && !str_contains($html, '$30.00'), 'Admin without payout permission can see daily revenue');
+check(!str_contains($html, '>Pay<') && !str_contains($html, '$30.00'), 'Admin without payout permission can see daily pay');
 context(1, '/report/daily', [Permissions::VIEW_PAYOUTS]);
 $html = $view->make('report.daily', ['report' => $report])->render();
-check(str_contains($html, '>Revenue<'), 'Admin with payout permission cannot see daily revenue');
+check(str_contains($html, '>Sales<') && str_contains($html, '>Pay<'), 'Admin with payout permission cannot see daily Sales or Pay columns');
 
 $advertiserReporter = new class {
     public function between($from, $to, $format): void {}
 };
 context(1, '/report/advertiser', [Permissions::VIEW_ADV_REPORTS]);
 $html = $view->make('report.advertiser', ['reporter' => $advertiserReporter, 'dates' => $reportDates])->render();
-check(!str_contains($html, '>Revenue<') && !str_contains($html, '>EPC<') && !str_contains($html, '>TOTAL<'), 'Admin without payout permission can see advertiser payout columns');
+check(!str_contains($html, '>Pay<') && !str_contains($html, '>EPC<') && !str_contains($html, '>TOTAL<'), 'Admin without payout permission can see advertiser payout columns');
 context(1, '/report/advertiser', [Permissions::VIEW_ADV_REPORTS, Permissions::VIEW_PAYOUTS]);
 $html = $view->make('report.advertiser', ['reporter' => $advertiserReporter, 'dates' => $reportDates])->render();
-check(str_contains($html, '>Revenue<') && str_contains($html, '>EPC<') && str_contains($html, '>TOTAL<'), 'Admin with payout permission cannot see advertiser payout columns');
+check(str_contains($html, '>Sales<') && str_contains($html, '>Pay<') && str_contains($html, '>EPC<') && str_contains($html, '>TOTAL<'), 'Admin with payout permission cannot see advertiser Sales or payout columns');
 
 $clickRow = (object) ['idclicks' => 123, 'offer_name' => 'Sample Offer', 'conversion_timestamp' => '2026-08-28 12:00:00', 'paid' => '98765.43', 'sub1' => '', 'sub2' => '', 'sub3' => '', 'sub4' => '', 'sub5' => ''];
 $clickPaginator = new class { public function links(): string { return ''; } public function withQueryString(): self { return $this; } };
@@ -408,6 +411,13 @@ foreach (['offer/admin.blade.php', 'offer/affiliate.blade.php', 'employee.blade.
         check(!str_contains($reportSource, $removedColumn), "{$reportView} still renders the {$removedColumn} column");
     }
 }
+$oldColumnPattern = '/<th\b[^>]*>\s*(?:Conversion|Conversions|Revenue|Sales Revenue)\s*<\/th>/i';
+foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root . '/resources/views')) as $reportViewFile) {
+    if (!str_ends_with($reportViewFile->getFilename(), '.blade.php')) continue;
+    check(!preg_match($oldColumnPattern, file_get_contents($reportViewFile->getPathname())), $reportViewFile->getFilename() . ' still uses an old Sales or Pay column label');
+}
+$affiliateReportSource = file_get_contents($root . '/src/Report/Affiliate.php');
+check(str_contains($affiliateReportSource, 'ReportPermissions::CONVERSIONS => "Sales"') && str_contains($affiliateReportSource, 'ReportPermissions::REVENUE => "Pay"'), 'Legacy affiliate report headers do not use Sales and Pay');
 $themeInit = file_get_contents($root . '/resources/views/layouts/partials/network-theme-init.blade.php');
 $networkJs = file_get_contents($root . '/public/js/network.js');
 check(str_contains($themeInit, "localStorage.getItem('rl-theme') === 'light' ? 'light' : 'dark'") && str_contains($networkJs, "localStorage.getItem('rl-theme') === 'light' ? 'light' : 'dark'"), 'Dark mode is not the default for users without a saved preference');

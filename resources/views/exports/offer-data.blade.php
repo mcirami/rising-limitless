@@ -5,7 +5,7 @@
         <th>Offer Name</th>
         <th>Raw</th>
         <th>Unique</th>
-        <th>Conversion</th>
+        <th>Sales</th>
     </tr>
     </thead>
     <tbody>

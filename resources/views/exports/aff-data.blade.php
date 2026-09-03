@@ -5,7 +5,7 @@
         <th>Agent Username</th>
         <th>Raw</th>
         <th>Unique</th>
-        <th>Conversion</th>
+        <th>Sales</th>
     </tr>
     </thead>
     <tbody>

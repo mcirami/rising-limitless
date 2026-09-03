@@ -2,7 +2,7 @@
     $canViewRevenue = false;
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
-    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Advertiser' => 'Pay Code', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];
+    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Advertiser' => 'Pay Code', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Sales'];
     $offerCountries = $offerCountries ?? \App\Support\OfferCountryBadges::forOffers(collect(array_slice($reportRows, 0, -1))->map(fn($row) => (object) ['idoffer' => $row['idoffer'], 'offer_name' => $row['offer_name']]));
 @endphp
 @extends('report.template')

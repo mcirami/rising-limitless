@@ -28,8 +28,8 @@ class Affiliate extends ReportBase
         ReportPermissions::RAW_CLICKS => "Raw",
         ReportPermissions::UNIQUE_CLICKS => "Unique",
         ReportPermissions::FREE_SIGN_UPS => "Free Sign Ups",
-        ReportPermissions::CONVERSIONS => "Conversions",
-        ReportPermissions::REVENUE => "Revenue",
+        ReportPermissions::CONVERSIONS => "Sales",
+        ReportPermissions::REVENUE => "Pay",
         ReportPermissions::EPC => "EPC",
         ReportPermissions::IGNORE => "TOTAL",
     ];

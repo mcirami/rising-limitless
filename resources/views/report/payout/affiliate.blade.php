@@ -13,7 +13,7 @@
         <tr>
             <th class="value_span9">Payout Type</th>
             <th class="value_span9">Notes</th>
-            <th class="value_span9">Revenue</th>
+            <th class="value_span9">Pay</th>
             <th class="value_span9">Date Achieved</th>
         </tr>
         </thead>
@@ -34,7 +34,7 @@
                 <thead>
                 <tr>
                     <th>Week range</th>
-                    <th>Revenue</th>
+                    <th>Pay</th>
                     <th>Deductions</th>
                     <th>Bonuses</th>
                     <th>Referrals</th>
@@ -76,7 +76,7 @@
                             <td></td>
                             <td><b>Type</b></td>
                             <td><b>Notes</b></td>
-                            <td><b>Revenue</b></td>
+                            <td><b>Pay</b></td>
                             <td><b>Date Achieved</b></td>
                             <td></td>
                             <td></td>
@@ -103,8 +103,8 @@
                                         <th class="value_span9">Unique</th>
                                         <th class="value_span9">FreeSignUps</th>
                                         <th class="value_span9">Pending Conversions</th>
-                                        <th class="value_span9">Conversions</th>
-                                        <th class="value_span9">Revenue</th>
+                                        <th class="value_span9">Sales</th>
+                                        <th class="value_span9">Pay</th>
                                         <th class="value_span9">Deductions</th>
                                         <th class="value_span9">EPC</th>
                                         <th class="value_span9">TOTAL</th>

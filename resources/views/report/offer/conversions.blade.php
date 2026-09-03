@@ -26,7 +26,7 @@
 			<th class="value_span9">Username</th>
 			<th class="value_span9">Clicks</th>
 			<th class="value_span9">Unique Clicks</th>
-			<th class="value_span9">Conversions</th>
+			<th class="value_span9">Sales</th>
 		</tr>
 		</thead>
 		<tbody>

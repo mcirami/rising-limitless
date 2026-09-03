@@ -5,8 +5,8 @@
     $canViewRevenue = \App\Support\PayoutVisibility::forCurrentUser();
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
-    $reportColumns = ['idrep' => 'Rep ID', 'user_name' => 'Rep', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];
-    if ($canViewRevenue) $reportColumns['Revenue'] = 'Sales Revenue';
+    $reportColumns = ['idrep' => 'Rep ID', 'user_name' => 'Rep', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Sales'];
+    if ($canViewRevenue) $reportColumns['Revenue'] = 'Pay';
     if ($canViewRevenue) $reportColumns += ['TOTAL' => 'Total'];
 @endphp
 @extends('report.template')

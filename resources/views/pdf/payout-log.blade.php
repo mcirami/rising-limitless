@@ -40,7 +40,7 @@
         <tr>
             <th class="value_span9">Payout Type</th>
             <th class="value_span9">Notes</th>
-            <th class="value_span9">Revenue</th>
+            <th class="value_span9">Pay</th>
             <th class="value_span9">Date Achieved</th>
         </tr>
         </thead>
@@ -62,8 +62,8 @@
             <th class="value_span9">Unique</th>
             <th class="value_span9">FreeSignUps</th>
             <th class="value_span9">Pending Conversions</th>
-            <th class="value_span9">Conversions</th>
-            <th class="value_span9">Revenue</th>
+            <th class="value_span9">Sales</th>
+            <th class="value_span9">Pay</th>
             <th class="value_span9">Deductions</th>
             <th class="value_span9">EPC</th>
             <th class="value_span9">Total</th>
@@ -95,8 +95,8 @@
             <th class="value_span9">Unique</th>
             <th class="value_span9">FreeSignUps</th>
             <th class="value_span9">Pending Conversions</th>
-            <th class="value_span9">Conversions</th>
-            <th class="value_span9">Revenue</th>
+            <th class="value_span9">Sales</th>
+            <th class="value_span9">Pay</th>
             <th class="value_span9">Deductions</th>
             <th class="value_span9">EPC</th>
             <th class="value_span9">Total</th>

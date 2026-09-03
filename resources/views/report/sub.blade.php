@@ -26,7 +26,7 @@
             <th class="value_span9">Sub</th>
             <th class="value_span9">Raw</th>
             <th class="value_span9">Unique</th>
-            <th class="value_span9">Conversions</th>
+            <th class="value_span9">Sales</th>
         </tr>
         </thead>
         <tbody>
