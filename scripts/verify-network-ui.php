@@ -251,37 +251,44 @@ context(1, '/report/affiliate?role=2', ['view_payouts']);
 $html = $view->make('report.employee', $reportData)->render();
 check(str_contains($html, 'role=2') && str_contains($html, 'Total Revenue'), 'Authorized admin role filter/revenue visibility lost');
 $offerRows = array_map(function ($row) {
-    $row['idoffer'] = $row['idrep']; $row['offer_name'] = $row['user_name'];
+    $row['idoffer'] = $row['idrep']; $row['offer_name'] = $row['user_name']; $row['Advertiser'] = $row['idrep'] === 'TOTAL' ? '' : 'ADV-CODE';
     unset($row['idrep'], $row['user_name']); return $row;
 }, $affiliateRows);
 $offerReporter = new class($offerRows) {
     public function __construct(private array $rows) {}
     public function fetchReport($from, $to): array { return $this->rows; }
 };
-$offerData = array_replace($reportData, ['reporter' => $offerReporter]);
+$reportOfferCountries = [17 => ['name' => 'Sample Rep', 'countries' => array_combine(['AU', 'AT', 'BE', 'CA', 'CH', 'DE', 'DK', 'ES', 'FI', 'FR', 'GB', 'IE', 'IT', 'LU', 'NL', 'NO', 'NZ', 'SE'], ['Australia', 'Austria', 'Belgium', 'Canada', 'Switzerland', 'Germany', 'Denmark', 'Spain', 'Finland', 'France', 'United Kingdom', 'Ireland', 'Italy', 'Luxembourg', 'Netherlands', 'Norway', 'New Zealand', 'Sweden']), 'source' => 'rules', 'mode' => 'allowed', 'note' => '']];
+$offerData = array_replace($reportData, ['reporter' => $offerReporter, 'offerCountries' => $reportOfferCountries]);
 context(2, '/report/offer');
 $html = $view->make('report.offer.admin', $offerData)->render();
 check(!str_contains($html, '$240.00') && !str_contains($html, 'Export Data'), 'Manager offer report exposed restricted controls/data');
 check(str_contains($html, '/report/offer/17/user-conversions'), 'Offer conversion drill-down missing');
+check(str_contains($html, 'data-report-field="Advertiser">Pay Code</th>') && str_contains($html, 'ADV-CODE'), 'Manager offer report is missing Pay Code');
+check(str_contains($html, '<span class="rl-country-label">Available GEOs</span>') && substr_count($html, 'data-geo-extra hidden') === 6 && str_contains($html, 'Show all 18'), 'Manager offer report GEO list is missing or not collapsed after 12 countries');
 file_put_contents($output . '/manager-offer-report.html', $html);
 context(1, '/report/offer', [Permissions::VIEW_PAYOUTS]);
-$adminAdvertiserRows = array_replace($offerRows, [0 => array_replace($offerRows[0], ['Advertiser' => 'ADV-CODE'])]);
-$adminAdvertiserReporter = new class($adminAdvertiserRows) {
+$adminAdvertiserReporter = new class($offerRows) {
     public function __construct(private array $rows) {}
     public function fetchReport($from, $to): array { return $this->rows; }
 };
 $html = $view->make('report.offer.admin', array_replace($offerData, ['reporter' => $adminAdvertiserReporter]))->render();
-check(str_contains($html, 'data-report-field="Advertiser"') && str_contains($html, 'ADV-CODE'), 'Permitted Admin offer report is missing Advertiser code');
+check(str_contains($html, 'data-report-field="Advertiser">Pay Code</th>') && str_contains($html, 'ADV-CODE'), 'Permitted Admin offer report is missing Pay Code');
 check(!str_contains($html, 'data-report-field="EPC"'), 'Permitted Admin offer report still shows EPC');
 context(0, '/report/offer');
 $html = $view->make('report.offer.admin', $offerData)->render();
-check(str_contains($html, 'data-report-field="EPC"') && !str_contains($html, 'data-report-field="Advertiser"'), 'God offer report lost EPC');
+check(str_contains($html, 'data-report-field="EPC"') && str_contains($html, 'data-report-field="Advertiser">Pay Code</th>'), 'God offer report lost EPC or Pay Code');
 context(3, '/report/offer');
 $html = $view->make('report.offer.affiliate', array_replace($offerData, ['report' => (object) ['bonuses' => []], 'yesterdayConversions' => 7, 'yesterdayDate' => 'Aug 31, 2026']))->render();
 check(!str_contains($html, '$240.00') && !str_contains($html, '>Revenue<') && !str_contains($html, '>EPC<') && !str_contains($html, '>Total<'), 'Agent report exposes payout columns or values');
+check(str_contains($html, 'data-report-field="Advertiser">Pay Code</th>') && str_contains($html, 'ADV-CODE') && str_contains($html, 'Show all 18'), 'Agent offer report is missing Pay Code or expandable GEOs');
 check(str_contains($html, '/user/42/17/conversions-by-country'), 'Agent report lost country drill-down');
 check(str_contains($html, "Yesterday's Conversions") && str_contains($html, '<strong>7</strong>') && str_contains($html, 'Aug 31, 2026'), 'Agent yesterday conversion metric missing');
 check(!str_contains($html, 'Pending Conversions'), 'Agent offer report still shows Pending Conversions');
+$offerControllerSource = file_get_contents($root . '/app/Http/Controllers/Report/OfferReportController.php');
+check(substr_count($offerControllerSource, 'addFilter(new Filters\\Advertiser())') === 2, 'Offer report Pay Code is not loaded for every report role');
+$offerJavascript = file_get_contents($root . '/public/js/network-offers.js');
+check(strpos($offerJavascript, "event.target.closest('[data-geo-toggle]')") < strpos($offerJavascript, 'if (!table) return;'), 'Offer Report GEO toggle is initialized after the Manage Offers-only guard');
 file_put_contents($output . '/agent-report.html', $html);
 
 $linkRequest = Request::create('/report/offer?d_from=2025-08-25&d_to=2025-08-31&dateSelect=7&adminLogin=1');

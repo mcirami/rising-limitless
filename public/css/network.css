@@ -315,6 +315,7 @@ body.rl-app .modal .btn-default:hover,body.rl-app .modal .btn-default:focus{back
 body.rl-app button.rl-geo-toggle{display:inline;width:auto;min-width:0;height:auto;align-self:center;margin:0 0 0 3px;padding:0!important;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;color:#3864a3;font:700 10px/20px Network,system-ui,sans-serif;text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:nowrap}
 body.rl-app button.rl-geo-toggle:hover,body.rl-app button.rl-geo-toggle:focus{background:transparent!important;color:var(--rl-accent)}
 .rl-advertiser-name{color:#3864a3;font-weight:700}
+.rl-performance-table [data-report-offer-cell]{min-width:260px}
 .rl-country-note{font-size:10px;color:var(--rl-muted);line-height:22px}
 :root[data-theme=dark] .rl-country-badge{color:#9cbfff;background:#293344;border-color:#354155}
 :root[data-theme=dark] body.rl-app button.rl-geo-toggle{color:#9cbfff}

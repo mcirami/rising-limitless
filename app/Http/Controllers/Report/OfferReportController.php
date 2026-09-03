@@ -53,10 +53,7 @@ class OfferReportController extends ReportController
         $reporter = new Reporter($repo);
 	    ['startDate' => $startDate, 'endDate' => $endDate, 'dateSelect' => $dateSelect] = $this->reportDateContext($dates);
 
-		$this->applyAdminStyleOfferFilters(
-			$reporter,
-			\App\Support\PayoutVisibility::forCurrentUser()
-		);
+		$this->applyAdminStyleOfferFilters($reporter);
 
         return view('report.offer.admin',
 		        compact('reporter', 'dates', 'startDate', 'endDate', 'dateSelect'));
@@ -150,18 +147,15 @@ class OfferReportController extends ReportController
 		return view('report.offer.conversions-by-country', compact('affiliateReport', 'offer'));
 	}
 
-	private function applyAdminStyleOfferFilters(Reporter $reporter, bool $includeAdvertiser = false): void {
+	private function applyAdminStyleOfferFilters(Reporter $reporter): void {
 		$reporter
 			->addFilter( new Filters\DeductionColumnFilter() )
 			->addFilter( new Filters\Total( self::OFFER_TOTAL_COLUMNS ) )
 			->addFilter( new Filters\EarningPerClick( 'UniqueClicks', 'Revenue' ) )
 			->addFilter( new Filters\DollarSign( [ 'Revenue', 'Deductions', 'EPC' ] ) )
 			->addFilter( new Filters\ClickLink( request() ) )
-			->addFilter( new Filters\ClickLink( request(), 'UniqueClicks', 'idoffer', '/offer/{id}/clicks', [ 'filter' => 'affiliate', 'unique' => 1 ] ) );
-
-		if ($includeAdvertiser) {
-			$reporter->addFilter(new Filters\Advertiser());
-		}
+			->addFilter( new Filters\ClickLink( request(), 'UniqueClicks', 'idoffer', '/offer/{id}/clicks', [ 'filter' => 'affiliate', 'unique' => 1 ] ) )
+			->addFilter(new Filters\Advertiser());
 	}
 
 	private function applyAffiliateOfferFilters(Reporter $reporter): void {
@@ -172,6 +166,7 @@ class OfferReportController extends ReportController
 				[ 'Revenue', 'Deductions' ]
 			) )
 			->addFilter( new Filters\EarningPerClick( 'UniqueClicks', 'Revenue' ) )
-			->addFilter( new Filters\DollarSign( [ 'Revenue', 'Deductions', 'EPC', 'TOTAL' ] ) );
+			->addFilter( new Filters\DollarSign( [ 'Revenue', 'Deductions', 'EPC', 'TOTAL' ] ) )
+			->addFilter(new Filters\Advertiser());
 	}
 }

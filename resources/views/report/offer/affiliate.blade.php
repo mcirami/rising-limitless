@@ -2,7 +2,8 @@
     $canViewRevenue = false;
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
-    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];
+    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Advertiser' => 'Pay Code', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];
+    $offerCountries = $offerCountries ?? \App\Support\OfferCountryBadges::forOffers(collect(array_slice($reportRows, 0, -1))->map(fn($row) => (object) ['idoffer' => $row['idoffer'], 'offer_name' => $row['offer_name']]));
 @endphp
 @extends('report.template')
 
@@ -22,18 +23,19 @@
 @endsection
 
 @section('table')
-    @include('report.partials.performance-table', ['reportCaption' => 'Your offer performance'])
+    @include('report.partials.offer-performance-table', ['reportCaption' => 'Your offer performance'])
 @endsection
 
 
 
 @section('footer')
+    <script src="{{ $webroot }}js/network-offers.js?v={{ filemtime(public_path('js/network-offers.js')) }}" defer></script>
     <script type="text/javascript">
 
         $(document).ready(function () {
             $('#mainTable').tablesorter(
                 {
-                    sortList: [[4, 1]],
+                    sortList: [[5, 1]],
                     widgets: ['staticRow'],
                 });
         });
