@@ -7,7 +7,7 @@
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
     $reportColumns = ['idrep' => 'Rep ID', 'user_name' => 'Rep', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Conversions'];
     if ($canViewRevenue) $reportColumns['Revenue'] = 'Sales Revenue';
-    if ($canViewRevenue) $reportColumns += ['EPC' => 'EPC', 'TOTAL' => 'Total'];
+    if ($canViewRevenue) $reportColumns += ['TOTAL' => 'Total'];
 @endphp
 @extends('report.template')
 @section('report-title', 'Affiliate Reports')

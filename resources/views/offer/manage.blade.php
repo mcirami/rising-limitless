@@ -53,11 +53,16 @@
         <div class="rl-table-scroll">
             <table class="table" id="mainTable">
                 <thead><tr>
-                    <th aria-sort="ascending"><button class="rl-sort" data-offer-sort="name">Offer ↕</button></th><th>Type</th>
+                    <th aria-sort="ascending">
+                        <button class="rl-sort" data-offer-sort="name">Offer ↕</button>
+                    </th>
+                    <th>Pay Code</th>
                     @if($showAccess)<th>Access</th>@endif
                     @if($isAgent)<th>Offer Link</th>@endif
-                    @if($showPayout)<th><button class="rl-sort" data-offer-sort="payout">Payout ↕</button></th>@endif
-                    <th>Advertiser</th><th>Status</th>
+                    @if($showPayout)
+                        <th><button class="rl-sort" data-offer-sort="payout">Payout ↕</button></th>
+                    @endif
+                    <th>Status</th>
                     @if(!$isAgent)<th><button class="rl-sort" data-offer-sort="created">Created ↕</button></th>@endif
                     @if($showActions)<th>Actions</th>@endif
                 </tr></thead>
@@ -75,11 +80,10 @@
                             <span class="rl-offer-name">{{ $countryInfo['name'] }}</span>
                             @include('offer.partials.country-meta', ['showOfferId' => false, 'countryLabel' => 'Available GEOs', 'agentLayout' => true])
                         </td>
-                        <td><span class="rl-badge is-type">{{ $typeNames[$offer->offer_type] ?? 'Other' }}</span></td>
+                        <td><span class="rl-advertiser-name">{{ $offer->campaign_name ?: '—' }}</span></td>
                         @if($showAccess)<td><a class="rl-button" href="{{ $contextUrl('/offer_access.php?id=' . $offer->idoffer) }}"><i class="fas fa-lock" aria-hidden="true"></i> Affiliate Access</a></td>@endif
                         @if($isAgent)<td><button type="button" class="rl-button" data-copy-text="{{ $trackingLink }}">Copy My Link</button></td>@endif
                         @if($showPayout)<td class="rl-money">${{ number_format($payout, 2) }}</td>@endif
-                        <td><span class="rl-advertiser-name">{{ $offer->campaign_name ?: '—' }}</span></td>
                         <td><span class="rl-badge {{ (int) $offer->status === 1 ? 'is-active' : 'is-inactive' }}">● {{ (int) $offer->status === 1 ? 'Active' : 'Inactive' }}</span></td>
                         @if(!$isAgent)<td class="rl-date">{{ substr((string) $offer->offer_timestamp, 0, 10) }}</td>@endif
                         @if($showActions)
