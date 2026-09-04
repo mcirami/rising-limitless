@@ -10,7 +10,7 @@ $dotEnv = Dotenv::createImmutable(__DIR__.'/..');
 $dotEnv->load();
 
 // set default timezone
-    date_default_timezone_set(env('TIMEZONE'));
+    date_default_timezone_set(env('TIMEZONE') ?: 'UTC');
 
 
     if (env('APP_DEBUG')) {

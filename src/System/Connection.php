@@ -79,9 +79,9 @@ class Connection
     public static function createConnectionWithSubDomain($SUB_DOMAIN, $forceLive = false)
     {
         if (!$forceLive) {
-            return new PDO( DB_TYPE . ":host=" . LOCALHOST . ";port=" . self::$port . ";dbname=" . $SUB_DOMAIN, DB_USERNAME, DB_PASSWORD);
+            return new PDO( DB_TYPE . ":host=" . LOCALHOST . ";port=" . self::$port . ";dbname=" . $SUB_DOMAIN, DB_USERNAME, DB_PASSWORD, DatabaseConnection::getOptions());
         } else {
-            return new PDO( DB_TYPE . ":host=" . self::$host . ";port=" . self::$port . ";dbname=" . $SUB_DOMAIN, DB_USERNAME, DB_PASSWORD);
+            return new PDO( DB_TYPE . ":host=" . self::$host . ";port=" . self::$port . ";dbname=" . $SUB_DOMAIN, DB_USERNAME, DB_PASSWORD, DatabaseConnection::getOptions());
         }
     }
 
