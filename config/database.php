@@ -51,6 +51,9 @@ return [
 			'prefix'    => '',
 			'strict'    => false,
 			'engine'    => null,
+			'options'   => extension_loaded('pdo_mysql') && env('DB_SSL', false) ? [
+				PDO::MYSQL_ATTR_SSL_CA => base_path('resources/certs/digitalocean-ca.crt'),
+			] : [],
 		],
 		
 		'master' => [
