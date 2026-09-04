@@ -58,16 +58,19 @@ return [
 		
 		'master' => [
 			'driver'    => 'mysql',
-			'host'      => env('MASTER_DB_HOST', '127.0.0.1'),
-			'port'      => env('MASTER_DB_PORT', '3306'),
-			'database'  => env('MASTER_DB_DATABASE', 'forge'),
-			'username'  => env('MASTER_DB_USERNAME', 'forge'),
-			'password'  => env('MASTER_DB_PASSWORD', ''),
+			'host'      => env('MASTER_DB_HOST') ?: env('DB_HOST', '127.0.0.1'),
+			'port'      => env('MASTER_DB_PORT') ?: env('DB_PORT', '3306'),
+			'database'  => env('MASTER_DB_DATABASE') ?: env('DB_DATABASE', 'forge'),
+			'username'  => env('MASTER_DB_USERNAME') ?: env('DB_USERNAME', 'forge'),
+			'password'  => env('MASTER_DB_PASSWORD') ?: env('DB_PASSWORD', ''),
 			'charset'   => 'utf8mb4',
 			'collation' => 'utf8mb4_unicode_ci',
 			'prefix'    => '',
 			'strict'    => false,
 			'engine'    => null,
+			'options'   => extension_loaded('pdo_mysql') && env('DB_SSL', false) ? [
+				PDO::MYSQL_ATTR_SSL_CA => base_path('resources/certs/digitalocean-ca.crt'),
+			] : [],
 		],
 		
 		'pgsql' => [
