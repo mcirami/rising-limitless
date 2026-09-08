@@ -19,14 +19,19 @@ class DBWhiteLabelService
 
     public $url;
 
+    private $database;
+
     public function __construct($url)
     {
         $this->url = $url;
+        $this->database = self::configuredDatabase();
     }
 
     public function changeDatabaseHostWithSubDomain()
     {
-        Config::set('database.connections.mysql.database', $this->subDomain ?: self::configuredDatabase());
+        // The tenant slug and physical database name are usually identical on
+        // legacy installs, but they can differ during a safe database cutover.
+        Config::set('database.connections.mysql.database', $this->database);
 
 
         //If you want to use query builder without having to specify the connection
