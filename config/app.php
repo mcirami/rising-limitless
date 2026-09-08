@@ -4,6 +4,8 @@ return [
 
     'network_name' => env('NETWORK_NAME', 'Rising Limitless'),
 
+    'company_subdomain' => env('COMPANY_SUBDOMAIN', env('DB_DATABASE')),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
