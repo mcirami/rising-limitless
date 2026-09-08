@@ -88,7 +88,14 @@ class Company
     //gets sub domain of current host
     static function getSub()
     {
-	    return config("app.company_subdomain", env("DB_DATABASE"));
+	    // This method is called by the legacy loader before Laravel's
+	    // configuration service has been bootstrapped. Read the values that
+	    // Dotenv has already loaded instead of resolving the config service.
+	    return $_ENV["COMPANY_SUBDOMAIN"]
+	        ?? $_SERVER["COMPANY_SUBDOMAIN"]
+	        ?? $_ENV["DB_DATABASE"]
+	        ?? $_SERVER["DB_DATABASE"]
+	        ?? null;
        /* $sub = explode(".", $_SERVER["HTTP_HOST"]);
 
 		if ($sub[0] === "www" || is_numeric($sub[0]) ) {
