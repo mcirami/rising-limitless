@@ -5,7 +5,12 @@
     $canViewRevenue = \App\Support\PayoutVisibility::forCurrentUser();
     $reportRows = $reporter->fetchReport($dates['startDate'], $dates['endDate']);
     $reportSummary = \App\Support\ReportSummary::fromTotalledReport($reportRows, $canViewRevenue);
-    $reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Advertiser' => 'Pay Code', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Sales'];
+    if ($userType === Privilege::ROLE_ADMIN || $userType === Privilege::ROLE_GOD) {
+		$reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Advertiser' => 'Pay Code', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Sales'];
+	} else {
+		$reportColumns = ['idoffer' => 'Offer ID', 'offer_name' => 'Offer Name', 'Clicks' => 'Raw', 'UniqueClicks' => 'Unique', 'Conversions' => 'Sales'];
+	}
+
     if ($canViewRevenue) {
         $reportColumns['Revenue'] = 'Pay';
         if ($userType !== Privilege::ROLE_ADMIN) $reportColumns['EPC'] = 'EPC';

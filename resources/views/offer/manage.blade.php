@@ -5,6 +5,8 @@
     $role = (int) $session::userType();
     $permissions = $session::permissions();
     $isAgent = $role === 3;
+	$isAdmin = $role === 1;
+	$isGod = $role === 0;
     $showActions = $role === 0;
     $showPayout = \App\Support\PayoutVisibility::forCurrentUser();
     $showAccess = !$isAgent && in_array($role, [0, 1]) && $permissions->can('edit_affiliates');
@@ -56,7 +58,9 @@
                     <th aria-sort="ascending">
                         <button class="rl-sort" data-offer-sort="name">Offer ↕</button>
                     </th>
-                    <th>Pay Code</th>
+                    @if($isAdmin || $isGod)
+                        <th>Pay Code</th>
+                    @endif
                     @if($showAccess)<th>Access</th>@endif
                     @if($isAgent)<th>Offer Link</th>@endif
                     @if($showPayout)
@@ -80,7 +84,7 @@
                             <span class="rl-offer-name">{{ $countryInfo['name'] }}</span>
                             @include('offer.partials.country-meta', ['showOfferId' => false, 'countryLabel' => 'Available GEOs', 'agentLayout' => true])
                         </td>
-                        <td><span class="rl-advertiser-name">{{ $offer->campaign_name ?: '—' }}</span></td>
+                        @if($isAdmin || $isGod)<td><span class="rl-advertiser-name">{{ $offer->campaign_name ?: '—' }}</span></td>@endif
                         @if($showAccess)<td><a class="rl-button" href="{{ $contextUrl('/offer_access.php?id=' . $offer->idoffer) }}"><i class="fas fa-lock" aria-hidden="true"></i> Affiliate Access</a></td>@endif
                         @if($isAgent)<td><button type="button" class="rl-button" data-copy-text="{{ $trackingLink }}">Copy My Link</button></td>@endif
                         @if($showPayout)<td class="rl-money">${{ number_format($payout, 2) }}</td>@endif
