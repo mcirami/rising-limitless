@@ -27,7 +27,7 @@
                 <div class="rl-account-grid">
                     <section class="rl-card">
                         <header class="rl-card-header"><h2><i class="fas fa-lock" aria-hidden="true"></i>Security</h2></header>
-                        <div class="rl-card-body"><div class="rl-security-row"><div><p>Password</p><strong aria-label="Password is hidden">••••••••••</strong></div><a class="rl-button" href="{{ $editUrl }}">Change</a></div><p class="rl-note">Keep your account secure with a strong, unique password.</p></div>
+                        <div class="rl-card-body"><div class="rl-security-row"><div><p>Password</p><strong aria-label="Password is hidden">••••••••••</strong></div><a class="rl-button" href="{{ $editUrl }}">Change</a></div><p class="rl-note">Keep your account secure with a strong, unique password.</p>@if((int) $userType === 0)<a class="rl-button" style="margin-top:14px" href="{{ route('two-factor.setup') }}">Google Authenticator</a>@endif</div>
                     </section>
                     <section class="rl-card">
                         <header class="rl-card-header"><h2><i class="fas fa-id-card" aria-hidden="true"></i>Network Access</h2></header>
