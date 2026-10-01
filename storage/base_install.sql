@@ -228,6 +228,7 @@ DROP TABLE IF EXISTS `click_geo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `click_geo` (
+  `_replication_id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `click_id` int unsigned NOT NULL,
   `iso_code` varchar(255) NOT NULL,
   `postal` varchar(255) NOT NULL,
@@ -254,6 +255,7 @@ DROP TABLE IF EXISTS `click_has_bonus`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `click_has_bonus` (
+  `_replication_id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `click_bonus_id` int NOT NULL,
   `click_id` int unsigned NOT NULL,
   KEY `FK_click_bonus_id` (`click_bonus_id`),
@@ -280,6 +282,7 @@ DROP TABLE IF EXISTS `click_vars`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `click_vars` (
+  `_replication_id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `click_id` int unsigned NOT NULL,
   `url` varchar(255) NOT NULL,
   `sub1` varchar(255) NOT NULL DEFAULT '',
@@ -881,6 +884,7 @@ DROP TABLE IF EXISTS `offer_caps`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `offer_caps` (
+  `_replication_id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `offer_idoffer` int unsigned NOT NULL,
   `type` int NOT NULL,
   `time_interval` int NOT NULL,
@@ -1100,6 +1104,7 @@ DROP TABLE IF EXISTS `referrals`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `referrals` (
+  `_replication_id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `referrer_user_id` int unsigned NOT NULL,
   `aff_id` int unsigned NOT NULL,
   `start_date` date NOT NULL,
@@ -1419,6 +1424,7 @@ DROP TABLE IF EXISTS `user_has_bonus`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user_has_bonus` (
+  `_replication_id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `bonus_id` int NOT NULL,
   `user_id` int unsigned NOT NULL,
   KEY `FK_bonus` (`bonus_id`),
@@ -1445,6 +1451,7 @@ DROP TABLE IF EXISTS `user_has_notification`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user_has_notification` (
+  `_replication_id` bigint unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `notification_id` int unsigned NOT NULL,
   `user_id` int unsigned NOT NULL,
   `seen` tinyint NOT NULL DEFAULT '0',
