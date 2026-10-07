@@ -21,7 +21,7 @@ final class OfferFlowRouter
         $country = strtoupper(trim($country ?? ''));
         $skipped = [];
         foreach ($steps as $index => $step) {
-            if (in_array($country, $step['countries'], true)) {
+            if (!empty($step['allow_all_countries']) || in_array($country, $step['countries'], true)) {
                 return ['offer_id' => (int) $step['offer_id'], 'position' => $index + 1, 'skipped' => $skipped, 'fallback' => false];
             }
             $skipped[] = $index + 1;

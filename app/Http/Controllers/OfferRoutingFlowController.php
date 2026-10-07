@@ -78,7 +78,8 @@ class OfferRoutingFlowController extends Controller
         $rules = [
             'steps' => ['required', 'array', 'min:1', 'max:50'],
             'steps.*.offer_id' => ['required', 'integer', 'distinct', $offer()],
-            'steps.*.countries' => ['required', 'array', 'min:1', 'max:250'],
+            'steps.*.allow_all_countries' => ['sometimes', 'boolean'],
+            'steps.*.countries' => ['sometimes', 'array', 'max:250'],
             'steps.*.countries.*' => ['required', 'string', Rule::in(array_keys(Geo::$countries))],
             'fallback_offer_id' => ['required', 'integer', $offer()],
         ];
@@ -90,11 +91,18 @@ class OfferRoutingFlowController extends Controller
             ];
         }
         $data = $request->validate($rules);
+        foreach ($data['steps'] as $index => $step) {
+            if (empty($step['allow_all_countries']) && empty($step['countries'])) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    "steps.$index.countries" => 'Choose at least one country or enable Allow all countries.',
+                ]);
+            }
+        }
         // Store only the supported fields, even when a client supplies extra step keys.
         $data['steps'] = array_map(fn ($step) => [
             'offer_id' => (int) $step['offer_id'],
-            'countries' => array_values(array_unique($step['countries'])),
-        ], array_values($data['steps']));
+            'countries' => !empty($step['allow_all_countries']) ? [] : array_values(array_unique($step['countries'])),
+        ] + (!empty($step['allow_all_countries']) ? ['allow_all_countries' => true] : []), array_values($data['steps']));
         return $data;
     }
 }

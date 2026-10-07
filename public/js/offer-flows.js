@@ -33,14 +33,19 @@
     function updateRows() {
         const seen = new Set();
         const warnings = [];
+        let catchAll = null;
         rows().forEach((row, index) => {
             row.querySelector('[data-position]').textContent = 'Offer ' + (index + 1);
             row.querySelector('[data-up]').disabled = index === 0;
             row.querySelector('[data-down]').disabled = index === rows().length - 1;
-            const overlaps = codes(row.querySelector('[data-codes]').value).filter(c => seen.has(c));
+            if (catchAll !== null) warnings.push('Offer ' + (index + 1) + ' is unreachable: offer ' + catchAll + ' allows all countries.');
+            if (row.querySelector('[data-allow-all]').checked && catchAll === null) catchAll = index + 1;
+            const rowCodes = row.querySelector('[data-allow-all]').checked ? [] : codes(row.querySelector('[data-codes]').value);
+            const overlaps = rowCodes.filter(c => seen.has(c));
             if (overlaps.length) warnings.push('Offer ' + (index + 1) + ': ' + overlaps.join(', ') + ' already match an earlier offer.');
-            codes(row.querySelector('[data-codes]').value).forEach(c => seen.add(c));
+            rowCodes.forEach(c => seen.add(c));
         });
+        if (catchAll !== null) warnings.push('The final fallback is unused because offer ' + catchAll + ' allows all countries.');
         form.querySelector('[data-overlap]').textContent = warnings.join(' ');
     }
     function updateCountries(row) {
@@ -70,6 +75,16 @@
         setupOffer(input, step.offer_id);
         const countryInput = row.querySelector('[data-codes]');
         countryInput.value = (step.countries || []).join(', ');
+        const allowAll = row.querySelector('[data-allow-all]');
+        allowAll.checked = step.allow_all_countries === true || step.allow_all_countries === 1 || step.allow_all_countries === '1';
+        function toggleAll() {
+            const controls = row.querySelector('[data-country-controls]');
+            controls.hidden = allowAll.checked;
+            controls.querySelectorAll('input, textarea, select, button').forEach(control => { control.disabled = allowAll.checked; });
+            countryInput.required = !allowAll.checked;
+            updateRows();
+        }
+        allowAll.addEventListener('change', toggleAll);
         countryInput.addEventListener('input', () => updateCountries(row));
         const picker = row.querySelector('[data-country-picker]');
         picker.parentElement.className = 'country-picker-label';
@@ -106,7 +121,7 @@
             }
         });
         row.addEventListener('dragend', () => { row.classList.remove('is-dragging'); dragged = null; });
-        container.append(row); updateCountries(row);
+        container.append(row); updateCountries(row); toggleAll();
     }
     (data.steps.length ? data.steps : [{}]).forEach(addStep);
     form.querySelector('[data-add-step]').addEventListener('click', () => { if (rows().length < 50) { addStep(); dirty(); rows().at(-1).querySelector('input').focus(); } });
@@ -114,7 +129,7 @@
     form.addEventListener('change', dirty);
     function payload() {
         return {
-            steps: rows().map(row => ({ offer_id: validateOffer(row.querySelector('[data-offer]')), countries: codes(row.querySelector('[data-codes]').value) })),
+            steps: rows().map(row => ({ offer_id: validateOffer(row.querySelector('[data-offer]')), countries: row.querySelector('[data-allow-all]').checked ? [] : codes(row.querySelector('[data-codes]').value), allow_all_countries: row.querySelector('[data-allow-all]').checked })),
             fallback_offer_id: validateOffer(fallback)
         };
     }
@@ -129,6 +144,7 @@
         function hidden(name, value) { const input = document.createElement('input'); input.type = 'hidden'; input.name = name; input.value = value; fields.append(input); }
         values.steps.forEach((step, index) => {
             hidden('steps[' + index + '][offer_id]', step.offer_id);
+            hidden('steps[' + index + '][allow_all_countries]', step.allow_all_countries ? '1' : '0');
             step.countries.forEach(c => hidden('steps[' + index + '][countries][]', c));
         });
     });

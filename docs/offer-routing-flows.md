@@ -10,10 +10,16 @@ with the existing Edit Offer Rules permission.
 4. Test countries using the current unsaved edits, then enable and save.
 5. Duplicate the flow to build other sequences. Copies start disabled and unassigned.
 
-Country codes can be typed with commas, spaces or slashes, or added using the
+Country codes can be pasted with commas, spaces, tabs, line breaks or slashes, or added using the
 country picker. UK is normalized to GB by the editor. Suggestions extract complete
 country-only segments after separators in offer names; review them before saving.
 Repeated countries are allowed: the first row containing the country wins.
+Each row also has an **Allow all countries** toggle. It catches every remaining
+click, including unknown locations, and makes later rows and the final fallback
+unreachable. The editor warns about those later rows. Turning the toggle off
+before saving restores the country text entered in that editing session. Saved
+allow-all rows store the flag and an empty list, so they cover new countries too.
+This is stored in the existing steps JSON and requires no additional migration.
 Drag handles and up/down buttons reorder rows, including their country lists.
 
 ## Runtime behavior

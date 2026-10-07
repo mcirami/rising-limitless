@@ -56,6 +56,26 @@ foreach ([['entry_offer_id'=>1], ['entry_offer_id'=>6,'fallback_offer_id'=>7], [
     catch (Illuminate\Validation\ValidationException $e) {checkFlow(true,'Rejected invalid flow');}
 }
 checkFlow(OfferRoutingFlow::count()===1,'Invalid saves changed storage');
+$allSteps = [$steps[0], ['offer_id'=>2, 'countries'=>[], 'allow_all_countries'=>true], $steps[2]];
+foreach (['AU','CA','UNKNOWN','',null] as $country) {
+    checkFlow(OfferFlowRouter::resolve($allSteps,5,$country)['offer_id']===2,'Allow-all failed to catch country/unknown location');
+}
+checkFlow(OfferFlowRouter::resolve($allSteps,5,'AT')['offer_id']===1,'Allow-all displaced an earlier match');
+$allPayload=array_replace($payload,['steps'=>$allSteps]);
+$controller->update(flowRequest($allPayload,'PUT'),$flow);
+checkFlow($flow->fresh()->steps[1]['allow_all_countries']===true,'Allow-all flag not persisted');
+$allPreview=$controller->preview(flowRequest(['steps'=>$allSteps,'fallback_offer_id'=>5,'country'=>'UNKNOWN']))->getData(true);
+checkFlow($allPreview['offer_id']===2 && !$allPreview['fallback'],'Allow-all preview differs from runtime');
+// HTML omits countries when its controls are disabled, unlike JSON's empty array.
+$withoutCountries=[['offer_id'=>2,'allow_all_countries'=>'1']];
+$controller->update(flowRequest(array_replace($payload,['steps'=>$withoutCountries]),'PUT'),$flow);
+checkFlow($flow->fresh()->steps===[['offer_id'=>2,'countries'=>[],'allow_all_countries'=>true]],'HTML allow-all submission failed');
+foreach ([['offer_id'=>2,'countries'=>[],'allow_all_countries'=>false],['offer_id'=>2],['offer_id'=>2,'allow_all_countries'=>'yes']] as $invalidStep) {
+    try {$controller->preview(flowRequest(['steps'=>[$invalidStep],'fallback_offer_id'=>5,'country'=>'AT']));checkFlow(false,'Empty or invalid country selection accepted');}
+    catch (Illuminate\Validation\ValidationException $e) {checkFlow(true,'Invalid country selection rejected');}
+}
+$controller->update(flowRequest($payload,'PUT'),$flow);
+
 $controller->duplicate($flow);
 $copy=OfferRoutingFlow::orderByDesc('id')->first();
 checkFlow(!$copy->is_active && $copy->entry_offer_id===null && $copy->steps===$steps,'Duplicate must be independent, unassigned and disabled');
