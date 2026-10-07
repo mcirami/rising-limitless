@@ -9,7 +9,7 @@
 <select onchange="handleSelect(this);" class="selectBox " id="role" name="role" aria-label="Filter by account type">
 
 
-    @if(\LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_GOD)
+    @if(\LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_GOD || ($showAdmins ?? false))
         <option @if(request('role',3) == 1) selected @endif value='1'>Admins
         </option>
     @endif

@@ -11,7 +11,7 @@
     <section class="rl-card">
         <div class="rl-toolbar">
             <label class="rl-search"><i class="fas fa-search" aria-hidden="true"></i><input id="searchBox" type="search" placeholder="Search users, email, ID…" aria-label="Search users"></label>
-            <div class="rl-toolbar-end">@include('report.options.user-type') @include('report.options.active')</div>
+            <div class="rl-toolbar-end">@include('report.options.user-type', ['showAdmins' => (int) \LeadMax\TrackYourStats\System\Session::userType() === \App\Privilege::ROLE_ADMIN && $permissions->can(\LeadMax\TrackYourStats\User\Permissions::VIEW_ALL_USERS)]) @include('report.options.active')</div>
         </div>
         <div class="rl-table-scroll">
             <table class="table table_01 manage_user_table" id="mainTable">
