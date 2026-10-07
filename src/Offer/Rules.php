@@ -31,12 +31,15 @@ class Rules
     
     public $ip;
 
-    function __construct($offid, $ip = null)
+    private bool $skipGeo = false;
+
+    function __construct($offid, $ip = null, bool $skipGeo = false)
     {
         // set our offer id
         $this->offid = $offid;
 
         $this->ip = $ip;
+        $this->skipGeo = $skipGeo;
 
         // find all rules associated with that offer
         $this->getRules();
@@ -236,10 +239,12 @@ class Rules
     private function addAllRules()
     {
         // none unique
-        $this->addToList(new NoneUnique($this->rules));
+        $this->addToList(new NoneUnique($this->rules, $this->offid));
 
         // geo
-        $this->addToList(new Geo($this->rules));
+        if (!$this->skipGeo) {
+            $this->addToList(new Geo($this->rules));
+        }
 
         // device
         $this->addToList(new Device($this->rules));

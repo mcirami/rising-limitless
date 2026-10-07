@@ -35,6 +35,9 @@ $selectedOffer = \LeadMax\TrackYourStats\Offer\Offer::selectOneQuery($offid)->fe
 
 $rules = new \LeadMax\TrackYourStats\Offer\Rules($offid);
 
+$routingFlow = \Illuminate\Support\Facades\Schema::hasTable('offer_routing_flows')
+    ? \App\OfferRoutingFlow::where('entry_offer_id', $offid)->first() : null;
+
 $offerView = new \LeadMax\TrackYourStats\Offer\View(\LeadMax\TrackYourStats\System\Session::userType());
 
 $activeCap = false;
@@ -454,6 +457,12 @@ foreach ($rules->rules as $rule) {
 					<p>
 						
 						<label class = "form-group">Rules</label>
+                        <?php if (\LeadMax\TrackYourStats\System\Session::userType() == \App\Privilege::ROLE_GOD): ?>
+                            <a class="btn btn-default btn-sm" href="/offer/routing-flows">Offer Routing Flows</a>
+                            <?php if ($routingFlow): ?>
+                                <span>This offer starts flow <a href="<?= route('offer-flows.edit', $routingFlow) ?>"><?= htmlspecialchars($routingFlow->name, ENT_QUOTES, 'UTF-8') ?></a> (<?= $routingFlow->is_active ? 'active — flow countries replace GEO rules for this traffic' : 'paused' ?>).</span>
+                            <?php endif; ?>
+                        <?php endif; ?>
 						<!-- Geo Modal trigger modal -->
 						<button type = "button" class = "btn btn-default btn-sm " data-toggle = "modal"
 								data-target = "#geoModal">

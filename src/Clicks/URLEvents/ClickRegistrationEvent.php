@@ -36,6 +36,8 @@ class ClickRegistrationEvent extends URLEvent
 
     public $ip;
 
+    private bool $countryFlowApplied = false;
+
 	//public $country;
 
     public function __construct($user_id, $offer_id, $sub_variables_array, $ip)
@@ -54,11 +56,34 @@ class ClickRegistrationEvent extends URLEvent
 
     public function fire()
     {
+        if (!$this->applyCountryFlow()) {
+            return false;
+        }
         if ($this->registerClick()) {
             $this->sendUserToOffer();
         }
 
 	    return false;
+    }
+
+    private function applyCountryFlow(): bool
+    {
+        $flow = \App\Support\OfferFlowRouter::forEntry((int) $this->offerId);
+        if (!$flow) return true;
+
+        // Validate entry access before resolving; destination access is checked again during registration.
+        $this->getOfferDataFromDatabase($this->offerId);
+        if (!$this->offerData || !$this->offerData->status || !$this->validateUser()) return false;
+
+        $geo = ClickGeo::findGeo($this->ip);
+        $result = \App\Support\OfferFlowRouter::resolve($flow->steps, (int) $flow->fallback_offer_id, $geo['isoCode'] ?? null);
+        $this->offerId = $result['offer_id'];
+        $this->getOfferDataFromDatabase($this->offerId);
+        if (!$this->offerData || !$this->offerData->status || !$this->validateUser()) return false;
+        $this->subVarArray['offerid'] = $this->offerId;
+        $this->countryFlowApplied = true;
+        // Resolve once: a destination's own entry-flow assignment is never followed.
+        return true;
     }
 
     private function getClickType()
@@ -221,7 +246,7 @@ class ClickRegistrationEvent extends URLEvent
 
 	private function checkOfferRules()
     {
-        $rules = new Rules($this->offerId, $this->ip);
+        $rules = new Rules($this->offerId, $this->ip, $this->countryFlowApplied);
 
         if ($rules->checkAllRules()) {
             return true;

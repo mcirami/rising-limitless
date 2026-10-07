@@ -76,6 +76,11 @@ class NavBar
             "Manage Offers" => [
                 'url' => '/offer/manage',
             ],
+            'Offer Routing Flows' => [
+                'url' => '/offer/routing-flows',
+                'required_permissions' => [Permissions::EDIT_OFFER_RULES],
+                'required_user_types' => [\App\Privilege::ROLE_GOD],
+            ],
 
             'Create Offers' => [
                 'url' => '/offer_add.php',

@@ -152,6 +152,16 @@ Route::group(['middleware' => 'legacy.auth'], function () {
         });
     });
     Route::group(['prefix' => 'offer'], function () {
+        Route::middleware(['role:0', 'permissions:' . Permissions::EDIT_OFFER_RULES])->group(function () {
+            Route::get('routing-flows', [\App\Http\Controllers\OfferRoutingFlowController::class, 'index'])->name('offer-flows.index');
+            Route::get('routing-flows/create', [\App\Http\Controllers\OfferRoutingFlowController::class, 'create'])->name('offer-flows.create');
+            Route::post('routing-flows', [\App\Http\Controllers\OfferRoutingFlowController::class, 'store'])->name('offer-flows.store');
+            Route::post('routing-flows/preview', [\App\Http\Controllers\OfferRoutingFlowController::class, 'preview'])->name('offer-flows.preview');
+            Route::get('routing-flows/{flow}/edit', [\App\Http\Controllers\OfferRoutingFlowController::class, 'edit'])->name('offer-flows.edit');
+            Route::put('routing-flows/{flow}', [\App\Http\Controllers\OfferRoutingFlowController::class, 'update'])->name('offer-flows.update');
+            Route::post('routing-flows/{flow}/duplicate', [\App\Http\Controllers\OfferRoutingFlowController::class, 'duplicate'])->name('offer-flows.duplicate');
+            Route::delete('routing-flows/{flow}', [\App\Http\Controllers\OfferRoutingFlowController::class, 'destroy'])->name('offer-flows.destroy');
+        });
         Route::get('manage', [OfferController::class, 'showManage']);
         Route::get('{id}/request', [OfferController::class, 'requestOffer'])->middleware('role:3');
         Route::group(['middleware' => 'role:0'], function () {

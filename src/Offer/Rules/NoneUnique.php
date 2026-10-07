@@ -26,9 +26,12 @@ class NoneUnique implements Rule
 
     private $hashId;
 
-    public function __construct($rules)
+    private $offerId;
+
+    public function __construct($rules, $offerId = null)
     {
         $this->rules = $rules;
+        $this->offerId = $offerId;
 
         $this->filterRules();
 
@@ -41,7 +44,7 @@ class NoneUnique implements Rule
     {
 
 
-        $offerLogCookie = new Cookie($_GET["repid"], $_GET["offerid"]);
+        $offerLogCookie = new Cookie($_GET["repid"], $this->offerId ?? $_GET["offerid"]);
 
         if ($offerLogCookie->isUnique()) {
             return true;

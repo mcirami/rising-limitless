@@ -400,7 +400,7 @@ class RepHasOffer
     public static function doesAffiliateOwnOffer($userId, $offerId)
     {
         $db = DatabaseConnection::getInstance();
-        $sql = "SELECT * FROM rep_has_offer WHERE rep_idrep = :user_id AND offer_idoffer = :offer_id";
+        $sql = "SELECT 1 FROM rep_has_offer WHERE rep_idrep = :user_id AND offer_idoffer = :offer_id LIMIT 1";
         $prep = $db->prepare($sql);
 
         $prep->bindParam(":user_id", $userId);
@@ -409,7 +409,7 @@ class RepHasOffer
         $prep->execute();
 
 
-        return ($prep->rowCount() > 0);
+        return $prep->fetchColumn() !== false;
     }
 
 
@@ -904,5 +904,3 @@ class RepHasOffer
 
 
 } // end class
-
-    
