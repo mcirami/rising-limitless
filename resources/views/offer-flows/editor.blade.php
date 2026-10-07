@@ -5,6 +5,12 @@
     <nav class="rl-inline-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('offer-flows.index') }}">Offer Routing Flows</a><span aria-hidden="true">›</span><span>{{ $flow->exists ? 'Edit flow' : 'New flow' }}</span></nav>
     <div class="rl-page-heading"><div><h1>{{ $flow->exists ? $flow->name : 'New routing flow' }}</h1><p>Work down the list until the click’s country matches an offer.</p></div></div>
     @if(session('flow_saved'))<div class="rl-settings-message" role="status">{{ session('flow_saved') }}</div>@endif
+    @if(session('flow_rule_skips'))
+        <div class="rl-form-errors" role="alert"><strong>Some individual offer rules were skipped.</strong>
+            <p>Those offers keep their existing rules, so their direct-click routing may differ from this flow.</p>
+            <ul>@foreach(session('flow_rule_skips') as $offerId => $reasons)<li><a href="/offer_edit_rules.php?offid={{ $offerId }}">Offer #{{ $offerId }} — review rules</a>: {{ implode(' ', $reasons) }}</li>@endforeach</ul>
+        </div>
+    @endif
     @if($errors->any())<div class="rl-form-errors" role="alert"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     <form id="flow-form" method="post" action="{{ $flow->exists ? route('offer-flows.update', $flow) : route('offer-flows.store') }}">
         @csrf @if($flow->exists) @method('PUT') @endif
@@ -33,7 +39,7 @@
             <p>Use <strong>Save flow &amp; create offer rules</strong> to create a GEO rule under each offer: allow its selected countries, otherwise redirect to the next offer. The last offer redirects to the final fallback. This also works for flows you saved previously.</p>
             <p class="help-block">These rules are active for all direct traffic to each offer, even when this flow is paused. “Allow all countries” creates a rule that accepts unknown locations too. Generating again updates this flow’s rules and removes its generated rules for rows you removed. Normal Save flow does not change individual rules. Deleting the flow leaves its individual rules in place.</p>
             <label class="flow-toggle"><input type="checkbox" name="replace_geo_rules" value="1" @checked(old('replace_geo_rules'))> Deactivate existing GEO rules on these offers</label>
-            <p class="help-block">Exact active matches are kept, even when this box is checked. Matching compares allowed countries, redirect offer and caps—not the rule name. Only different manual GEO rules are deactivated. Different rules from another flow cannot be overwritten. New rules are named by their allowed countries.</p>
+            <p class="help-block">Exact active matches are kept, even when this box is checked. Matching compares allowed countries, redirect offer and caps—not the rule name. Only different manual GEO rules are deactivated. Offers with different existing rules are skipped and reported while the other offers are processed. Different rules from another flow cannot be overwritten. New rules are named by their allowed countries.</p>
             @if(isset($generatedRules) && $generatedRules->isNotEmpty())
                 <h3>Previously generated rules</h3>
                 <p class="help-block">These are the last generated rules. Use the create offer rules button to apply your current edits.</p>

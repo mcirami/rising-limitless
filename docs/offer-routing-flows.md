@@ -100,14 +100,14 @@ rules** checked. Matching compares the country set (ignoring order and duplicate
 entries), allow/deny mode, redirect destination, active status, and enabled caps;
 names do not determine a match. Pre-existing matches keep their ID, name, country
 records and ownership, including matches belonging to another flow. Other steps
-continue publishing. Different active manual GEO rules block publication unless
+continue publishing. Offers with different active manual GEO rules are skipped unless
 **Deactivate existing GEO rules** is checked. That option disables only different
 manual GEO rules; exact matches, device and repeat-click rules are preserved.
-Different rules belonging to another flow cannot be overwritten.
+Offers with different rules belonging to another flow are also skipped. The flow and all other eligible offers are saved; the result lists skipped offer IDs with links to their rules. Skipped offers retain their existing direct-click behavior, which may differ from the flow.
 New and flow-owned rules are named by sorted allowed codes (for example `AU ES FR`)
 or `All countries`. Very long lists use a country-count suffix to fit the database
 name limit; the complete allowed-country list is still saved. Re-publishing also
-refreshes names on flow-owned matches without rebuilding their country records. All changes, including the flow save, roll back on a conflict.
+refreshes names on flow-owned matches without rebuilding their country records. Redirect loops and validation failures still roll back the transaction. Loop detection includes the retained rules on skipped offers.
 Choose a fallback outside the step list. Publication also rejects reachable
 cycles through existing active GEO redirects (conservatively, without assuming
 country lists make a cycle impossible).

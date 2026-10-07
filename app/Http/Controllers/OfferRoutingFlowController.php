@@ -55,16 +55,17 @@ class OfferRoutingFlowController extends Controller
     {
         $data = $this->validated($request, $flow->exists ? $flow : null);
         $request->validate(['create_offer_rules' => ['sometimes', 'boolean'], 'replace_geo_rules' => ['sometimes', 'boolean']]);
-        DB::transaction(function () use ($request, $flow, $data) {
+        $skipped = [];
+        DB::transaction(function () use ($request, $flow, $data, &$skipped) {
             if ($flow->exists) OfferRoutingFlow::whereKey($flow->id)->lockForUpdate()->firstOrFail();
             $flow->fill($data)->save();
             if ($request->boolean('create_offer_rules')) {
-                OfferFlowRulePublisher::publish($flow, $request->boolean('replace_geo_rules'));
+                $skipped = OfferFlowRulePublisher::publish($flow, $request->boolean('replace_geo_rules'));
             }
         });
         return redirect()->route('offer-flows.edit', $flow)->with('flow_saved', $request->boolean('create_offer_rules')
-            ? 'Flow saved and individual offer GEO rules created or updated. These rules are active for direct offer traffic.'
-            : 'Flow saved. Individual offer rules were not changed.');
+            ? ($skipped ? 'Flow saved. Offer rules were processed except for the offers listed below.' : 'Flow saved and individual offer GEO rules created or updated. These rules are active for direct offer traffic.')
+            : 'Flow saved. Individual offer rules were not changed.')->with('flow_rule_skips', $skipped);
     }
 
     public function duplicate(OfferRoutingFlow $flow)
