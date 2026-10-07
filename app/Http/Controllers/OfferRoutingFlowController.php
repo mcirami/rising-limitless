@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Offer;
 use App\OfferRoutingFlow;
 use App\Support\OfferFlowRouter;
+use App\Support\OfferFlowRulePublisher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use LeadMax\TrackYourStats\Offer\Rules\Geo;
 
@@ -32,19 +35,36 @@ class OfferRoutingFlowController extends Controller
             'flow' => $flow,
             'offers' => Offer::orderBy('offer_name')->get(['idoffer', 'offer_name', 'status']),
             'countries' => Geo::$countries,
+            'generatedRules' => $flow->exists && Schema::hasColumn('rule', 'routing_flow_id')
+                ? DB::table('rule')->where('routing_flow_id', $flow->id)->orderBy('offer_idoffer')->get()
+                : collect(),
         ]);
     }
 
     public function store(Request $request)
     {
-        $flow = OfferRoutingFlow::create($this->validated($request));
-        return redirect()->route('offer-flows.edit', $flow)->with('flow_saved', 'Flow saved.');
+        return $this->save($request, new OfferRoutingFlow());
     }
 
     public function update(Request $request, OfferRoutingFlow $flow)
     {
-        $flow->update($this->validated($request, $flow));
-        return redirect()->route('offer-flows.edit', $flow)->with('flow_saved', 'Flow saved.');
+        return $this->save($request, $flow);
+    }
+
+    private function save(Request $request, OfferRoutingFlow $flow)
+    {
+        $data = $this->validated($request, $flow->exists ? $flow : null);
+        $request->validate(['create_offer_rules' => ['sometimes', 'boolean'], 'replace_geo_rules' => ['sometimes', 'boolean']]);
+        DB::transaction(function () use ($request, $flow, $data) {
+            if ($flow->exists) OfferRoutingFlow::whereKey($flow->id)->lockForUpdate()->firstOrFail();
+            $flow->fill($data)->save();
+            if ($request->boolean('create_offer_rules')) {
+                OfferFlowRulePublisher::publish($flow, $request->boolean('replace_geo_rules'));
+            }
+        });
+        return redirect()->route('offer-flows.edit', $flow)->with('flow_saved', $request->boolean('create_offer_rules')
+            ? 'Flow saved and individual offer GEO rules created or updated. These rules are active for direct offer traffic.'
+            : 'Flow saved. Individual offer rules were not changed.');
     }
 
     public function duplicate(OfferRoutingFlow $flow)
@@ -59,8 +79,14 @@ class OfferRoutingFlowController extends Controller
 
     public function destroy(OfferRoutingFlow $flow)
     {
-        $flow->delete();
-        return redirect()->route('offer-flows.index')->with('flow_saved', 'Flow deleted. Its entry offer now uses its existing rules.');
+        DB::transaction(function () use ($flow) {
+            OfferRoutingFlow::whereKey($flow->id)->lockForUpdate()->firstOrFail();
+            if (Schema::hasColumn('rule', 'routing_flow_id')) {
+                DB::table('rule')->where('routing_flow_id', $flow->id)->update(['routing_flow_id' => null]);
+            }
+            $flow->delete();
+        });
+        return redirect()->route('offer-flows.index')->with('flow_saved', 'Flow deleted. Any generated offer rules remain active and can be managed under their offers.');
     }
 
     public function preview(Request $request)

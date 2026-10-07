@@ -78,3 +78,47 @@ The configured `risinglimitless.test` app/Docker stack was unavailable during th
 change, so its database migration and a full live click were not executed.
 The broader existing `verify-network-ui.php` suite stops at its uploaded-sidebar-
 logo fixture assertion in this checkout, before testing the new feature.
+
+## Generate individual offer GEO rules
+
+Use **Save flow & create offer rules** in a new or existing flow. This saves the
+current edits and publishes an active GEO allow-list under every step's offer.
+Each rule redirects to the next step if the country does not match; the final
+step redirects to the flow's final fallback. The fallback itself is not modified.
+The editor lists previously generated rules with links to each offer's rules page.
+
+This is an explicit publication, not automatic synchronization: **Save flow**
+only changes the flow. Re-publishing updates the same rule IDs, replaces their
+country lists and redirects, and removes generated rules for removed steps.
+Deleted individual rules are recreated on the next publication. Generated rules
+apply to all direct traffic to those offers, even if the source flow is paused.
+Deleting the source flow retains those rules as independently managed rules.
+Duplicating a flow does not copy ownership of its generated rules.
+
+Existing active GEO rules block publication unless **Deactivate existing GEO
+rules** is checked. That option disables and preserves manual GEO rules; device
+and repeat-click rules are untouched. Another flow's generated rules cannot be
+overwritten. All changes, including the flow save, roll back on a conflict.
+Choose a fallback outside the step list. Publication also rejects reachable
+cycles through existing active GEO redirects (conservatively, without assuming
+country lists make a cycle impossible).
+
+An all-country step publishes an allow rule using the `ALL` country marker,
+which the legacy GEO checker accepts for every location, including unknown ones.
+This avoids enumerating the country catalog. Its configured next-offer redirect
+is present for consistency but is never used by that GEO rule. Caps and non-GEO
+rules continue their usual behavior.
+
+Apply this additional migration before using generation:
+
+```sh
+php artisan migrate --path=database/migrations/2026_10_07_000002_add_routing_flow_id_to_rules.php
+```
+
+It adds a nullable indexed ownership column to `rule`; existing rules are left
+unowned. Normal flow saves and tracking remain usable before this migration.
+Test generation, update, conflict handling and lifecycle using:
+
+```sh
+php scripts/verify-flow-offer-rules.php
+```

@@ -347,6 +347,10 @@ class Geo implements Rule
 
         foreach ($this->filteredRules as $rule) {
 
+            if ($rule['deny'] == 0 && in_array('ALL', $rule['country_list'], true)) {
+                return true;
+            }
+
             // if the rule is to not allow these countries
             if ($rule["deny"] == 1) {
                 foreach ($rule["country_list"] as $country_code) {
